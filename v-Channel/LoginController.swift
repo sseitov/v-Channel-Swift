@@ -10,6 +10,11 @@ import UIKit
 import SVProgressHUD
 import Firebase
 
+protocol LoginControllerDelegate {
+    func didLogin()
+    func didLogout()
+}
+
 class LoginController: UIViewController, TextFieldContainerDelegate {
 
     @IBOutlet weak var userField: TextFieldContainer!
@@ -17,9 +22,11 @@ class LoginController: UIViewController, TextFieldContainerDelegate {
     @IBOutlet weak var signInButton: UIButton!
     @IBOutlet weak var signUpButton: UIButton!
     
+    var delegate:LoginControllerDelegate?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupTitle("Login")
+        setupTitle("Sign In")
         
         userField.textType = .emailAddress
         userField.placeholder = "email"
@@ -95,16 +102,20 @@ class LoginController: UIViewController, TextFieldContainerDelegate {
                 SVProgressHUD.dismiss()
                 self.showMessage((error as! NSError).localizedDescription, messageType: .error)
             } else {
-                Model.shared.getEmailUser(firUser!.uid, result: { user in
+                if firUser!.isEmailVerified || testUser(user) {
+                    Model.shared.getEmailUser(firUser!.uid, result: { user in
+                        SVProgressHUD.dismiss()
+                        if user != nil {
+                            self.delegate?.didLogin()
+                        } else {
+                            self.showMessage("Can not download profile data.", messageType: .error)
+                        }
+                    })
+                } else {
                     SVProgressHUD.dismiss()
-                    if user != nil {
-                        self.goBack()
-                    } else {
-                        self.showMessage("Can not download profile data.", messageType: .error)
-                    }
-                })
+                    self.showMessage("You must confirm your registeration. Check your mailbox and try again.", messageType: .information)
+                }
             }
         })
     }
-
 }

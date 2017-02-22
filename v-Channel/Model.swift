@@ -14,10 +14,14 @@ import AFNetworking
 
 func currentUser() -> User? {
     if let user = FIRAuth.auth()?.currentUser {
-        return user.isEmailVerified ? Model.shared.getUser(user.uid) : nil
+        return (user.isEmailVerified || testUser(user.email!)) ? Model.shared.getUser(user.uid) : nil
     } else {
         return nil
     }
+}
+
+func testUser(_ user:String) -> Bool {
+    return user == "user1@test.ru" || user == "user2@test.ru"
 }
 
 func generateUDID() -> String {
@@ -95,23 +99,16 @@ class Model: NSObject {
     
     func signOut(_ completion: @escaping() -> ()) {
         let ref = FIRDatabase.database().reference()
-        let currentID = currentUser()!.uid!
         ref.child("tokens").child(currentUser()!.uid!).removeValue(completionBlock: { _, _ in
-            ref.child("users").child(currentUser()!.uid!).removeValue(completionBlock: { _, _ in
-                let user = FIRAuth.auth()?.currentUser
-                user?.delete { _ in
-                    self.deleteUser(currentID)
-                    try? FIRAuth.auth()?.signOut()
-                    self.newTokenRefHandle = nil
-                    self.updateTokenRefHandle = nil
-                    self.newCallRefHandle = nil
-                    self.deleteCallRefHandle = nil
-                    self.newContactRefHandle = nil
-                    self.updateContactRefHandle = nil
-                    self.deleteContactRefHandle = nil
-                    completion()
-                }
-            })
+            try? FIRAuth.auth()?.signOut()
+            self.newTokenRefHandle = nil
+            self.updateTokenRefHandle = nil
+            self.newCallRefHandle = nil
+            self.deleteCallRefHandle = nil
+            self.newContactRefHandle = nil
+            self.updateContactRefHandle = nil
+            self.deleteContactRefHandle = nil
+            completion()
         })
     }
     
@@ -330,6 +327,14 @@ class Model: NSObject {
         })
     }
     
+    func deleteContact(_ contact:Contact) {
+        currentUser()?.removeFromContacts(contact)
+        let ref = FIRDatabase.database().reference()
+        ref.child("contacts").child(contact.uid!).removeValue()
+        self.managedObjectContext.delete(contact)
+        self.saveContext()
+    }
+    
     fileprivate func observeContacts() {
         let ref = FIRDatabase.database().reference()
         let contactQuery = ref.child("contacts").queryLimited(toLast:25)
@@ -369,7 +374,7 @@ class Model: NSObject {
         })
         
         deleteContactRefHandle = contactQuery.observe(.childRemoved, with: { (snapshot) -> Void in
-            if let contact = self.getContact(snapshot.key) {
+            if currentUser() != nil, let contact = self.getContact(snapshot.key) {
                 if currentUser()!.containsContact(contact: contact) {
                     currentUser()!.removeFromContacts(contact)
                     self.managedObjectContext.delete(contact)

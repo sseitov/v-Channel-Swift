@@ -10,13 +10,14 @@ import UIKit
 import Firebase
 import SVProgressHUD
 
-class ContactListController: UITableViewController {
+
+let IP_STUN_SERVER_VOIP = "95.31.31.166"
+//let IP_STUN_SERVER_VOIP = "192.168.1.15"
+let IP_AUDIO_PORT_VOIP = "6888"
+
+class ContactListController: UITableViewController, LoginControllerDelegate, CallControllerDelegate {
 
     fileprivate var contacts:[User] = []
-
-    fileprivate let IP_STUN_SERVER_VOIP = "95.31.31.166"
-    //    fileprivate let IP_STUN_SERVER_VOIP = "192.168.1.15"
-    fileprivate let IP_AUDIO_PORT_VOIP = "6888"
     
     fileprivate var ipGetter:IP_Getter?
     fileprivate var gateway:CallGatewayInfo?
@@ -35,6 +36,7 @@ class ContactListController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupTitle("My Contacts")
         
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(self.addContactNotify(_:)),
@@ -68,6 +70,38 @@ class ContactListController: UITableViewController {
             getterTimer = Timer.scheduledTimer(timeInterval: 0.4, target: self, selector: #selector(self.checkGateway(_:)), userInfo: nil, repeats: true);
         }
     }
+    
+    func didLogin() {
+        dismiss(animated: true, completion: {
+            Model.shared.startObservers()
+            self.contacts = Model.shared.myContacts()
+            self.tableView.reloadData()
+            self.gateway = nil
+            self.ipGetter = IP_Getter(IP_STUN_SERVER_VOIP, port: IP_AUDIO_PORT_VOIP)
+            self.getterTimer = Timer.scheduledTimer(timeInterval: 0.4, target: self, selector: #selector(self.checkGateway(_:)), userInfo: nil, repeats: true);
+        })
+    }
+    
+    func didLogout() {
+        if IS_PAD() {
+            performSegue(withIdentifier: "personalCall", sender: nil)
+        }
+        for user in contacts {
+            Model.shared.deleteUser(user.uid!)
+        }
+        contacts = []
+        tableView.reloadData()
+        _ = navigationController?.popViewController(animated: true)
+        performSegue(withIdentifier: "login", sender: self)
+    }
+
+    func callDidFinish(_ call:CallController) {
+        if IS_PAD() {
+            performSegue(withIdentifier: "personalCall", sender: nil)
+        } else {
+            _ = navigationController?.popViewController(animated: true)
+        }
+    }
 
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -93,7 +127,7 @@ class ContactListController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 1
+        return 5
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -114,6 +148,7 @@ class ContactListController: UITableViewController {
         } else {
             cell.incomming = false
         }
+        cell.accessoryType = .disclosureIndicator
         return cell
     }
 
@@ -219,7 +254,7 @@ class ContactListController: UITableViewController {
     
     // MARK: - Contact management
     
-    func doAddContact() {
+    @IBAction func addContact(_ sender: Any) {
         let alert = EmailInput.getEmail(cancelHandler: {
         }, acceptHandler: { email in
             SVProgressHUD.show(withStatus: "Search...")
@@ -239,7 +274,7 @@ class ContactListController: UITableViewController {
                                 if user != nil {
                                     Model.shared.addContact(with: user!)
                                     self.tableView.beginUpdates()
-                                    let indexPath = IndexPath(row: self.contacts.count, section: 2)
+                                    let indexPath = IndexPath(row: self.contacts.count, section: 0)
                                     self.contacts.append(user!)
                                     self.tableView.insertRows(at: [indexPath], with: .bottom)
                                     self.tableView.endUpdates()
@@ -261,19 +296,10 @@ class ContactListController: UITableViewController {
         alert?.show()
     }
     
-    @IBAction func addContact(_ sender: Any) {
-        let alert = ActionSheet.create(title: "What do you want to do?", actions: ["Add personal contact", "Create chat group"], handler1: {
-            self.doAddContact()
-        }, handler2: {
-            self.performSegue(withIdentifier: "group", sender: nil)
-        })
-        alert?.show()
-    }
-    
     func addContactNotify(_ notify:Notification) {
         if let user = notify.object as? User {
             self.tableView.beginUpdates()
-            let indexPath = IndexPath(row: self.contacts.count, section: 2)
+            let indexPath = IndexPath(row: self.contacts.count, section: 0)
             self.contacts.append(user)
             self.tableView.insertRows(at: [indexPath], with: .bottom)
             self.tableView.endUpdates()
@@ -283,7 +309,7 @@ class ContactListController: UITableViewController {
     func updateContactNotify(_ notify:Notification) {
         if let user = notify.object as? User {
             if let index = self.contacts.index(of: user) {
-                let indexPath = IndexPath(row: index, section: 2)
+                let indexPath = IndexPath(row: index, section: 0)
                 self.tableView.reloadRows(at: [indexPath], with: .fade)
             }
         }
@@ -317,15 +343,27 @@ class ContactListController: UITableViewController {
     // MARK: - Navigation
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "personalCall" {
+        if segue.identifier == "login" {
+            let nav = segue.destination as! UINavigationController
+            let controller = nav.topViewController as! LoginController
+            controller.delegate = self
+        } else if segue.identifier == "personalCall" {
             let nav = segue.destination as! UINavigationController
             let controller = nav.topViewController as! CallController
-            if let contact = sender as? User {
-                controller.contact = contact
-                controller.gateway = self.gateway
+            if sender != nil {
+                if let contact = sender as? User {
+                    controller.contact = contact
+                    controller.gateway = self.gateway
+                } else {
+                    controller.incommingCall = sender as? [String:Any]
+                }
+                controller.delegate = self
             } else {
-                controller.incommingCall = sender as? [String:Any]
+                controller.delegate = nil
             }
+        } else if segue.identifier == "settings" {
+            let controller = segue.destination as! SettingsController
+            controller.delegate = self
         }
     }
 

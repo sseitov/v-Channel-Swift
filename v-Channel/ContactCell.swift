@@ -79,9 +79,11 @@ class ContactCell: UITableViewCell {
     @IBOutlet weak var contactImage: UIImageView!
     @IBOutlet weak var contactName: UILabel!
     @IBOutlet weak var callStatus: UIImageView!
+    @IBOutlet weak var cellContainer: UIView!
     
     override func awakeFromNib() {
         super.awakeFromNib()
         callStatus.isHidden = true
+        cellContainer.setupBorder(UIColor.white, radius: 10)
     }
 }

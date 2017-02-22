@@ -13,6 +13,10 @@ import SVProgressHUD
 import IQKeyboardManager
 import AVFoundation
 
+func IS_PAD() -> Bool {
+    return UIDevice.current.userInterfaceIdiom == .pad
+}
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
 
@@ -70,13 +74,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         }
         IQKeyboardManager.shared().isEnableAutoToolbar = false
         
+        return true
+    }
+    
+    fileprivate func ringPlay() {
         let defaultSoundSetting = UserDefaults.standard.url(forKey: "ringtone")
         let url = defaultSoundSetting == nil ? Bundle.main.url(forResource: "ringtone", withExtension: "wav")! : defaultSoundSetting
         ringPlayer = try? AVAudioPlayer(contentsOf: url!)
         ringPlayer?.numberOfLoops = -1
-        ringPlayer?.prepareToPlay()
-
-        return true
+        if ringPlayer!.prepareToPlay() {
+            ringPlayer!.play()
+        }
     }
     
     func ringStop() {
@@ -117,7 +125,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
                     try? AVAudioSession.sharedInstance().setActive(true)
                 }
                 try? AVAudioSession.sharedInstance().overrideOutputAudioPort(.speaker)
-                ringPlayer?.play()
+                ringPlay()
             } else if pushType == PushType.hangUpCall.rawValue {
                 ringStop()
             }

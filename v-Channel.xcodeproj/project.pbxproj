@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2C161D1E1E5E23EB002FF97D /* SettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C161D1D1E5E23EB002FF97D /* SettingsController.swift */; };
+		2C161D201E5E260F002FF97D /* SoundSettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C161D1F1E5E260F002FF97D /* SoundSettingsController.swift */; };
 		2C58977B1E5D7879004F8B46 /* busy.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2C5897781E5D7879004F8B46 /* busy.wav */; };
 		2C58977C1E5D7879004F8B46 /* calling.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2C5897791E5D7879004F8B46 /* calling.wav */; };
 		2C58977D1E5D7879004F8B46 /* ringtone.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2C58977A1E5D7879004F8B46 /* ringtone.wav */; };
@@ -108,6 +110,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2C161D1D1E5E23EB002FF97D /* SettingsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsController.swift; sourceTree = "<group>"; };
+		2C161D1F1E5E260F002FF97D /* SoundSettingsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SoundSettingsController.swift; sourceTree = "<group>"; };
 		2C5897781E5D7879004F8B46 /* busy.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = busy.wav; path = sounds/busy.wav; sourceTree = "<group>"; };
 		2C5897791E5D7879004F8B46 /* calling.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = calling.wav; path = sounds/calling.wav; sourceTree = "<group>"; };
 		2C58977A1E5D7879004F8B46 /* ringtone.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = ringtone.wav; path = sounds/ringtone.wav; sourceTree = "<group>"; };
@@ -458,6 +462,8 @@
 				2CF8FBD81E5606E1003FC98E /* CallController.swift */,
 				2C5898021E5D8F6F004F8B46 /* LoginController.swift */,
 				2C5898041E5D8F94004F8B46 /* SignUpController.swift */,
+				2C161D1D1E5E23EB002FF97D /* SettingsController.swift */,
+				2C161D1F1E5E260F002FF97D /* SoundSettingsController.swift */,
 				2CE75BA51E55D40800EEE103 /* AppDelegate.swift */,
 				2C5B2AD51E561190006CC809 /* Model.swift */,
 			);
@@ -702,6 +708,7 @@
 				2C5897FA1E5D8051004F8B46 /* voipcoreaudio.c in Sources */,
 				2C5897F81E5D8051004F8B46 /* ipGetter.c in Sources */,
 				2C5B2B001E561968006CC809 /* StringExtensions.swift in Sources */,
+				2C161D1E1E5E23EB002FF97D /* SettingsController.swift in Sources */,
 				2C5898051E5D8F94004F8B46 /* SignUpController.swift in Sources */,
 				2C5B2B041E561968006CC809 /* UIViewControllerExtensions.swift in Sources */,
 				2CF8FBD91E5606E1003FC98E /* CallController.swift in Sources */,
@@ -710,6 +717,7 @@
 				2C5B2AEC1E5618F7006CC809 /* LGProgressView.m in Sources */,
 				2CF8FBD71E5606BF003FC98E /* ContactListController.swift in Sources */,
 				2C5897FE1E5D8051004F8B46 /* VoipStreamHandler.m in Sources */,
+				2C161D201E5E260F002FF97D /* SoundSettingsController.swift in Sources */,
 				2C5B2AE81E5618F7006CC809 /* LGAlertView.m in Sources */,
 				2CE75BA61E55D40800EEE103 /* AppDelegate.swift in Sources */,
 				2C5B2AD11E56110A006CC809 /* Contact+CoreDataClass.swift in Sources */,

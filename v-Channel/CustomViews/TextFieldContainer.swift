@@ -17,7 +17,7 @@ class TextFieldContainer: UIView, UITextFieldDelegate {
 
     var delegate:TextFieldContainerDelegate?
     
-    var nonActiveColor:UIColor = UIColor.mainColor(0.2)
+    var nonActiveColor:UIColor = UIColor.groupTableViewBackground
     var activeColor:UIColor = UIColor.white
     var placeholderColor = UIColor.gray
     

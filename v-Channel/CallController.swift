@@ -9,10 +9,16 @@
 import UIKit
 import AVFoundation
 
+protocol CallControllerDelegate {
+    func callDidFinish(_ call:CallController)
+}
+
 class CallController: UIViewController {
     
     @IBOutlet weak var userImage: UIImageView!
+    @IBOutlet weak var loudButton: UIBarButtonItem!
     
+    var delegate:CallControllerDelegate?
     var gateway:CallGatewayInfo?
     var contact:User?
     var incommingCall:[String:Any]?
@@ -27,7 +33,14 @@ class CallController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupBackButton()
+        
+        if delegate == nil {
+            navigationItem.leftBarButtonItem = nil
+            navigationItem.rightBarButtonItem = nil
+            return
+        } else {
+            setupBackButton()
+        }
         
         if contact == nil {
             contact = Model.shared.getUser(incommingCall!["from"] as! String)
@@ -57,11 +70,17 @@ class CallController: UIViewController {
         setupTitle(contact!.name!)
         
         VoipStreamHandler.sharedInstance().open(withGateway: gateway, receiverCount: 1, senderId: 0, silenceSuppression: 24)
+        loudButton.image = VoipStreamHandler.sharedInstance().isLoudSpeaker() ?
+            UIImage(named: "loudOn") : UIImage(named: "loudOff")
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
+        if delegate == nil {
+            return
+        }
+
         VoipStreamHandler.sharedInstance().startVoIP()
         if incommingCall != nil {
             VoipStreamHandler.sharedInstance().wait(forFinish: {
@@ -89,6 +108,9 @@ class CallController: UIViewController {
     }
     
     override func goBack() {
+        if delegate == nil {
+            return
+        }
         if incommingCall != nil || incommingCallID != nil {
             let alert = createQuestion("Want you hang up?", acceptTitle: "Yes", cancelTitle: "Cancel", acceptHandler: {
                 self.ringPlayer?.stop()
@@ -97,13 +119,13 @@ class CallController: UIViewController {
                     Model.shared.hangUpCall(callID: self.incommingCallID!)
                     self.incommingCallID = nil
                 }
-                super.goBack()
+                self.delegate?.callDidFinish(self)
             })
             alert?.show()
         } else {
             self.busyPlayer?.stop()
             VoipStreamHandler.sharedInstance().hangUp()
-            super.goBack()
+            self.delegate?.callDidFinish(self)
         }
     }
     
@@ -120,4 +142,13 @@ class CallController: UIViewController {
             }
         }
     }
+    
+    @IBAction func switchLoud(_ sender: UIBarButtonItem) {
+        var isLoud = VoipStreamHandler.sharedInstance().isLoudSpeaker()
+        isLoud = !isLoud
+        VoipStreamHandler.sharedInstance().enableLoudspeaker(isLoud)
+        sender.image = VoipStreamHandler.sharedInstance().isLoudSpeaker() ?
+            UIImage(named: "loudOn") : UIImage(named: "loudOff")
+    }
+
 }

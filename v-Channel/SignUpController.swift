@@ -16,7 +16,8 @@ class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigati
     @IBOutlet weak var nickField: TextFieldContainer!
     @IBOutlet weak var emailField: TextFieldContainer!
     @IBOutlet weak var passwordField: TextFieldContainer!
-    
+    @IBOutlet weak var signUpButton: UIButton!
+   
     var avatar:UIImage?
     
     override func viewDidLoad() {
@@ -41,6 +42,8 @@ class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigati
         passwordField.secure = true
         passwordField.delegate = self
         
+        signUpButton.setupBorder(UIColor.clear, radius: 30)
+
         let tap = UITapGestureRecognizer(target: self, action: #selector(self.tap))
         self.view.addGestureRecognizer(tap)
     }
@@ -124,10 +127,19 @@ class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigati
                                              nick: self.nickField.text(),
                                              image: self.avatar!, result:
                     { setError in
-                        SVProgressHUD.dismiss()
                         if setError == nil {
-                            self.dismiss(animated: true, completion: nil)
+                            FIRAuth.auth()?.currentUser?.sendEmailVerification(completion: { error in
+                                SVProgressHUD.dismiss()
+                                if error == nil {
+                                    self.showMessage("Check your mailbox now. You account will be activated after you confirm registration.", messageType: .information, messageHandler: {
+                                        self.goBack()
+                                    })
+                                } else {
+                                    self.showMessage(setError!.localizedDescription, messageType: .error)
+                                }
+                            })
                         } else {
+                            SVProgressHUD.dismiss()
                             self.showMessage(setError!.localizedDescription, messageType: .error)
                         }
                 })

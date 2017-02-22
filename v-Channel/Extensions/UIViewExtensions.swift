@@ -17,9 +17,7 @@ extension UIView {
         self.clipsToBounds = true
     }
     
-    func addDashedBorder() {
-        let color = UIColor.mainColor().cgColor
-        
+    func addDashedBorder(_ color:UIColor = UIColor.mainColor()) {
         let shapeLayer:CAShapeLayer = CAShapeLayer()
         let frameSize = self.frame.size
         let shapeRect = CGRect(x: 0, y: 0, width: frameSize.width, height: frameSize.height)
@@ -27,7 +25,7 @@ extension UIView {
         shapeLayer.bounds = shapeRect
         shapeLayer.position = CGPoint(x: frameSize.width/2, y: frameSize.height/2)
         shapeLayer.fillColor = UIColor.clear.cgColor
-        shapeLayer.strokeColor = color
+        shapeLayer.strokeColor = color.cgColor
         shapeLayer.lineWidth = 1
         shapeLayer.lineJoin = kCALineJoinRound
         shapeLayer.lineDashPattern = [10,5]
