@@ -13,8 +13,8 @@ import Firebase
 import AFNetworking
 
 func currentUser() -> User? {
-    if FIRAuth.auth()?.currentUser != nil {
-        return Model.shared.getUser(FIRAuth.auth()!.currentUser!.uid)
+    if let user = FIRAuth.auth()?.currentUser {
+        return user.isEmailVerified ? Model.shared.getUser(user.uid) : nil
     } else {
         return nil
     }
@@ -105,7 +105,6 @@ class Model: NSObject {
                     self.newTokenRefHandle = nil
                     self.updateTokenRefHandle = nil
                     self.newCallRefHandle = nil
-                    self.updateCallRefHandle = nil
                     self.deleteCallRefHandle = nil
                     self.newContactRefHandle = nil
                     self.updateContactRefHandle = nil
@@ -136,12 +135,12 @@ class Model: NSObject {
     private var updateTokenRefHandle: FIRDatabaseHandle?
     
     private var newCallRefHandle: FIRDatabaseHandle?
-    private var updateCallRefHandle: FIRDatabaseHandle?
     private var deleteCallRefHandle: FIRDatabaseHandle?
     
     private var newContactRefHandle: FIRDatabaseHandle?
     private var updateContactRefHandle: FIRDatabaseHandle?
     private var deleteContactRefHandle: FIRDatabaseHandle?
+    
     // MARK: - User table
     
     func createEmailUser(_ user:FIRUser, email:String, nick:String, image:UIImage, result: @escaping(NSError?) -> ()) {
@@ -409,7 +408,7 @@ class Model: NSObject {
     fileprivate func pushIncommingCall(to:User) {
         if to.token != nil {
             let notification:[String:Any] = [
-                "title" : "SimpleVOIP call",
+                "title" : "v-Chanel call",
                 "body" : "Call from \(currentUser()!.name!)",
                 "content_available": true]
             let data:[String:Int] = ["pushType" : PushType.incommingCall.rawValue]
@@ -468,17 +467,6 @@ class Model: NSObject {
         return uid
     }
     
-    func acceptCall(callID:String) {
-        let ref = FIRDatabase.database().reference()
-        ref.child("calls").child(callID).setValue("ACCEPTED")
-    }
-    
-    func acceptCall(callID:String, host:String, port:String) {
-        let data = ["host": host, "port" : port]
-        let ref = FIRDatabase.database().reference()
-        ref.child("calls").child(callID).setValue(data)
-    }
-    
     func hangUpCall(callID:String) {
         let ref = FIRDatabase.database().reference()
         ref.child("calls").child(callID).removeValue()
@@ -494,10 +482,6 @@ class Model: NSObject {
                     NotificationCenter.default.post(name: incommingCallNotification, object: snapshot.key)
                 }
             }
-        })
-        
-        updateCallRefHandle = callQuery.observe(.childChanged, with: { (snapshot) -> Void in
-            NotificationCenter.default.post(name: acceptCallNotification, object: snapshot.key)
         })
         
         deleteCallRefHandle = callQuery.observe(.childRemoved, with: { (snapshot) -> Void in

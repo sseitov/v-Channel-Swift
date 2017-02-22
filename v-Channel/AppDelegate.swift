@@ -11,12 +11,13 @@ import Firebase
 import UserNotifications
 import SVProgressHUD
 import IQKeyboardManager
+import AVFoundation
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
 
     var window: UIWindow?
-
+    private var ringPlayer:AVAudioPlayer?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
@@ -68,11 +69,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
             SVProgressHUD.setFont(font)
         }
         IQKeyboardManager.shared().isEnableAutoToolbar = false
+        
+        let defaultSoundSetting = UserDefaults.standard.url(forKey: "ringtone")
+        let url = defaultSoundSetting == nil ? Bundle.main.url(forResource: "ringtone", withExtension: "wav")! : defaultSoundSetting
+        ringPlayer = try? AVAudioPlayer(contentsOf: url!)
+        ringPlayer?.numberOfLoops = -1
+        ringPlayer?.prepareToPlay()
 
         return true
     }
     
-    // MARK: - Refresh_token
+    func ringStop() {
+        ringPlayer?.stop()
+    }
+    
+    // MARK: - Refresh FCM token
     
     func tokenRefreshNotification(_ notification: Notification) {
         if let refreshedToken = FIRInstanceID.instanceID().token() {
@@ -93,6 +104,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
                 print("Unable to connect with FCM. \(error)")
             }
         }
+    }
+    
+    // MARK: - Application delegate
+    
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
+                     fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        if let pushTypeStr = userInfo["pushType"] as? String, let pushType = Int(pushTypeStr) {
+            if pushType == PushType.incommingCall.rawValue {
+                if application.applicationState != .active {
+                    try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, with:[.mixWithOthers])
+                    try? AVAudioSession.sharedInstance().setActive(true)
+                }
+                try? AVAudioSession.sharedInstance().overrideOutputAudioPort(.speaker)
+                ringPlayer?.play()
+            } else if pushType == PushType.hangUpCall.rawValue {
+                ringStop()
+            }
+        }
+        completionHandler(.newData)
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
@@ -129,7 +159,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
-    // MARK: - Split view
+    // MARK: - SplitView delegate
     
     func splitViewController(_ svc: UISplitViewController, shouldHide vc: UIViewController, in orientation: UIInterfaceOrientation) -> Bool {
         return false
@@ -157,6 +187,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         }
     }
 }
+
+// MARK: - NotificationCenter delegate
 
 @available(iOS 10, *)
 extension AppDelegate : UNUserNotificationCenterDelegate {

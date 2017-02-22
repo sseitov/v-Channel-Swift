@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11201" systemVersion="16A323" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_0" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11161"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -15,13 +18,19 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ike-j9-LLp" userLabel="ContainerView">
+                    <rect key="frame" x="20" y="168" width="280" height="232.5"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HSq-h8-JBU" userLabel="ProgressContainerView">
+                            <rect key="frame" x="72" y="22.5" width="136" height="121"/>
                             <subviews>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aJl-oz-F44" userLabel="CircularProgressContainerView">
+                                    <rect key="frame" x="45" y="20" width="46" height="46"/>
                                     <subviews>
-                                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="iEM-f7-H3N" userLabel="CircularProgressBGImageView"/>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="iEM-f7-H3N" userLabel="CircularProgressBGImageView">
+                                            <rect key="frame" x="0.0" y="0.0" width="46" height="46"/>
+                                        </imageView>
                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Lvs-Ex-aRI" userLabel="CircularProgressView" customClass="LGProgressView">
+                                            <rect key="frame" x="0.0" y="0.0" width="46" height="46"/>
                                             <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                         </view>
                                     </subviews>
@@ -40,6 +49,7 @@
                                     </constraints>
                                 </view>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="751" verticalCompressionResistancePriority="751" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0g2-EA-wMM" userLabel="ProgressLabel">
+                                    <rect key="frame" x="68" y="81" width="0.0" height="0.0"/>
                                     <fontDescription key="fontDescription" name="AvenirNext-Regular" family="Avenir Next" pointSize="16"/>
                                     <color key="textColor" red="0.23863965272903442" green="0.21453884243965149" blue="0.22207650542259216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     <nil key="highlightedColor"/>
@@ -62,8 +72,10 @@
                             </userDefinedRuntimeAttributes>
                         </view>
                         <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Jhd-gB-lhw" userLabel="CompleteContainerView">
+                            <rect key="frame" x="0.0" y="0.0" width="280" height="232.5"/>
                             <subviews>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Og-o2-cic" userLabel="messageLabel">
+                                    <rect key="frame" x="20" y="81" width="240" height="50.5"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="240" id="hGd-ke-vQ6"/>
                                     </constraints>
@@ -74,6 +86,7 @@ release 28.3 MB space?</string>
                                     <nil key="highlightedColor"/>
                                 </label>
                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="M5H-bf-sYg" userLabel="cancelButton" customClass="HPLocalizedButton">
+                                    <rect key="frame" x="20" y="190.5" width="240" height="36"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="36" id="KJX-gH-uou"/>
                                     </constraints>
@@ -91,6 +104,7 @@ release 28.3 MB space?</string>
                                     </connections>
                                 </button>
                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="m9R-rB-c96" userLabel="OKButton" customClass="ILSPPRoundCornerButton">
+                                    <rect key="frame" x="20" y="149.5" width="240" height="36"/>
                                     <color key="backgroundColor" red="0.20392156859999999" green="0.67450980390000004" blue="0.42745098040000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="36" id="XFj-Iw-gcd"/>
