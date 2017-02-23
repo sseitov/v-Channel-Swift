@@ -214,20 +214,16 @@ NSString *const NOTIFICATION_CALL_STREAM_ROUTING_UPDATE = @"com.vchannel.upwork.
     vcNetworkingReceiverStart(receiver, startReceiver, finishReceiver);
 }
 
-void startReceiver(int uid) {
-    if (uid == [VoipStreamHandler sharedInstance].senderId) {
-        [[VoipStreamHandler sharedInstance].startCondition lock];
-        [[VoipStreamHandler sharedInstance].startCondition signal];
-        [[VoipStreamHandler sharedInstance].startCondition unlock];
-    }
+void startReceiver() {
+    [[VoipStreamHandler sharedInstance].startCondition lock];
+    [[VoipStreamHandler sharedInstance].startCondition signal];
+    [[VoipStreamHandler sharedInstance].startCondition unlock];
 }
 
-void finishReceiver(int uid) {
-    if (uid == [VoipStreamHandler sharedInstance].senderId) {
-        [[VoipStreamHandler sharedInstance].finishCondition lock];
-        [[VoipStreamHandler sharedInstance].finishCondition signal];
-        [[VoipStreamHandler sharedInstance].finishCondition unlock];
-    }
+void finishReceiver() {
+    [[VoipStreamHandler sharedInstance].finishCondition lock];
+    [[VoipStreamHandler sharedInstance].finishCondition signal];
+    [[VoipStreamHandler sharedInstance].finishCondition unlock];
 }
 
 - (void)waitForStart:(void (^)(void))start {
@@ -250,8 +246,10 @@ void finishReceiver(int uid) {
         [[VoipStreamHandler sharedInstance].finishCondition wait];
         [[VoipStreamHandler sharedInstance].finishCondition unlock];
         dispatch_async(dispatch_get_main_queue(), ^{
-            if ([VoipStreamHandler sharedInstance]->receiver != nil)
+            if ([VoipStreamHandler sharedInstance]->receiver != nil) {
+                [[VoipStreamHandler sharedInstance] hangUp];
                 finish();
+            }
         });
     });
 }

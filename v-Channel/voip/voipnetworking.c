@@ -273,9 +273,10 @@ void vcNetworkingReceiverStart(vcNetworkingReceiverContext *context, receiver_ca
                 }
                 
                 if (buffer[1] == 'S' && buffer[2] == 'T' && buffer[3] == 'O' && buffer[4] == 'P') {
-                    finish(ringBufferId);
+                    finish();
+                    context->stopped = true;
                 } else if (buffer[1] == 'S' && buffer[2] == 'T' && buffer[3] == 'A' && buffer[4] == 'R' && buffer[5] == 'T') {
-                    start(ringBufferId);
+                    start();
                 } else {
                     //fprintf(stderr, "RECEIVED %ld BYTES\n", result);
                     uint8_t *targetBuffer = vcRingBufferProducerGetCurrent(context->ringBuffer[ringBufferId]);

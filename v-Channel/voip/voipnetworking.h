@@ -21,7 +21,7 @@ typedef struct vcNetworkingReceiverContext vcNetworkingReceiverContext;
 
 typedef struct vcNetworkingSenderContext vcNetworkingSenderContext;
 
-typedef void (*receiver_callback_t)(int);
+typedef void (*receiver_callback_t)(void);
 
 vcNetworkingSenderContext *vcNetworkingSenderCreate(const char *host, const char *port, uint8_t senderId, int silence,vcRingBuffer *ringBuffer, vcEncryptor *encryptor, vcEncoder *encoder);
 size_t vcNetworkingSenderGetSent(vcNetworkingSenderContext *context);

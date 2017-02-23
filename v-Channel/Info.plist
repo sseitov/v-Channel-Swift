@@ -20,15 +20,16 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-    <key>NSCameraUsageDescription</key>
-    <string>v-Channel needs your camera for video call and setup your avatar.</string>
-    <key>NSMicrophoneUsageDescription</key>
-    <string>v-Channel needs use your microphone for VOIP audio call.</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>v-Channel needs your photo library for setup your avatar.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>v-Channel needs your camera for video call and setup your avatar.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>v-Channel needs use your microphone for VOIP audio call.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>v-Channel needs your photo library for setup your avatar.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
+		<string>remote-notification</string>
 		<string>voip</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
@@ -62,7 +63,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-    <key>UIViewControllerBasedStatusBarAppearance</key>
-    <false/>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
 </dict>
 </plist>
