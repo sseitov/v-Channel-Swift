@@ -98,6 +98,7 @@
 		2C5B2B031E561968006CC809 /* UIImageExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5B2AFD1E561968006CC809 /* UIImageExtensions.swift */; };
 		2C5B2B041E561968006CC809 /* UIViewControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5B2AFE1E561968006CC809 /* UIViewControllerExtensions.swift */; };
 		2C5B2B051E561968006CC809 /* UIViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5B2AFF1E561968006CC809 /* UIViewExtensions.swift */; };
+		2C8174491E6D3EFD001E2AF7 /* RingtonePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8174481E6D3EFD001E2AF7 /* RingtonePlayer.swift */; };
 		2CE75BA61E55D40800EEE103 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE75BA51E55D40800EEE103 /* AppDelegate.swift */; };
 		2CE75BAD1E55D40800EEE103 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2CE75BAB1E55D40800EEE103 /* Main.storyboard */; };
 		2CE75BAF1E55D40800EEE103 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2CE75BAE1E55D40800EEE103 /* Assets.xcassets */; };
@@ -215,6 +216,7 @@
 		2C5B2AFD1E561968006CC809 /* UIImageExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UIImageExtensions.swift; path = Extensions/UIImageExtensions.swift; sourceTree = "<group>"; };
 		2C5B2AFE1E561968006CC809 /* UIViewControllerExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UIViewControllerExtensions.swift; path = Extensions/UIViewControllerExtensions.swift; sourceTree = "<group>"; };
 		2C5B2AFF1E561968006CC809 /* UIViewExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UIViewExtensions.swift; path = Extensions/UIViewExtensions.swift; sourceTree = "<group>"; };
+		2C8174481E6D3EFD001E2AF7 /* RingtonePlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RingtonePlayer.swift; sourceTree = "<group>"; };
 		2CE75BA21E55D40800EEE103 /* v-Channel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "v-Channel.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CE75BA51E55D40800EEE103 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2CE75BAC1E55D40800EEE103 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -429,6 +431,18 @@
 			name = LGAlertView;
 			sourceTree = "<group>";
 		};
+		2C81744A1E6D4E1F001E2AF7 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				2C5898021E5D8F6F004F8B46 /* LoginController.swift */,
+				2C5898041E5D8F94004F8B46 /* SignUpController.swift */,
+				2C161D1D1E5E23EB002FF97D /* SettingsController.swift */,
+				2C161D1F1E5E260F002FF97D /* SoundSettingsController.swift */,
+				2C8174481E6D3EFD001E2AF7 /* RingtonePlayer.swift */,
+			);
+			name = Profile;
+			sourceTree = "<group>";
+		};
 		2CE75B991E55D40600EEE103 = {
 			isa = PBXGroup;
 			children = (
@@ -457,13 +471,10 @@
 				2C5B2AD91E5618B8006CC809 /* CustomViews */,
 				2C5B2AD81E5618AB006CC809 /* Extensions */,
 				2C5B2AC91E560F57006CC809 /* Model */,
+				2C81744A1E6D4E1F001E2AF7 /* Profile */,
 				2CF8FBD61E5606BF003FC98E /* ContactListController.swift */,
 				2C58977E1E5D7A97004F8B46 /* ContactCell.swift */,
 				2CF8FBD81E5606E1003FC98E /* CallController.swift */,
-				2C5898021E5D8F6F004F8B46 /* LoginController.swift */,
-				2C5898041E5D8F94004F8B46 /* SignUpController.swift */,
-				2C161D1D1E5E23EB002FF97D /* SettingsController.swift */,
-				2C161D1F1E5E260F002FF97D /* SoundSettingsController.swift */,
 				2CE75BA51E55D40800EEE103 /* AppDelegate.swift */,
 				2C5B2AD51E561190006CC809 /* Model.swift */,
 			);
@@ -706,6 +717,7 @@
 				2C5B2B021E561968006CC809 /* UIFontExtensions.swift in Sources */,
 				2C5B2B011E561968006CC809 /* UIColorExtensions.swift in Sources */,
 				2C5897FA1E5D8051004F8B46 /* voipcoreaudio.c in Sources */,
+				2C8174491E6D3EFD001E2AF7 /* RingtonePlayer.swift in Sources */,
 				2C5897F81E5D8051004F8B46 /* ipGetter.c in Sources */,
 				2C5B2B001E561968006CC809 /* StringExtensions.swift in Sources */,
 				2C161D1E1E5E23EB002FF97D /* SettingsController.swift in Sources */,
@@ -790,7 +802,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -835,7 +847,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";

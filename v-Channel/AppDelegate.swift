@@ -11,7 +11,6 @@ import Firebase
 import UserNotifications
 import SVProgressHUD
 import IQKeyboardManager
-import AVFoundation
 
 func IS_PAD() -> Bool {
     return UIDevice.current.userInterfaceIdiom == .pad
@@ -21,7 +20,6 @@ func IS_PAD() -> Bool {
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
 
     var window: UIWindow?
-    private var ringPlayer:AVAudioPlayer?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
@@ -77,20 +75,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         return true
     }
     
-    fileprivate func ringPlay() {
-        let defaultSoundSetting = UserDefaults.standard.url(forKey: "ringtone")
-        let url = defaultSoundSetting == nil ? Bundle.main.url(forResource: "ringtone", withExtension: "wav")! : defaultSoundSetting
-        ringPlayer = try? AVAudioPlayer(contentsOf: url!)
-        ringPlayer?.numberOfLoops = -1
-        if ringPlayer!.prepareToPlay() {
-            ringPlayer!.play()
-        }
-    }
-    
-    func ringStop() {
-        ringPlayer?.stop()
-    }
-    
     // MARK: - Refresh FCM token
     
     func tokenRefreshNotification(_ notification: Notification) {
@@ -120,14 +104,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
                      fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         if let pushTypeStr = userInfo["pushType"] as? String, let pushType = Int(pushTypeStr) {
             if pushType == PushType.incommingCall.rawValue {
-                if application.applicationState != .active {
-                    try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, with:[.mixWithOthers])
-                    try? AVAudioSession.sharedInstance().setActive(true)
-                }
-                try? AVAudioSession.sharedInstance().overrideOutputAudioPort(.speaker)
-                ringPlay()
+                Ringtone.shared.play()
             } else if pushType == PushType.hangUpCall.rawValue {
-                ringStop()
+                Ringtone.shared.stop()
             }
         }
         completionHandler(.newData)

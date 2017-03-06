@@ -30,3 +30,5 @@ Pods/
 Podfile.lock
 
 GoogleService-Info.plist
+opus.framework
+.opus

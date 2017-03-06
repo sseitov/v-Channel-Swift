@@ -7,34 +7,35 @@
 //
 
 import UIKit
-import AVFoundation
 
 class SoundSettingsController: UITableViewController {
 
     private var systemRingtones:[URL] = []
-    private var defaultSettings:URL?
-    private var ringPlayer:AVAudioPlayer?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTitle("Select ringtone")
         setupBackButton()
-        defaultSettings = UserDefaults.standard.url(forKey: "ringtone")
         let enumerator = FileManager.default.enumerator(at: URL(string: "/Library/Ringtones")!, includingPropertiesForKeys: [.isDirectoryKey])
         while let url = enumerator?.nextObject() as? URL {
             systemRingtones.append(url)
         }
+        Ringtone.shared.play()
     }
     
-    @IBAction func selectSound(_ sender: Any) {
-        if defaultSettings == nil {
-            UserDefaults.standard.removeObject(forKey: "ringtone")
-        } else {
-            UserDefaults.standard.set(defaultSettings, forKey: "ringtone")
+    override func goBack() {
+        Ringtone.shared.stop()
+        super.goBack()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if let url = Ringtone.shared.defaultRingtone(), let index = systemRingtones.index(of: url) {
+            let indexPath = IndexPath(row: index, section: 1)
+            
+            tableView.selectRow(at: indexPath, animated: true, scrollPosition: .top)
         }
-        UserDefaults.standard.synchronize()
-        defaultSettings = UserDefaults.standard.url(forKey: "ringtone")
-        goBack()
+        Ringtone.shared.play()
     }
     
     // MARK: - Table view data source
@@ -63,7 +64,7 @@ class SoundSettingsController: UITableViewController {
         let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
         if indexPath.section == 0{
             cell.textLabel?.text = "Default"
-            if defaultSettings == nil {
+            if Ringtone.shared.defaultRingtone() == nil {
                 cell.accessoryType = .checkmark
             } else {
                 cell.accessoryType = .none
@@ -72,40 +73,30 @@ class SoundSettingsController: UITableViewController {
             let name = systemRingtones[indexPath.row].lastPathComponent
             let ext = systemRingtones[indexPath.row].pathExtension
             cell.textLabel?.text = name.replacingOccurrences(of: ".\(ext)", with: "")
-            if defaultSettings != nil && defaultSettings! == systemRingtones[indexPath.row] {
-                cell.accessoryType = .checkmark
+            if indexPath.section == 0 {
+                if Ringtone.shared.defaultRingtone() == nil {
+                    cell.accessoryType = .checkmark
+                } else {
+                    cell.accessoryType = .none
+                }
             } else {
-                cell.accessoryType = .none
+                let ringtone = Ringtone.shared.defaultRingtone()
+                if ringtone != nil && ringtone! == systemRingtones[indexPath.row] {
+                    cell.accessoryType = .checkmark
+                } else {
+                    cell.accessoryType = .none
+                }
             }
         }
         cell.selectionStyle = .none
         return cell
     }
-    
-    override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
-        if indexPath.section == 0 {
-            defaultSettings = nil
-        } else {
-            defaultSettings = systemRingtones[indexPath.row]
-        }
-        var selected = tableView.indexPathForSelectedRow
-        if selected == nil {
-            selected = IndexPath(row: 0, section: 0)
-        }
-        
-        tableView.beginUpdates()
-        tableView.reloadRows(at: [selected!, indexPath], with: .fade)
-        tableView.endUpdates()
-        
-        return indexPath
-    }
-    
+
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let url = indexPath.section == 0 ? Bundle.main.url(forResource: "ringtone", withExtension: "wav")! : systemRingtones[indexPath.row]
-        ringPlayer = try? AVAudioPlayer(contentsOf: url)
-        if ringPlayer!.prepareToPlay() {
-            ringPlayer?.play()
-        }
+        tableView.reloadData()
+        let url:URL? = indexPath.section == 0 ? nil : systemRingtones[indexPath.row]
+        Ringtone.shared.setDefaultRingtone(url)
+        Ringtone.shared.play()
     }
 
 }

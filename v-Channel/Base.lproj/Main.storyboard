@@ -4,7 +4,6 @@
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -231,12 +230,6 @@
                     <navigationItem key="navigationItem" id="fBk-T1-pNh">
                         <barButtonItem key="leftBarButtonItem" image="back" id="D2t-Za-xRL">
                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" title="Select" id="Dek-9R-lOD">
-                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            <connections>
-                                <action selector="selectSound:" destination="LSq-vC-bWF" id="3lu-o8-00J"/>
-                            </connections>
                         </barButtonItem>
                     </navigationItem>
                 </tableViewController>

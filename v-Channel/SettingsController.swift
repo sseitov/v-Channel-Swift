@@ -54,7 +54,7 @@ class SettingsController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .value1, reuseIdentifier: nil)
-        cell.textLabel?.font = UIFont.condensedFont(17)
+        cell.textLabel?.font = UIFont.condensedFont(15)
         cell.detailTextLabel?.font = UIFont.mainFont(15)
         if indexPath.section == 0 {
             cell.textLabel?.text = currentUser()!.email!

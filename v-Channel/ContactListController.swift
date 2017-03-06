@@ -11,8 +11,8 @@ import Firebase
 import SVProgressHUD
 
 
-let IP_STUN_SERVER_VOIP = "95.31.31.166"
-//let IP_STUN_SERVER_VOIP = "192.168.1.15"
+//let IP_STUN_SERVER_VOIP = "95.31.31.166"
+let IP_STUN_SERVER_VOIP = "192.168.1.15"
 let IP_AUDIO_PORT_VOIP = "6888"
 
 class ContactListController: UITableViewController, LoginControllerDelegate, CallControllerDelegate {
@@ -26,7 +26,7 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Cal
     fileprivate var inCall:[String:Any]? {
         didSet {
             if inCall == nil {
-                (UIApplication.shared.delegate as! AppDelegate).ringStop()
+                Ringtone.shared.stop()
             }
             tableView.reloadData()
         }
