@@ -130,9 +130,7 @@ void DeompressionDataCallbackHandler(void *decompressionOutputRefCon,
                                             kVTDecodeFrame_EnableAsynchronousDecompression | kVTDecodeFrame_1xRealTimePlayback,
                                             decodeBuffer,
                                             NULL);
-    if (err != noErr) {
-        NSLog(@"decode error: %d", (int)err);
-    } else {
+    if (err == noErr) {
         VTDecompressionSessionWaitForAsynchronousFrames(_session);
         _numFrames++;
     }

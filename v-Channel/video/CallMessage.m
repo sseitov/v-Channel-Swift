@@ -32,7 +32,7 @@
 
 @end
 
-@implementation CallVideoStartMessage
+@implementation CallVideoFrameMessage
 
 - (instancetype)initWithDictionary:(NSDictionary*)dictionary
 {
@@ -42,16 +42,18 @@
         _pps = dictionary[@"pps"];
         _width = [dictionary[@"width"] intValue];
         _height = [dictionary[@"height"] intValue];
+        _frame = dictionary[@"frame"];
     }
     return self;
 }
 
 - (NSDictionary*)pack {
-    return @{@"messageType" : [NSNumber numberWithInt:messageStart],
+    return @{@"messageType" : [NSNumber numberWithInt:messageFrame],
              @"sps" : _sps,
              @"pps" : _pps,
              @"width": [NSNumber numberWithInt:_width],
-             @"height": [NSNumber numberWithInt:_height]};
+             @"height": [NSNumber numberWithInt:_height],
+             @"frame": _frame};
 }
 
 @end
@@ -61,22 +63,6 @@
 - (NSDictionary*)pack
 {
     return @{@"messageType" : [NSNumber numberWithInt:messageStop]};
-}
-
-@end
-
-@implementation CallVideoFrameMessage
-
-- (instancetype)initWithDictionary:(NSDictionary*)dictionary
-{
-    self = [super initWithDictionary:dictionary];
-    _frame = dictionary[@"frame"];
-    return self;
-}
-
-- (NSDictionary*)pack {
-    return @{@"messageType" : [NSNumber numberWithInt:messageFrame],
-             @"frame": _frame};
 }
 
 @end

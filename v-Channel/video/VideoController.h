@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "VideoLayerView.h"
 
 @class CallMessage;
 
@@ -18,6 +19,7 @@
 
 @interface VideoController : UIViewController
 
+@property (weak, nonatomic) IBOutlet VideoLayerView *peerView;
 @property (weak, nonatomic) id<VideoControllerDelegate> delegate;
 
 - (void)start;

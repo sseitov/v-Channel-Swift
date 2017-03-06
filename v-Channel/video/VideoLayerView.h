@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 
-@interface VideoLayerView : UIView
+@interface VideoLayerView : UIImageView
 
 - (void)drawBuffer:(CMSampleBufferRef)videoBuffer;
 - (void)clear;

@@ -10,7 +10,6 @@
 
 enum VideoMessageType {
     messageNone = 0,
-    messageStart,
     messageFrame,
     messageStop
 };
@@ -25,21 +24,16 @@ enum VideoMessageType {
 
 @end
 
-@interface CallVideoStartMessage : CallMessage
+@interface CallVideoFrameMessage : CallMessage
 
 @property (strong, nonatomic, readonly) NSData* sps;
 @property (strong, nonatomic, readonly) NSData* pps;
 @property (nonatomic, readonly) int width;
 @property (nonatomic, readonly) int height;
+@property (strong, nonatomic, readonly) NSData* frame;
 
 @end
 
 @interface CallVideoStopMessage : CallMessage
-
-@end
-
-@interface CallVideoFrameMessage : CallMessage
-
-@property (strong, nonatomic, readonly) NSData* frame;
 
 @end

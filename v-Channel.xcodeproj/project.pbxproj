@@ -101,7 +101,7 @@
 		2C8174491E6D3EFD001E2AF7 /* RingtonePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8174481E6D3EFD001E2AF7 /* RingtonePlayer.swift */; };
 		2C8174701E6D8011001E2AF7 /* Camera.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C8174651E6D8011001E2AF7 /* Camera.m */; };
 		2C8174711E6D8011001E2AF7 /* DragView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C8174671E6D8011001E2AF7 /* DragView.m */; };
-		2C8174721E6D8011001E2AF7 /* VideoController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2C8174691E6D8011001E2AF7 /* VideoController.mm */; };
+		2C8174721E6D8011001E2AF7 /* VideoController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C8174691E6D8011001E2AF7 /* VideoController.m */; };
 		2C8174731E6D8011001E2AF7 /* VideoLayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C81746B1E6D8011001E2AF7 /* VideoLayerView.m */; };
 		2C8174741E6D8011001E2AF7 /* VTDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C81746D1E6D8011001E2AF7 /* VTDecoder.m */; };
 		2C8174751E6D8011001E2AF7 /* VTEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C81746F1E6D8011001E2AF7 /* VTEncoder.m */; };
@@ -229,7 +229,7 @@
 		2C8174661E6D8011001E2AF7 /* DragView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DragView.h; path = video/DragView.h; sourceTree = "<group>"; };
 		2C8174671E6D8011001E2AF7 /* DragView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DragView.m; path = video/DragView.m; sourceTree = "<group>"; };
 		2C8174681E6D8011001E2AF7 /* VideoController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VideoController.h; path = video/VideoController.h; sourceTree = "<group>"; };
-		2C8174691E6D8011001E2AF7 /* VideoController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = VideoController.mm; path = video/VideoController.mm; sourceTree = "<group>"; };
+		2C8174691E6D8011001E2AF7 /* VideoController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VideoController.m; path = video/VideoController.m; sourceTree = "<group>"; };
 		2C81746A1E6D8011001E2AF7 /* VideoLayerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VideoLayerView.h; path = video/VideoLayerView.h; sourceTree = "<group>"; };
 		2C81746B1E6D8011001E2AF7 /* VideoLayerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VideoLayerView.m; path = video/VideoLayerView.m; sourceTree = "<group>"; };
 		2C81746C1E6D8011001E2AF7 /* VTDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VTDecoder.h; path = video/VTDecoder.h; sourceTree = "<group>"; };
@@ -474,7 +474,7 @@
 				2C8174661E6D8011001E2AF7 /* DragView.h */,
 				2C8174671E6D8011001E2AF7 /* DragView.m */,
 				2C8174681E6D8011001E2AF7 /* VideoController.h */,
-				2C8174691E6D8011001E2AF7 /* VideoController.mm */,
+				2C8174691E6D8011001E2AF7 /* VideoController.m */,
 				2C81746A1E6D8011001E2AF7 /* VideoLayerView.h */,
 				2C81746B1E6D8011001E2AF7 /* VideoLayerView.m */,
 				2C81746C1E6D8011001E2AF7 /* VTDecoder.h */,
@@ -756,7 +756,7 @@
 				2C5B2AEF1E5618F7006CC809 /* NSPointerArray+AbstractionHelpers.m in Sources */,
 				2C5B2AF71E561935006CC809 /* EmailInput.swift in Sources */,
 				2C5897FB1E5D8051004F8B46 /* voipcrypto.c in Sources */,
-				2C8174721E6D8011001E2AF7 /* VideoController.mm in Sources */,
+				2C8174721E6D8011001E2AF7 /* VideoController.m in Sources */,
 				2C5898031E5D8F6F004F8B46 /* LoginController.swift in Sources */,
 				2C5B2AD41E56110A006CC809 /* User+CoreDataProperties.swift in Sources */,
 				2C5B2B021E561968006CC809 /* UIFontExtensions.swift in Sources */,

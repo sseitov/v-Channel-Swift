@@ -174,6 +174,7 @@ class CallController: UIViewController {
             if videoView.isHidden {
                 videoController!.shutdown()
             } else {
+                videoController?.peerView.image = userImage.image
                 videoController!.start()
             }
         }
