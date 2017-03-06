@@ -16,7 +16,7 @@ protocol CallControllerDelegate {
 class CallController: UIViewController {
     
     @IBOutlet weak var userImage: UIImageView!
-    @IBOutlet weak var loudButton: UIBarButtonItem!
+    @IBOutlet weak var videoView: UIView!
     
     var delegate:CallControllerDelegate?
     var gateway:CallGatewayInfo?
@@ -26,8 +26,7 @@ class CallController: UIViewController {
     
     private var ringPlayer:AVAudioPlayer?
     private var busyPlayer:AVAudioPlayer?
-    
-    private var isVideo = false
+    private var videoController:VideoController?
     
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -36,9 +35,9 @@ class CallController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        videoView.isHidden = true
         if delegate == nil {
             navigationItem.leftBarButtonItem = nil
-            navigationItem.rightBarButtonItems = []
             return
         } else {
             setupBackButton()
@@ -72,8 +71,15 @@ class CallController: UIViewController {
         setupTitle(contact!.name!)
         
         VoipStreamHandler.sharedInstance().open(withGateway: gateway, receiverCount: 1, senderId: 0, silenceSuppression: 24)
-        loudButton.image = VoipStreamHandler.sharedInstance().isLoudSpeaker() ?
-            UIImage(named: "loudOn") : UIImage(named: "loudOff")
+    }
+    
+    private func rightButtonItems() -> [UIBarButtonItem] {
+        let loudImage = VoipStreamHandler.sharedInstance().isLoudSpeaker() ? UIImage(named: "loudOn") : UIImage(named: "loudOff")
+        let sound = UIBarButtonItem(image: loudImage, style: .plain, target: self, action: #selector(self.switchLoud(_:)))
+        sound.tintColor = UIColor.white
+        let video = UIBarButtonItem(image: UIImage(named: "videoOff"), style: .plain, target: self, action: #selector(self.switchVideo(_:)))
+        video.tintColor = UIColor.white
+        return [video, sound]
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -85,6 +91,7 @@ class CallController: UIViewController {
 
         VoipStreamHandler.sharedInstance().startVoIP()
         if incommingCall != nil {
+            navigationItem.setRightBarButtonItems(rightButtonItems(), animated: true)
             VoipStreamHandler.sharedInstance().wait(forFinish: {
                 self.incommingCall = nil
                 self.goBack()
@@ -97,6 +104,7 @@ class CallController: UIViewController {
             VoipStreamHandler.sharedInstance().wait(forStart: {
                 self.ringPlayer?.stop()
                 self.userImage.stopAnimating()
+                self.navigationItem.setRightBarButtonItems(self.rightButtonItems(), animated: true)
                 self.userImage.image = UIImage(data: self.contact!.avatar as! Data)?.withSize(self.userImage.frame.size).inCircle()
                 VoipStreamHandler.sharedInstance().wait(forFinish: {
                     if self.incommingCallID != nil {
@@ -121,12 +129,18 @@ class CallController: UIViewController {
                     Model.shared.hangUpCall(callID: self.incommingCallID!)
                     self.incommingCallID = nil
                 }
+                if !self.videoView.isHidden {
+                    self.videoController!.shutdown()
+                }
                 self.delegate?.callDidFinish(self)
             })
             alert?.show()
         } else {
             self.busyPlayer?.stop()
             VoipStreamHandler.sharedInstance().hangUp()
+            if !self.videoView.isHidden {
+                self.videoController!.shutdown()
+            }
             self.delegate?.callDidFinish(self)
         }
     }
@@ -145,7 +159,7 @@ class CallController: UIViewController {
         }
     }
     
-    @IBAction func switchLoud(_ sender: UIBarButtonItem) {
+    func switchLoud(_ sender: UIBarButtonItem) {
         var isLoud = VoipStreamHandler.sharedInstance().isLoudSpeaker()
         isLoud = !isLoud
         VoipStreamHandler.sharedInstance().enableLoudspeaker(isLoud)
@@ -153,8 +167,21 @@ class CallController: UIViewController {
             UIImage(named: "loudOn") : UIImage(named: "loudOff")
     }
 
-    @IBAction func switchVideo(_ sender: UIBarButtonItem) {
-        isVideo = !isVideo
-        sender.image = isVideo ? UIImage(named: "videoOn") : UIImage(named: "videoOff")
+    func switchVideo(_ sender: UIBarButtonItem) {
+        videoView.isHidden = !videoView.isHidden
+        sender.image = videoView.isHidden ? UIImage(named: "videoOff") : UIImage(named: "videoOn")
+        if videoController != nil {
+            if videoView.isHidden {
+                videoController!.shutdown()
+            } else {
+                videoController!.start()
+            }
+        }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "videoView" {
+            videoController = segue.destination as? VideoController
+        }
     }
 }

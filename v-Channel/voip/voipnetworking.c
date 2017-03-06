@@ -28,8 +28,6 @@
 
 #define SAMPLE_RATE 48000.0
 #define CHANNELS_PER_FRAME 1
-#define AUDIO_PACKET 30
-#define VIDEO_PACKET 12
 
 #define ARRAYSZ(a) (sizeof(a)/sizeof(*(a)))
 
@@ -139,11 +137,10 @@ static void send_frames(vcNetworkingSenderContext *context, int16_t *audio_frame
                                    iv);
                 
                 // TODO this can probably be optimized *cough*
-                uint8_t entirePacket[INPUT_BUFFER_SIZE+2];
+                uint8_t entirePacket[INPUT_BUFFER_SIZE+1];
                 entirePacket[0] = context->senderId;
-                entirePacket[1] = AUDIO_PACKET;
                 
-                memcpy(entirePacket+2, context->encryptor->encrypted, context->encryptor->encryptedLength);
+                memcpy(entirePacket+1, context->encryptor->encrypted, context->encryptor->encryptedLength);
                 size_t entirePacketLength = context->encryptor->encryptedLength+1;
                 ssize_t written = write(context->socket, entirePacket, entirePacketLength);
                 context->sent += written;
@@ -157,11 +154,10 @@ void vcNetworkingSenderStart(vcNetworkingSenderContext *context) {
     dispatch_async(context->dispatchQueue, ^{
         pthread_mutex_lock(&context->destructionMutex);
         
-        uint8_t entirePacket[INPUT_BUFFER_SIZE+2];
+        uint8_t entirePacket[INPUT_BUFFER_SIZE+1];
         entirePacket[0] = context->senderId;
-        entirePacket[1] = AUDIO_PACKET;
-        memcpy(entirePacket+2, "START", 5);
-        size_t entirePacketLength = 7;
+        memcpy(entirePacket+1, "START", 5);
+        size_t entirePacketLength = 6;
         write(context->socket, entirePacket, entirePacketLength);
 
         context->stopped = 0;
@@ -191,11 +187,10 @@ void vcNetworkingSenderDestroy(vcNetworkingSenderContext *context)
         bool wasRunning = OSAtomicCompareAndSwap32Barrier(0, 1, &context->stopped);
         context->stopped = true;
         
-        uint8_t entirePacket[INPUT_BUFFER_SIZE+2];
+        uint8_t entirePacket[INPUT_BUFFER_SIZE+1];
         entirePacket[0] = context->senderId;
-        entirePacket[1] = AUDIO_PACKET;
-        memcpy(entirePacket+2, "STOP", 4);
-        size_t entirePacketLength = 6;
+        memcpy(entirePacket+1, "STOP", 4);
+        size_t entirePacketLength = 5;
         write(context->socket, entirePacket, entirePacketLength);
 
         if (wasRunning) {
@@ -271,24 +266,25 @@ void vcNetworkingReceiverStart(vcNetworkingReceiverContext *context, receiver_ca
             
             if (result > 0) {
                 uint8_t ringBufferId = buffer[0];
-                uint8_t contentId = buffer[1];
-                if (contentId == AUDIO_PACKET) {
-                    if(ringBufferId >= context->ringBufferCount) {
-                        fprintf(stderr, "GOT DATA FOR INVALID RINGBUFFER (%d of %d)", ringBufferId, context->ringBufferCount);
-                        continue;
-                    }
-                    
-                    if (buffer[2] == 'S' && buffer[3] == 'T' && buffer[4] == 'O' && buffer[5] == 'P') {
-                        finish();
-                        context->stopped = true;
-                    } else if (buffer[2] == 'S' && buffer[3] == 'T' && buffer[4] == 'A' && buffer[5] == 'R' && buffer[6] == 'T') {
-                        start();
-                    } else {
-                        uint8_t *targetBuffer = vcRingBufferProducerGetCurrent(context->ringBuffer[ringBufferId]);
-                        context->received += result;
-                        memcpy(targetBuffer, buffer+2, result-2);
-                        vcRingBufferProducerProduced(context->ringBuffer[ringBufferId], result);
-                    }
+                //                fprintf(stderr, "Received %zd bytes for %d\n", result, ringBufferId);
+                if(ringBufferId >= context->ringBufferCount) {
+                    fprintf(stderr, "GOT DATA FOR INVALID RINGBUFFER (%d of %d)", ringBufferId, context->ringBufferCount);
+                    continue;
+                }
+                
+                if (buffer[1] == 'S' && buffer[2] == 'T' && buffer[3] == 'O' && buffer[4] == 'P') {
+                    finish();
+                    context->stopped = true;
+                } else if (buffer[1] == 'S' && buffer[2] == 'T' && buffer[3] == 'A' && buffer[4] == 'R' && buffer[5] == 'T') {
+                    start();
+                } else {
+                    //fprintf(stderr, "RECEIVED %ld BYTES\n", result);
+                    uint8_t *targetBuffer = vcRingBufferProducerGetCurrent(context->ringBuffer[ringBufferId]);
+                    context->received += result;
+                    // memcpy unavoidable as we need to look into the received buffer
+                    // before we know which ringbuffer is the right one..
+                    memcpy(targetBuffer, buffer+1, result-1);
+                    vcRingBufferProducerProduced(context->ringBuffer[ringBufferId], result);
                 }
             }
             else if (result == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {

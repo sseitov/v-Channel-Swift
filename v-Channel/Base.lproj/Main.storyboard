@@ -6,7 +6,6 @@
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
-        <capability name="Navigation items with more than one left or right bar item" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -46,11 +45,21 @@
                                     <constraint firstAttribute="width" constant="240" id="TEx-kC-8vO"/>
                                 </constraints>
                             </imageView>
+                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PSP-CF-Akv">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="504"/>
+                                <connections>
+                                    <segue destination="bJ0-Tr-NI4" kind="embed" identifier="videoView" id="kVV-AZ-lyk"/>
+                                </connections>
+                            </containerView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
+                            <constraint firstAttribute="trailing" secondItem="PSP-CF-Akv" secondAttribute="trailing" id="PlE-TO-raE"/>
                             <constraint firstItem="out-nv-zEh" firstAttribute="centerY" secondItem="svH-Pt-448" secondAttribute="centerY" id="QEY-WN-FZ3"/>
                             <constraint firstItem="out-nv-zEh" firstAttribute="centerX" secondItem="svH-Pt-448" secondAttribute="centerX" id="R5E-lC-uhy"/>
+                            <constraint firstItem="PSP-CF-Akv" firstAttribute="top" secondItem="SYR-Wa-9uf" secondAttribute="bottom" id="YLE-GA-pEk"/>
+                            <constraint firstItem="PSP-CF-Akv" firstAttribute="leading" secondItem="svH-Pt-448" secondAttribute="leading" id="keX-uy-kCY"/>
+                            <constraint firstItem="GAO-Cl-Wes" firstAttribute="top" secondItem="PSP-CF-Akv" secondAttribute="bottom" id="tZE-cx-JxZ"/>
                         </constraints>
                     </view>
                     <toolbarItems/>
@@ -58,29 +67,15 @@
                         <barButtonItem key="leftBarButtonItem" image="hangUp" id="oS7-WV-Hbr">
                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         </barButtonItem>
-                        <rightBarButtonItems>
-                            <barButtonItem image="videoOff" id="MT5-k2-1VY">
-                                <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <connections>
-                                    <action selector="switchVideo:" destination="JEX-9P-axG" id="AWo-de-uOk"/>
-                                </connections>
-                            </barButtonItem>
-                            <barButtonItem image="loudOff" id="Kyk-3J-Vc1">
-                                <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <connections>
-                                    <action selector="switchLoud:" destination="JEX-9P-axG" id="1tC-ut-mgF"/>
-                                </connections>
-                            </barButtonItem>
-                        </rightBarButtonItems>
                     </navigationItem>
                     <connections>
-                        <outlet property="loudButton" destination="Kyk-3J-Vc1" id="Xq2-bp-nj0"/>
                         <outlet property="userImage" destination="out-nv-zEh" id="roK-I6-JJi"/>
+                        <outlet property="videoView" destination="PSP-CF-Akv" id="3wb-ty-jbE"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="FJe-Yq-33r" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="829" y="129"/>
+            <point key="canvasLocation" x="828.75" y="128.87323943661971"/>
         </scene>
         <!--Split View Controller-->
         <scene sceneID="Nki-YV-4Qg">
@@ -473,16 +468,54 @@
             </objects>
             <point key="canvasLocation" x="3296" y="-632"/>
         </scene>
+        <!--Video Controller-->
+        <scene sceneID="K6E-pK-nUa">
+            <objects>
+                <viewController id="bJ0-Tr-NI4" customClass="VideoController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8Zb-vQ-UlH">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="504"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Spo-bf-MLL" customClass="VideoLayerView">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="504"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XBV-Z3-0kb" customClass="DragView">
+                                <rect key="frame" x="20" y="20" width="100" height="100"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="100" id="8Xb-mU-8dU"/>
+                                    <constraint firstAttribute="height" constant="100" id="qg0-T5-sbt"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="XBV-Z3-0kb" firstAttribute="leading" secondItem="8Zb-vQ-UlH" secondAttribute="leadingMargin" constant="4" id="NQA-7s-ZhJ"/>
+                            <constraint firstItem="Spo-bf-MLL" firstAttribute="leading" secondItem="8Zb-vQ-UlH" secondAttribute="leading" id="OiX-zK-jJm"/>
+                            <constraint firstAttribute="bottom" secondItem="Spo-bf-MLL" secondAttribute="bottom" id="UEv-EI-mUV"/>
+                            <constraint firstAttribute="trailing" secondItem="Spo-bf-MLL" secondAttribute="trailing" id="UT8-63-OiV"/>
+                            <constraint firstItem="Spo-bf-MLL" firstAttribute="top" secondItem="8Zb-vQ-UlH" secondAttribute="top" id="jNi-Kv-idA"/>
+                            <constraint firstItem="XBV-Z3-0kb" firstAttribute="top" secondItem="8Zb-vQ-UlH" secondAttribute="topMargin" constant="20" id="qlo-lb-c6Q"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="peerView" destination="Spo-bf-MLL" id="kcD-dB-xf7"/>
+                        <outlet property="selfView" destination="XBV-Z3-0kb" id="ahn-Ts-BS2"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="zcq-fg-NxA" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1736" y="163"/>
+        </scene>
     </scenes>
     <resources>
         <image name="add_contact" width="27" height="27"/>
         <image name="back" width="22" height="22"/>
         <image name="hangUp" width="28" height="28"/>
         <image name="logo.png" width="1024" height="1024"/>
-        <image name="loudOff" width="28" height="28"/>
         <image name="settings" width="22" height="22"/>
         <image name="stop" width="50" height="30"/>
-        <image name="videoOff" width="28" height="28"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="ECL-Uc-JUn"/>

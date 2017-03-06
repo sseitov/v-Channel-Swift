@@ -13,7 +13,6 @@
 @protocol VideoControllerDelegate <NSObject>
 
 - (void)sendVideoMessage:(CallMessage*)message;
-- (void)didFinish;
 
 @end
 
@@ -21,6 +20,7 @@
 
 @property (weak, nonatomic) id<VideoControllerDelegate> delegate;
 
+- (void)start;
 - (void)receiveVideoMessage:(CallMessage*)message;
 - (void)shutdown;
 

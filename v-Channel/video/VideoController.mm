@@ -73,9 +73,6 @@ public:
 @property (weak, nonatomic) IBOutlet DragView *selfView;
 @property (weak, nonatomic) IBOutlet VideoLayerView *peerView;
 
-- (IBAction)switchCamera:(id)sender;
-- (IBAction)endCall:(UIBarButtonItem*)sender;
-
 @property (strong, nonatomic) VTEncoder* encoder;
 @property (strong, nonatomic) VTDecoder* decoder;
 @property (atomic) BOOL decoderIsOpened;
@@ -90,32 +87,50 @@ public:
 {
     [super viewDidLoad];
     
-    [[Camera shared] startup];
     _captureQueue = dispatch_queue_create("com.vchannel.VideoCall.Capture", DISPATCH_QUEUE_SERIAL);
     _decodeQueue = dispatch_queue_create("com.vchannel.VideoCall.Decoder", DISPATCH_QUEUE_SERIAL);
-
+    
     _encoder = [[VTEncoder alloc] init];
     _encoder.delegate = self;
     
     _decoder = [[VTDecoder alloc] init];
     _decoder.delegate = self;
+    
+}
 
+- (void)start {
+    [[Camera shared] startup];
+    
     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(deviceOrientationDidChange:)
                                                  name: UIDeviceOrientationDidChangeNotification
                                                object:nil];
+    _orientation = [[UIDevice currentDevice] orientation];
+    [self startCapture];
 }
 
 - (void)shutdown
 {
+    [self stopCapture];
     _decodeStream.stop();
     [_decoder close];
     [[Camera shared] shutdown];
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
-    [self.navigationController popViewControllerAnimated:YES];
+}
+- (void)startCapture
+{
+    [[Camera shared].output setSampleBufferDelegate:self queue:_captureQueue];
+}
+
+- (void)stopCapture
+{
+    [self.delegate sendVideoMessage:[[CallVideoStopMessage alloc] init]];
+    [[Camera shared].output setSampleBufferDelegate:nil queue:_captureQueue];
+    [_encoder close];
+    [_selfView clear];
+    self.decoderIsOpened = NO;
 }
 
 - (void)receiveVideoMessage:(CallMessage*)message
@@ -162,12 +177,6 @@ public:
 
 }
 
-- (void)viewDidAppear:(BOOL)animated
-{
-    _orientation = [[UIDevice currentDevice] orientation];
-    [self startCapture];
-}
-
 - (void)deviceOrientationDidChange:(NSNotification*)notify
 {
     [self stopCapture];
@@ -175,33 +184,14 @@ public:
     [self startCapture];
 }
 
-- (void)startCapture
-{
-    [[Camera shared].output setSampleBufferDelegate:self queue:_captureQueue];
-}
-
-- (void)stopCapture
-{
-    [self.delegate sendVideoMessage:[[CallVideoStopMessage alloc] init]];
-    [[Camera shared].output setSampleBufferDelegate:nil queue:_captureQueue];
-    [_encoder close];
-    [_selfView clear];
-    self.decoderIsOpened = NO;
-}
-
+/*
 - (IBAction)switchCamera:(id)sender
 {
     [self stopCapture];
     [[Camera shared] switchCamera];
     [self startCapture];
 }
-
-- (IBAction)endCall:(UIBarButtonItem*)sender
-{
-    [self shutdown];
-    [self.delegate didFinish];
-}
-
+*/
 #pragma mark - AVCaptureVideoDataOutput delegate
 
 - (void) captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
@@ -209,6 +199,7 @@ public:
     if (connection.supportsVideoOrientation && connection.videoOrientation != (AVCaptureVideoOrientation)_orientation) {
         [connection setVideoOrientation:(AVCaptureVideoOrientation)_orientation];
     }
+
     CVImageBufferRef pixelBuffer = (CVImageBufferRef)CMSampleBufferGetImageBuffer(sampleBuffer);
     if (!_encoder.isOpened) {
         CGSize sz = CVImageBufferGetDisplaySize(pixelBuffer);
@@ -218,9 +209,11 @@ public:
             [_encoder openForWidth:sz.height height:sz.width];
         }
     }
+
     if (_encoder.isOpened) {
         [_encoder encodeBuffer:pixelBuffer];
     }
+ 
     [_selfView drawBuffer:sampleBuffer];
 }
 
@@ -242,7 +235,8 @@ public:
                                  @"frame" : data};
         message = [[CallVideoFrameMessage alloc] initWithDictionary:params];
     }
-    [self.delegate sendVideoMessage:message];
+    [self receiveVideoMessage:message];
+//    [self.delegate sendVideoMessage:message];
 }
 
 #pragma mark - VTDeccoder delegare
