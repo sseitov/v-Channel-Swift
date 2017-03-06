@@ -463,10 +463,13 @@ class Model: NSObject {
     
     // MARK: - VOIP calls
     
-    func makeCall(to:User, ip:String, port:String) -> String {
+    func makeCall(to:User, audioIP:String, audioPort:String, videoIP:String, videoPort:String) -> String {
         let ref = FIRDatabase.database().reference()
         let uid = generateUDID()
-        let data:[String:Any] = ["from" : currentUser()!.uid!, "ip" : ip, "port" : port, "to" : to.uid!]
+        let data:[String:Any] = ["from" : currentUser()!.uid!,
+                                 "audioIP" : audioIP, "audioPort" : audioPort,
+                                 "videoIP" : videoIP, "videoPort" : videoPort,
+                                 "to" : to.uid!]
         ref.child("calls").child(uid).setValue(data)
         pushIncommingCall(to: to)
         return uid

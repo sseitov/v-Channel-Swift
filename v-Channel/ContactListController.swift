@@ -13,14 +13,15 @@ import SVProgressHUD
 
 //let IP_STUN_SERVER_VOIP = "95.31.31.166"
 let IP_STUN_SERVER_VOIP = "192.168.1.15"
-let IP_AUDIO_PORT_VOIP = "6888"
+let IP_PORT_VOIP = "6888"
 
 class ContactListController: UITableViewController, LoginControllerDelegate, CallControllerDelegate {
 
     fileprivate var contacts:[User] = []
     
     fileprivate var ipGetter:IP_Getter?
-    fileprivate var gateway:CallGatewayInfo?
+    fileprivate var audioGateway:CallGatewayInfo?
+    fileprivate var videoGateway:CallGatewayInfo?
     fileprivate var getterTimer:Timer?
     
     fileprivate var inCall:[String:Any]? {
@@ -65,8 +66,9 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Cal
             Model.shared.startObservers()
             contacts = Model.shared.myContacts()
             tableView.reloadData()
-            gateway = nil
-            ipGetter = IP_Getter(IP_STUN_SERVER_VOIP, port: IP_AUDIO_PORT_VOIP)
+            audioGateway = nil
+            videoGateway = nil
+            ipGetter = IP_Getter(IP_STUN_SERVER_VOIP, port: IP_PORT_VOIP)
             getterTimer = Timer.scheduledTimer(timeInterval: 0.4, target: self, selector: #selector(self.checkGateway(_:)), userInfo: nil, repeats: true);
         }
     }
@@ -76,8 +78,9 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Cal
             Model.shared.startObservers()
             self.contacts = Model.shared.myContacts()
             self.tableView.reloadData()
-            self.gateway = nil
-            self.ipGetter = IP_Getter(IP_STUN_SERVER_VOIP, port: IP_AUDIO_PORT_VOIP)
+            self.audioGateway = nil
+            self.videoGateway = nil
+            self.ipGetter = IP_Getter(IP_STUN_SERVER_VOIP, port: IP_PORT_VOIP)
             self.getterTimer = Timer.scheduledTimer(timeInterval: 0.4, target: self, selector: #selector(self.checkGateway(_:)), userInfo: nil, repeats: true);
         })
     }
@@ -109,8 +112,17 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Cal
     
     func checkGateway(_ timer:Timer) {
         if ipGetter != nil && ipGetter!.check() {
-            timer.invalidate()
-            gateway = CallGatewayInfo(ipGetter: ipGetter)
+            if audioGateway == nil {
+                audioGateway = CallGatewayInfo(ipGetter: ipGetter)
+                print("===== set audio gateway \(audioGateway!.publicIP!):\(audioGateway!.publicPort!)")
+                self.ipGetter = nil
+                self.ipGetter = IP_Getter(IP_STUN_SERVER_VOIP, port: IP_PORT_VOIP)
+            } else {
+                videoGateway = CallGatewayInfo(ipGetter: ipGetter)
+                print("===== set video gateway \(videoGateway!.publicIP!):\(videoGateway!.publicPort!)")
+                timer.invalidate()
+                self.ipGetter = nil
+            }
         } else {
             print("No gateway yet\n")
         }
@@ -232,7 +244,7 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Cal
                         })
                         alert?.show()
                     } else {
-                        if gateway != nil {
+                        if audioGateway != nil && videoGateway != nil {
                             Model.shared.hangUpCall(callID: callID)
                             performSegue(withIdentifier: "personalCall", sender: user)
                             self.inCall = nil
@@ -242,10 +254,10 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Cal
                         }
                     }
                 } else {
-                    if gateway != nil {
+                    if audioGateway != nil && videoGateway != nil {
                         performSegue(withIdentifier: "personalCall", sender: user)
                     } else {
-                        showMessage("I have not yet received public IP address. Need some wait...", messageType: .information)
+                        showMessage("You have not yet received public IP address. Need some wait...", messageType: .information)
                     }
                 }
             }
@@ -353,7 +365,8 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Cal
             if sender != nil {
                 if let contact = sender as? User {
                     controller.contact = contact
-                    controller.gateway = self.gateway
+                    controller.audioGateway = self.audioGateway
+                    controller.videoGateway = self.videoGateway
                 } else {
                     controller.incommingCall = sender as? [String:Any]
                 }

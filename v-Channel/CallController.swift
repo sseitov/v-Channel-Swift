@@ -19,7 +19,8 @@ class CallController: UIViewController {
     @IBOutlet weak var videoView: UIView!
     
     var delegate:CallControllerDelegate?
-    var gateway:CallGatewayInfo?
+    var audioGateway:CallGatewayInfo?
+    var videoGateway:CallGatewayInfo?
     var contact:User?
     var incommingCall:[String:Any]?
     var incommingCallID:String?
@@ -45,7 +46,8 @@ class CallController: UIViewController {
         
         if contact == nil {
             contact = Model.shared.getUser(incommingCall!["from"] as! String)
-            gateway = CallGatewayInfo(ip: incommingCall!["ip"] as! String, port: incommingCall!["port"] as! String)
+            audioGateway = CallGatewayInfo(ip: incommingCall!["audioIP"] as! String, port: incommingCall!["audioPort"] as! String)
+            videoGateway = CallGatewayInfo(ip: incommingCall!["videoIP"] as! String, port: incommingCall!["videoPort"] as! String)
             self.userImage.image = UIImage(data: self.contact!.avatar as! Data)?.withSize(self.userImage.frame.size).inCircle()
         } else {
             ringPlayer = try? AVAudioPlayer(contentsOf: Bundle.main.url(forResource: "calling", withExtension: "wav")!)
@@ -70,7 +72,7 @@ class CallController: UIViewController {
         
         setupTitle(contact!.name!)
         
-        VoipStreamHandler.sharedInstance().open(withGateway: gateway, receiverCount: 1, senderId: 0, silenceSuppression: 24)
+        VoipStreamHandler.sharedInstance().open(withGateway: audioGateway, receiverCount: 1, senderId: 0, silenceSuppression: 24)
     }
     
     private func rightButtonItems() -> [UIBarButtonItem] {
@@ -97,7 +99,11 @@ class CallController: UIViewController {
                 self.goBack()
             })
         } else {
-            incommingCallID = Model.shared.makeCall(to: contact!, ip: gateway!.publicIP!, port: gateway!.publicPort!)
+            incommingCallID = Model.shared.makeCall(to: contact!,
+                                                    audioIP: audioGateway!.publicIP!,
+                                                    audioPort: audioGateway!.publicPort!,
+                                                    videoIP: videoGateway!.publicIP!,
+                                                    videoPort: videoGateway!.publicPort!)
             if ringPlayer != nil && ringPlayer!.prepareToPlay() {
                 ringPlayer?.play()
             }

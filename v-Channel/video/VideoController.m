@@ -97,7 +97,6 @@
                                 height:frameMessage.height
                                    sps:frameMessage.sps
                                    pps:frameMessage.pps];
-                _peerView.image = nil;
             }
             else {
                 [_decoder decodeData:frameMessage.frame];
@@ -171,6 +170,11 @@
 
 - (void)decoder:(VTDecoder*)decoder decodedBuffer:(CMSampleBufferRef)buffer
 {
+    if (_peerView.image != nil) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            _peerView.image = nil;
+        });
+    }
     [_peerView drawBuffer:buffer];
     CFRelease(buffer);
 }
