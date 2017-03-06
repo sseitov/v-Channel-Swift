@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 
 #import "CallGatewayInfo.h"
+#import "CallMessage.h"
 
 #include "voipcodec.h"
 #include "voipcrypto.h"
@@ -34,7 +35,13 @@
     vcNetworkingSenderContext *sender;
     vcNetworkingReceiverContext *receiver;
     
+    vcNetworkingSenderContext *videoSender;
+    vcNetworkingReceiverContext *videoReceiver;
+    
     CallGatewayInfo *gatewayInfo;
+    
+    int videoSocket;
+    bool videoStopped;
 }
 
 @property (assign, nonatomic, readonly) int senderId;
@@ -54,5 +61,9 @@ extern NSString *const NOTIFICATION_CALL_STREAM_ROUTING_UPDATE;
 
 - (void)enableLoudspeaker:(bool)speaker;
 - (BOOL)isLoudSpeaker;
+
+- (void)startVideoWithGateway:(CallGatewayInfo*)_gatewayInfo message:(void (^)(NSData*))message;
+- (void)sendVideoMessage:(CallMessage*)message;
+- (void)stopVideo;
 
 @end

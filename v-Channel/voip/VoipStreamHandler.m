@@ -11,6 +11,16 @@
 #include <CommonCrypto/CommonCrypto.h>
 #import <AVFoundation/AVFoundation.h>
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <poll.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+
+#define VC_VIDEO_BUFFER_SIZE 65536
+
 @interface VoipStreamHandler ()
 
 @property (strong, nonatomic) NSCondition* startCondition;
@@ -204,8 +214,8 @@ NSString *const NOTIFICATION_CALL_STREAM_ROUTING_UPDATE = @"com.vchannel.upwork.
     }
     
     receiver = vcNetworkingReceiverCreateWithSocket(vcNetworkingSenderGetSocket(sender), receiverRingBuffers, receiverCount);
-    vcNetworkingSenderStart(sender);
     
+    vcNetworkingSenderStart(sender);    
     vcNetworkingReceiverStart(receiver, startReceiver, finishReceiver);
 }
 
@@ -253,6 +263,60 @@ void finishReceiver() {
 static void derive_key(const char *password, size_t password_size, uint8_t *key, size_t key_size) {
     uint8_t salt[] = {-106, -111, -100, -9, -25, -26, -21, 68, 6, 100, 45, -38, 109, -119, -76, -116};
     CCKeyDerivationPBKDF(kCCPBKDF2, password, password_size, salt, sizeof(salt), kCCPRFHmacAlgSHA256, 1<<20, key, key_size);
+}
+
+
+- (void)startVideoWithGateway:(CallGatewayInfo*)_gatewayInfo message:(void (^)(NSData*))message
+{
+    const char *host = gatewayInfo.publicIP.UTF8String;
+    const char *port = gatewayInfo.publicPort.UTF8String;
+    videoSocket = create_socket(host, port, 0);
+    
+    dispatch_queue_t videoDispatchQueue = dispatch_queue_create("vcNetworkingVideoReceiver", DISPATCH_QUEUE_SERIAL);
+    dispatch_async(videoDispatchQueue, ^{
+        struct pollfd pollfds[] = {
+            { videoSocket, POLLIN, 0 }
+        };
+        
+        static uint8_t buffer[VC_VIDEO_BUFFER_SIZE];
+        videoStopped = false;
+        while (!videoStopped) {
+            int pret = poll(pollfds, 1, 16);
+            if (pret == -1) {
+                fprintf(stderr, "socket error\n");
+                break;
+            }
+            else if (pret == 0) {
+                continue;
+            }
+            ssize_t result = read(videoSocket, buffer, VC_VIDEO_BUFFER_SIZE);
+            
+            if (result > 0) {
+                NSData* data = [[NSData alloc] initWithBytes:buffer length:result];
+                NSLog(@"message %ld", result);
+                message(data);
+            } else if (result == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+                continue;
+            } else {
+                videoStopped = true;
+            }
+        }
+        
+        fprintf(stderr, "Stopping video receiver thread\n");
+    });
+    
+}
+
+- (void)sendVideoMessage:(CallMessage*)message {
+    NSData* data = message.encrypt;
+    write(videoSocket, data.bytes, data.length);
+}
+
+- (void)stopVideo
+{
+    videoStopped = true;
+    close(videoSocket);
+    videoSocket = -1;
 }
 
 @end

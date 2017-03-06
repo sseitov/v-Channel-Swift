@@ -13,7 +13,8 @@ import SVProgressHUD
 
 //let IP_STUN_SERVER_VOIP = "95.31.31.166"
 let IP_STUN_SERVER_VOIP = "192.168.1.15"
-let IP_PORT_VOIP = "6888"
+let IP_AUDIO_PORT_VOIP = "6888"
+let IP_VIDEO_PORT_VOIP = "6889"
 
 class ContactListController: UITableViewController, LoginControllerDelegate, CallControllerDelegate {
 
@@ -68,7 +69,7 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Cal
             tableView.reloadData()
             audioGateway = nil
             videoGateway = nil
-            ipGetter = IP_Getter(IP_STUN_SERVER_VOIP, port: IP_PORT_VOIP)
+            ipGetter = IP_Getter(IP_STUN_SERVER_VOIP, port: IP_AUDIO_PORT_VOIP)
             getterTimer = Timer.scheduledTimer(timeInterval: 0.4, target: self, selector: #selector(self.checkGateway(_:)), userInfo: nil, repeats: true);
         }
     }
@@ -80,7 +81,7 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Cal
             self.tableView.reloadData()
             self.audioGateway = nil
             self.videoGateway = nil
-            self.ipGetter = IP_Getter(IP_STUN_SERVER_VOIP, port: IP_PORT_VOIP)
+            self.ipGetter = IP_Getter(IP_STUN_SERVER_VOIP, port: IP_AUDIO_PORT_VOIP)
             self.getterTimer = Timer.scheduledTimer(timeInterval: 0.4, target: self, selector: #selector(self.checkGateway(_:)), userInfo: nil, repeats: true);
         })
     }
@@ -116,7 +117,7 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Cal
                 audioGateway = CallGatewayInfo(ipGetter: ipGetter)
                 print("===== set audio gateway \(audioGateway!.publicIP!):\(audioGateway!.publicPort!)")
                 self.ipGetter = nil
-                self.ipGetter = IP_Getter(IP_STUN_SERVER_VOIP, port: IP_PORT_VOIP)
+                self.ipGetter = IP_Getter(IP_STUN_SERVER_VOIP, port: IP_VIDEO_PORT_VOIP)
             } else {
                 videoGateway = CallGatewayInfo(ipGetter: ipGetter)
                 print("===== set video gateway \(videoGateway!.publicIP!):\(videoGateway!.publicPort!)")

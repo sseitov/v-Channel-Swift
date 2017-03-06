@@ -62,8 +62,6 @@ struct vcNetworkingSenderContext {
     int silenceSuppression;
 };
 
-static int create_socket(const char *host, const char *port, int server);
-
 vcNetworkingSenderContext *vcNetworkingSenderCreate(const char *host, const char *port, uint8_t senderId, int silenceSupression, vcRingBuffer *ringBuffer, vcEncryptor *encryptor, vcEncoder *encoder) {
     vcNetworkingSenderContext *context = calloc(1, sizeof(*context));
     context->socket = create_socket(host, port, 0);
@@ -323,7 +321,7 @@ void vcNetworkingReceiverDestroy(vcNetworkingReceiverContext *context) {
     free(context);
 }
 
-static int create_socket(const char *host, const char *port, int server)
+int create_socket(const char *host, const char *port, int server)
 {
     int sock = 0, error;
     struct addrinfo hints, *result = NULL, *r;

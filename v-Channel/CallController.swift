@@ -8,6 +8,7 @@
 
 import UIKit
 import AVFoundation
+import MPMessagePack
 
 protocol CallControllerDelegate {
     func callDidFinish(_ call:CallController)
@@ -178,10 +179,22 @@ class CallController: UIViewController {
         sender.image = videoView.isHidden ? UIImage(named: "videoOff") : UIImage(named: "videoOn")
         if videoController != nil {
             if videoView.isHidden {
+                VoipStreamHandler.sharedInstance().stopVideo()
                 videoController!.shutdown()
             } else {
                 videoController?.peerView.image = userImage.image
                 videoController!.start()
+                VoipStreamHandler.sharedInstance().startVideo(withGateway: videoGateway, message: { data in
+                    if data != nil {
+                        if let dictionary = try? (data! as NSData).mp_dict(), let messageType = dictionary["messageType"] as? Int {
+                            if messageType == Int(messageFrame.rawValue) {
+                                self.videoController?.receiveVideoMessage(CallVideoFrameMessage(dictionary: dictionary))
+                            } else if messageType == Int(messageStop.rawValue) {
+                                self.videoController?.receiveVideoMessage(CallVideoStopMessage(dictionary: dictionary))
+                            }
+                        }
+                    }
+                })
             }
         }
     }
@@ -189,6 +202,16 @@ class CallController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "videoView" {
             videoController = segue.destination as? VideoController
+            videoController?.delegate = self
         }
     }
+    
+}
+
+extension CallController : VideoControllerDelegate {
+    
+    func sendVideoMessage(_ message: CallMessage!) {
+        VoipStreamHandler.sharedInstance().sendVideoMessage(message)
+    }
+    
 }

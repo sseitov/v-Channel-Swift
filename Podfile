@@ -11,7 +11,6 @@ target 'v-Channel' do
     
     pod 'AFNetworking'
     pod 'MPMessagePack'
-    pod 'CocoaAsyncSocket'
     
     pod 'SVProgressHUD'
     pod 'IQKeyboardManager'

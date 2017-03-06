@@ -11,7 +11,6 @@
 #import "Camera.h"
 #import "VTEncoder.h"
 #import "VTDecoder.h"
-#import "CallMessage.h"
 
 
 @interface VideoController () <AVCaptureVideoDataOutputSampleBufferDelegate, VTEncoderDelegate, VTDecoderDelegate> {
@@ -159,11 +158,10 @@
                              @"height" : [NSNumber numberWithInt:_encoder.height],
                              @"frame" : data};
     CallMessage *message = [[CallVideoFrameMessage alloc] initWithDictionary:params];
-//    [self.delegate sendVideoMessage:message];
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self receiveVideoMessage:message];
-    });
+    [self.delegate sendVideoMessage:message];
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        [self receiveVideoMessage:message];
+//    });
 }
 
 #pragma mark - VTDeccoder delegare

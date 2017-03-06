@@ -8,8 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "VideoLayerView.h"
-
-@class CallMessage;
+#import "CallMessage.h"
 
 @protocol VideoControllerDelegate <NSObject>
 

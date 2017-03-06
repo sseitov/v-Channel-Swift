@@ -23,6 +23,8 @@ typedef struct vcNetworkingSenderContext vcNetworkingSenderContext;
 
 typedef void (*receiver_callback_t)(void);
 
+int create_socket(const char *host, const char *port, int server);
+
 vcNetworkingSenderContext *vcNetworkingSenderCreate(const char *host, const char *port, uint8_t senderId, int silence,vcRingBuffer *ringBuffer, vcEncryptor *encryptor, vcEncoder *encoder);
 size_t vcNetworkingSenderGetSent(vcNetworkingSenderContext *context);
 int vcNetworkingSenderGetSocket(vcNetworkingSenderContext *context);
