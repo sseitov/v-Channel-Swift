@@ -28,3 +28,5 @@ DerivedData
 #
 Pods/
 Podfile.lock
+
+GoogleService-Info.plist
