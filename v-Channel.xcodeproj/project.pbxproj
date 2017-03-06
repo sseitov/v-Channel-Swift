@@ -99,6 +99,13 @@
 		2C5B2B041E561968006CC809 /* UIViewControllerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5B2AFE1E561968006CC809 /* UIViewControllerExtensions.swift */; };
 		2C5B2B051E561968006CC809 /* UIViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5B2AFF1E561968006CC809 /* UIViewExtensions.swift */; };
 		2C8174491E6D3EFD001E2AF7 /* RingtonePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8174481E6D3EFD001E2AF7 /* RingtonePlayer.swift */; };
+		2C8174701E6D8011001E2AF7 /* Camera.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C8174651E6D8011001E2AF7 /* Camera.m */; };
+		2C8174711E6D8011001E2AF7 /* DragView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C8174671E6D8011001E2AF7 /* DragView.m */; };
+		2C8174721E6D8011001E2AF7 /* VideoController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2C8174691E6D8011001E2AF7 /* VideoController.mm */; };
+		2C8174731E6D8011001E2AF7 /* VideoLayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C81746B1E6D8011001E2AF7 /* VideoLayerView.m */; };
+		2C8174741E6D8011001E2AF7 /* VTDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C81746D1E6D8011001E2AF7 /* VTDecoder.m */; };
+		2C8174751E6D8011001E2AF7 /* VTEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C81746F1E6D8011001E2AF7 /* VTEncoder.m */; };
+		2C8174781E6D8A3E001E2AF7 /* CallMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C8174771E6D8A3E001E2AF7 /* CallMessage.m */; };
 		2CE75BA61E55D40800EEE103 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE75BA51E55D40800EEE103 /* AppDelegate.swift */; };
 		2CE75BAD1E55D40800EEE103 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2CE75BAB1E55D40800EEE103 /* Main.storyboard */; };
 		2CE75BAF1E55D40800EEE103 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2CE75BAE1E55D40800EEE103 /* Assets.xcassets */; };
@@ -217,6 +224,20 @@
 		2C5B2AFE1E561968006CC809 /* UIViewControllerExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UIViewControllerExtensions.swift; path = Extensions/UIViewControllerExtensions.swift; sourceTree = "<group>"; };
 		2C5B2AFF1E561968006CC809 /* UIViewExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UIViewExtensions.swift; path = Extensions/UIViewExtensions.swift; sourceTree = "<group>"; };
 		2C8174481E6D3EFD001E2AF7 /* RingtonePlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RingtonePlayer.swift; sourceTree = "<group>"; };
+		2C8174641E6D8011001E2AF7 /* Camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Camera.h; path = video/Camera.h; sourceTree = "<group>"; };
+		2C8174651E6D8011001E2AF7 /* Camera.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Camera.m; path = video/Camera.m; sourceTree = "<group>"; };
+		2C8174661E6D8011001E2AF7 /* DragView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DragView.h; path = video/DragView.h; sourceTree = "<group>"; };
+		2C8174671E6D8011001E2AF7 /* DragView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DragView.m; path = video/DragView.m; sourceTree = "<group>"; };
+		2C8174681E6D8011001E2AF7 /* VideoController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VideoController.h; path = video/VideoController.h; sourceTree = "<group>"; };
+		2C8174691E6D8011001E2AF7 /* VideoController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = VideoController.mm; path = video/VideoController.mm; sourceTree = "<group>"; };
+		2C81746A1E6D8011001E2AF7 /* VideoLayerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VideoLayerView.h; path = video/VideoLayerView.h; sourceTree = "<group>"; };
+		2C81746B1E6D8011001E2AF7 /* VideoLayerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VideoLayerView.m; path = video/VideoLayerView.m; sourceTree = "<group>"; };
+		2C81746C1E6D8011001E2AF7 /* VTDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VTDecoder.h; path = video/VTDecoder.h; sourceTree = "<group>"; };
+		2C81746D1E6D8011001E2AF7 /* VTDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VTDecoder.m; path = video/VTDecoder.m; sourceTree = "<group>"; };
+		2C81746E1E6D8011001E2AF7 /* VTEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VTEncoder.h; path = video/VTEncoder.h; sourceTree = "<group>"; };
+		2C81746F1E6D8011001E2AF7 /* VTEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VTEncoder.m; path = video/VTEncoder.m; sourceTree = "<group>"; };
+		2C8174761E6D8A3E001E2AF7 /* CallMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CallMessage.h; path = video/CallMessage.h; sourceTree = "<group>"; };
+		2C8174771E6D8A3E001E2AF7 /* CallMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CallMessage.m; path = video/CallMessage.m; sourceTree = "<group>"; };
 		2CE75BA21E55D40800EEE103 /* v-Channel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "v-Channel.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CE75BA51E55D40800EEE103 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2CE75BAC1E55D40800EEE103 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -443,6 +464,27 @@
 			name = Profile;
 			sourceTree = "<group>";
 		};
+		2C8174611E6D77A8001E2AF7 /* Video */ = {
+			isa = PBXGroup;
+			children = (
+				2C8174761E6D8A3E001E2AF7 /* CallMessage.h */,
+				2C8174771E6D8A3E001E2AF7 /* CallMessage.m */,
+				2C8174641E6D8011001E2AF7 /* Camera.h */,
+				2C8174651E6D8011001E2AF7 /* Camera.m */,
+				2C8174661E6D8011001E2AF7 /* DragView.h */,
+				2C8174671E6D8011001E2AF7 /* DragView.m */,
+				2C8174681E6D8011001E2AF7 /* VideoController.h */,
+				2C8174691E6D8011001E2AF7 /* VideoController.mm */,
+				2C81746A1E6D8011001E2AF7 /* VideoLayerView.h */,
+				2C81746B1E6D8011001E2AF7 /* VideoLayerView.m */,
+				2C81746C1E6D8011001E2AF7 /* VTDecoder.h */,
+				2C81746D1E6D8011001E2AF7 /* VTDecoder.m */,
+				2C81746E1E6D8011001E2AF7 /* VTEncoder.h */,
+				2C81746F1E6D8011001E2AF7 /* VTEncoder.m */,
+			);
+			name = Video;
+			sourceTree = "<group>";
+		};
 		2CE75B991E55D40600EEE103 = {
 			isa = PBXGroup;
 			children = (
@@ -467,6 +509,7 @@
 		2CE75BA41E55D40800EEE103 /* v-Channel */ = {
 			isa = PBXGroup;
 			children = (
+				2C8174611E6D77A8001E2AF7 /* Video */,
 				2C5897E31E5D8040004F8B46 /* VOIP */,
 				2C5B2AD91E5618B8006CC809 /* CustomViews */,
 				2C5B2AD81E5618AB006CC809 /* Extensions */,
@@ -709,12 +752,15 @@
 				2C5B2AD21E56110A006CC809 /* Contact+CoreDataProperties.swift in Sources */,
 				2C58977F1E5D7A97004F8B46 /* ContactCell.swift in Sources */,
 				2C5B2ACC1E560FE8006CC809 /* vChannel.xcdatamodeld in Sources */,
+				2C8174731E6D8011001E2AF7 /* VideoLayerView.m in Sources */,
 				2C5B2AEF1E5618F7006CC809 /* NSPointerArray+AbstractionHelpers.m in Sources */,
 				2C5B2AF71E561935006CC809 /* EmailInput.swift in Sources */,
 				2C5897FB1E5D8051004F8B46 /* voipcrypto.c in Sources */,
+				2C8174721E6D8011001E2AF7 /* VideoController.mm in Sources */,
 				2C5898031E5D8F6F004F8B46 /* LoginController.swift in Sources */,
 				2C5B2AD41E56110A006CC809 /* User+CoreDataProperties.swift in Sources */,
 				2C5B2B021E561968006CC809 /* UIFontExtensions.swift in Sources */,
+				2C8174701E6D8011001E2AF7 /* Camera.m in Sources */,
 				2C5B2B011E561968006CC809 /* UIColorExtensions.swift in Sources */,
 				2C5897FA1E5D8051004F8B46 /* voipcoreaudio.c in Sources */,
 				2C8174491E6D3EFD001E2AF7 /* RingtonePlayer.swift in Sources */,
@@ -727,13 +773,17 @@
 				2C5897FD1E5D8051004F8B46 /* voipringbuffer.c in Sources */,
 				2C5897F71E5D8051004F8B46 /* IP_Getter.m in Sources */,
 				2C5B2AEC1E5618F7006CC809 /* LGProgressView.m in Sources */,
+				2C8174711E6D8011001E2AF7 /* DragView.m in Sources */,
 				2CF8FBD71E5606BF003FC98E /* ContactListController.swift in Sources */,
+				2C8174781E6D8A3E001E2AF7 /* CallMessage.m in Sources */,
 				2C5897FE1E5D8051004F8B46 /* VoipStreamHandler.m in Sources */,
 				2C161D201E5E260F002FF97D /* SoundSettingsController.swift in Sources */,
 				2C5B2AE81E5618F7006CC809 /* LGAlertView.m in Sources */,
 				2CE75BA61E55D40800EEE103 /* AppDelegate.swift in Sources */,
 				2C5B2AD11E56110A006CC809 /* Contact+CoreDataClass.swift in Sources */,
 				2C5B2AD31E56110A006CC809 /* User+CoreDataClass.swift in Sources */,
+				2C8174741E6D8011001E2AF7 /* VTDecoder.m in Sources */,
+				2C8174751E6D8011001E2AF7 /* VTEncoder.m in Sources */,
 				2C5897FC1E5D8051004F8B46 /* voipnetworking.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

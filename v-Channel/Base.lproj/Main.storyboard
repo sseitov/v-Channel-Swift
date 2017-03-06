@@ -6,6 +6,7 @@
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="Navigation items with more than one left or right bar item" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -57,12 +58,20 @@
                         <barButtonItem key="leftBarButtonItem" image="hangUp" id="oS7-WV-Hbr">
                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" image="loudOff" id="Kyk-3J-Vc1">
-                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            <connections>
-                                <action selector="switchLoud:" destination="JEX-9P-axG" id="1tC-ut-mgF"/>
-                            </connections>
-                        </barButtonItem>
+                        <rightBarButtonItems>
+                            <barButtonItem image="videoOff" id="MT5-k2-1VY">
+                                <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <action selector="switchVideo:" destination="JEX-9P-axG" id="AWo-de-uOk"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem image="loudOff" id="Kyk-3J-Vc1">
+                                <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <action selector="switchLoud:" destination="JEX-9P-axG" id="1tC-ut-mgF"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
                     </navigationItem>
                     <connections>
                         <outlet property="loudButton" destination="Kyk-3J-Vc1" id="Xq2-bp-nj0"/>
@@ -71,7 +80,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="FJe-Yq-33r" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="709" y="129"/>
+            <point key="canvasLocation" x="829" y="129"/>
         </scene>
         <!--Split View Controller-->
         <scene sceneID="Nki-YV-4Qg">
@@ -473,6 +482,7 @@
         <image name="loudOff" width="28" height="28"/>
         <image name="settings" width="22" height="22"/>
         <image name="stop" width="50" height="30"/>
+        <image name="videoOff" width="28" height="28"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="ECL-Uc-JUn"/>

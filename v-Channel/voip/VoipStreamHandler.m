@@ -149,11 +149,6 @@ NSString *const NOTIFICATION_CALL_STREAM_ROUTING_UPDATE = @"com.vchannel.upwork.
 - (void)mute:(BOOL)isMute
 {
     vcCoreAudioInputMute(audioInput, isMute);
-/*
-    for(int i=0; i < receiverCount; i++) {
-        vcCoreAudioOutputMute(audioOutputs[i], isMute);
-    }
- */
 }
 
 - (void)hangUp

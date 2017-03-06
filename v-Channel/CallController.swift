@@ -27,6 +27,8 @@ class CallController: UIViewController {
     private var ringPlayer:AVAudioPlayer?
     private var busyPlayer:AVAudioPlayer?
     
+    private var isVideo = false
+    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
@@ -36,7 +38,7 @@ class CallController: UIViewController {
         
         if delegate == nil {
             navigationItem.leftBarButtonItem = nil
-            navigationItem.rightBarButtonItem = nil
+            navigationItem.rightBarButtonItems = []
             return
         } else {
             setupBackButton()
@@ -151,4 +153,8 @@ class CallController: UIViewController {
             UIImage(named: "loudOn") : UIImage(named: "loudOff")
     }
 
+    @IBAction func switchVideo(_ sender: UIBarButtonItem) {
+        isVideo = !isVideo
+        sender.image = isVideo ? UIImage(named: "videoOn") : UIImage(named: "videoOff")
+    }
 }

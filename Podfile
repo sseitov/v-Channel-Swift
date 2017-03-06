@@ -10,6 +10,7 @@ target 'v-Channel' do
     pod 'Firebase/Messaging'
     
     pod 'AFNetworking'
+    pod 'MPMessagePack'
     
     pod 'SVProgressHUD'
     pod 'IQKeyboardManager'
