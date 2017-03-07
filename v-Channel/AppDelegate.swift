@@ -102,11 +102,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
                      fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        if let pushTypeStr = userInfo["pushType"] as? String, let pushType = Int(pushTypeStr) {
-            if pushType == PushType.incommingCall.rawValue {
-                Ringtone.shared.play()
-            } else if pushType == PushType.hangUpCall.rawValue {
-                Ringtone.shared.stop()
+        if application.applicationState != .active {
+            if let pushTypeStr = userInfo["pushType"] as? String, let pushType = Int(pushTypeStr) {
+                if pushType == PushType.incommingCall.rawValue {
+                    Ringtone.shared.play()
+                } else if pushType == PushType.hangUpCall.rawValue {
+                    Ringtone.shared.stop()
+                }
             }
         }
         completionHandler(.newData)

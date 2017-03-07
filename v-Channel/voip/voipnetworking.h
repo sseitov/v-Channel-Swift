@@ -21,8 +21,6 @@ typedef struct vcNetworkingReceiverContext vcNetworkingReceiverContext;
 
 typedef struct vcNetworkingSenderContext vcNetworkingSenderContext;
 
-typedef void (*receiver_callback_t)(void);
-
 int create_socket(const char *host, const char *port, int server);
 
 vcNetworkingSenderContext *vcNetworkingSenderCreate(const char *host, const char *port, uint8_t senderId, int silence,vcRingBuffer *ringBuffer, vcEncryptor *encryptor, vcEncoder *encoder);
@@ -33,7 +31,7 @@ void vcNetworkingSenderDestroy(vcNetworkingSenderContext *context);
 
 vcNetworkingReceiverContext *vcNetworkingReceiverCreateWithSocket(int socket, int videoSocket, vcRingBuffer **ringBuffer, uint8_t ringBufferCount);
 size_t vcNetworkingReceiverGetReceived(vcNetworkingReceiverContext *context);
-void vcNetworkingReceiverStart(vcNetworkingReceiverContext *context, receiver_callback_t start, receiver_callback_t finish);
+void vcNetworkingReceiverStart(vcNetworkingReceiverContext *context);
 void vcNetworkingReceiverDestroy(vcNetworkingReceiverContext *context);
 
 #endif

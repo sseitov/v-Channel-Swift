@@ -100,6 +100,7 @@ class Model: NSObject {
             self.newTokenRefHandle = nil
             self.updateTokenRefHandle = nil
             self.newCallRefHandle = nil
+            self.updateCallRefHandle = nil
             self.deleteCallRefHandle = nil
             self.newContactRefHandle = nil
             self.updateContactRefHandle = nil
@@ -128,6 +129,7 @@ class Model: NSObject {
     private var updateTokenRefHandle: FIRDatabaseHandle?
     
     private var newCallRefHandle: FIRDatabaseHandle?
+    private var updateCallRefHandle: FIRDatabaseHandle?
     private var deleteCallRefHandle: FIRDatabaseHandle?
     
     private var newContactRefHandle: FIRDatabaseHandle?
@@ -471,7 +473,12 @@ class Model: NSObject {
         return uid
     }
     
-    func hangUpCall(callID:String) {
+    func acceptCall(_ callID:String, accept:Bool) {
+        let ref = FIRDatabase.database().reference()
+        ref.child("calls").child(callID).setValue(["accept" : accept])
+    }
+    
+    func hangUpCall(_ callID:String) {
         let ref = FIRDatabase.database().reference()
         ref.child("calls").child(callID).removeValue()
     }
@@ -488,6 +495,12 @@ class Model: NSObject {
             }
         })
         
+        updateCallRefHandle = callQuery.observe(.childChanged, with: { (snapshot) -> Void in
+            if let call = snapshot.value as? [String:Any], let accept = call["accept"] as? Bool {
+                NotificationCenter.default.post(name: acceptCallNotification, object: snapshot.key, userInfo: ["accept" : accept])
+            }
+        })
+
         deleteCallRefHandle = callQuery.observe(.childRemoved, with: { (snapshot) -> Void in
             NotificationCenter.default.post(name: hangUpCallNotification, object: snapshot.key)
         })

@@ -238,7 +238,7 @@ static bool socketReady(int socket, struct pollfd *pollfds, int nfds) {
     return false;
 }
 
-void vcNetworkingReceiverStart(vcNetworkingReceiverContext *context, receiver_callback_t start, receiver_callback_t finish) {
+void vcNetworkingReceiverStart(vcNetworkingReceiverContext *context) {
     
     context->dispatchQueue = dispatch_queue_create("vcNetworkingReceiver", DISPATCH_QUEUE_SERIAL);
     dispatch_async(context->dispatchQueue, ^{
@@ -273,18 +273,10 @@ void vcNetworkingReceiverStart(vcNetworkingReceiverContext *context, receiver_ca
                     fprintf(stderr, "GOT DATA FOR INVALID RINGBUFFER (%d of %d)", ringBufferId, context->ringBufferCount);
                     continue;
                 }
-                
-                if (buffer[1] == 'S' && buffer[2] == 'T' && buffer[3] == 'O' && buffer[4] == 'P') {
-                    finish();
-                    context->stopped = true;
-                } else if (buffer[1] == 'S' && buffer[2] == 'T' && buffer[3] == 'A' && buffer[4] == 'R' && buffer[5] == 'T') {
-                    start();
-                } else {
-                    uint8_t *targetBuffer = vcRingBufferProducerGetCurrent(context->ringBuffer[ringBufferId]);
-                    context->received += result;
-                    memcpy(targetBuffer, buffer+1, result-1);
-                    vcRingBufferProducerProduced(context->ringBuffer[ringBufferId], result);
-                }
+                uint8_t *targetBuffer = vcRingBufferProducerGetCurrent(context->ringBuffer[ringBufferId]);
+                context->received += result;
+                memcpy(targetBuffer, buffer+1, result-1);
+                vcRingBufferProducerProduced(context->ringBuffer[ringBufferId], result);
             } else if (result == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
                 continue;
             } else {

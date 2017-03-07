@@ -21,13 +21,6 @@
 
 #define VC_VIDEO_BUFFER_SIZE 16384
 
-@interface VoipStreamHandler ()
-
-@property (strong, nonatomic) NSCondition* startCondition;
-@property (strong, nonatomic) NSCondition* finishCondition;
-
-@end
-
 @implementation VoipStreamHandler
 
 NSString *const NOTIFICATION_CALL_STREAM_ROUTING_UPDATE = @"com.vchannel.upwork.SimpleVOIP";
@@ -47,8 +40,6 @@ NSString *const NOTIFICATION_CALL_STREAM_ROUTING_UPDATE = @"com.vchannel.upwork.
                                                  selector:@selector(audioSessionInterrupted:)
                                                      name:AVAudioSessionInterruptionNotification
                                                    object:nil];
-        sharedInstance.startCondition = [[NSCondition alloc] init];
-        sharedInstance.finishCondition = [[NSCondition alloc] init];
     });
     
     return sharedInstance;
@@ -225,47 +216,7 @@ static void derive_key(const char *password, size_t password_size, uint8_t *key,
     receiver = vcNetworkingReceiverCreateWithSocket(vcNetworkingSenderGetSocket(sender), videoSocket, receiverRingBuffers, receiverCount);
     
     vcNetworkingSenderStart(sender);
-    vcNetworkingReceiverStart(receiver, startReceiver, finishReceiver);
-}
-
-void startReceiver() {
-    [[VoipStreamHandler sharedInstance].startCondition lock];
-    [[VoipStreamHandler sharedInstance].startCondition signal];
-    [[VoipStreamHandler sharedInstance].startCondition unlock];
-}
-
-void finishReceiver() {
-    [[VoipStreamHandler sharedInstance].finishCondition lock];
-    [[VoipStreamHandler sharedInstance].finishCondition signal];
-    [[VoipStreamHandler sharedInstance].finishCondition unlock];
-}
-
-- (void)waitForStart:(void (^)(void))start {
-    dispatch_queue_t dispatchQueue = dispatch_queue_create("vcNetworkingReceiverHandlerStart", DISPATCH_QUEUE_SERIAL);
-    dispatch_async(dispatchQueue, ^{
-        [[VoipStreamHandler sharedInstance].startCondition lock];
-        [[VoipStreamHandler sharedInstance].startCondition wait];
-        [[VoipStreamHandler sharedInstance].startCondition unlock];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if ([VoipStreamHandler sharedInstance]->receiver != nil)
-                start();
-        });
-    });
-}
-
-- (void)waitForFinish:(void (^)(void))finish {
-    dispatch_queue_t dispatchQueue = dispatch_queue_create("vcNetworkingReceiverHandlerFinish", DISPATCH_QUEUE_SERIAL);
-    dispatch_async(dispatchQueue, ^{
-        [[VoipStreamHandler sharedInstance].finishCondition lock];
-        [[VoipStreamHandler sharedInstance].finishCondition wait];
-        [[VoipStreamHandler sharedInstance].finishCondition unlock];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if ([VoipStreamHandler sharedInstance]->receiver != nil) {
-                [[VoipStreamHandler sharedInstance] hangUp];
-                finish();
-            }
-        });
-    });
+    vcNetworkingReceiverStart(receiver);
 }
 
 - (void)startVideo:(void (^)(NSData*))message

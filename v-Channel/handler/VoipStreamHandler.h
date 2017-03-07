@@ -58,8 +58,6 @@ extern NSString *const NOTIFICATION_CALL_STREAM_ROUTING_UPDATE;
      SilenceSuppression:(int)silence;
 
 - (void)startVoIP;
-- (void)waitForStart:(void (^)(void))start;
-- (void)waitForFinish:(void (^)(void))finish;
 - (void)hangUp;
 - (void)mute:(BOOL)isMute;
 

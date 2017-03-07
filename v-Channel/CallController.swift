@@ -45,6 +45,11 @@ class CallController: UIViewController {
             setupBackButton()
         }
         
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(self.hangUpCall(_:)),
+                                               name: hangUpCallNotification,
+                                               object: nil)
+        
         if contact == nil {
             contact = Model.shared.getUser(incommingCall!["from"] as! String)
             audioGateway = CallGatewayInfo(ip: incommingCall!["audioIP"] as! String, port: incommingCall!["audioPort"] as! String)
@@ -66,8 +71,8 @@ class CallController: UIViewController {
             userImage.animationRepeatCount = 0
             userImage.startAnimating()
             NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(self.hangUpCall(_:)),
-                                                   name: hangUpCallNotification,
+                                                   selector: #selector(self.acceptCall(_:)),
+                                                   name: acceptCallNotification,
                                                    object: nil)
         }
         
@@ -92,6 +97,45 @@ class CallController: UIViewController {
             return
         }
 
+        if incommingCall != nil {
+            startCall()
+            navigationItem.setRightBarButtonItems(rightButtonItems(), animated: true)
+        } else {
+            incommingCallID = Model.shared.makeCall(to: contact!,
+                                                    audioIP: audioGateway!.publicIP!,
+                                                    audioPort: audioGateway!.publicPort!,
+                                                    videoIP: videoGateway!.publicIP!,
+                                                    videoPort: videoGateway!.publicPort!)
+            if ringPlayer != nil && ringPlayer!.prepareToPlay() {
+                ringPlayer?.play()
+            }
+        }
+    }
+    
+    override func goBack() {
+        if delegate == nil {
+            return
+        }
+        
+        if busyPlayer != nil && busyPlayer!.isPlaying {
+            self.busyPlayer?.stop()
+            Model.shared.hangUpCall(self.incommingCallID!)
+            self.incommingCallID = nil
+            self.delegate?.callDidFinish(self)
+        } else if incommingCall != nil || incommingCallID != nil {
+            let callID = incommingCallID != nil ? incommingCallID : incommingCall!["uid"] as? String
+            let alert = createQuestion("Want you hang up?", acceptTitle: "Yes", cancelTitle: "Cancel", acceptHandler: {
+                Model.shared.hangUpCall(callID!)
+                self.finishCall()
+                self.delegate?.callDidFinish(self)
+            })
+            alert?.show()
+        } else {
+            self.delegate?.callDidFinish(self)
+        }
+    }
+    
+    private func startCall() {
         VoipStreamHandler.sharedInstance().startVoIP()
         VoipStreamHandler.sharedInstance().startVideo({ data in
             if data != nil {
@@ -110,76 +154,40 @@ class CallController: UIViewController {
                 }
             }
         })
-
-        if incommingCall != nil {
-            navigationItem.setRightBarButtonItems(rightButtonItems(), animated: true)
-            VoipStreamHandler.sharedInstance().wait(forFinish: {
-                self.incommingCall = nil
-                self.goBack()
-            })
-        } else {
-            incommingCallID = Model.shared.makeCall(to: contact!,
-                                                    audioIP: audioGateway!.publicIP!,
-                                                    audioPort: audioGateway!.publicPort!,
-                                                    videoIP: videoGateway!.publicIP!,
-                                                    videoPort: videoGateway!.publicPort!)
-            if ringPlayer != nil && ringPlayer!.prepareToPlay() {
-                ringPlayer?.play()
-            }
-            VoipStreamHandler.sharedInstance().wait(forStart: {
-                self.ringPlayer?.stop()
-                self.userImage.stopAnimating()
-                self.navigationItem.setRightBarButtonItems(self.rightButtonItems(), animated: true)
-                self.userImage.image = UIImage(data: self.contact!.avatar as! Data)?.withSize(self.userImage.frame.size).inCircle()
-                VoipStreamHandler.sharedInstance().wait(forFinish: {
-                    if self.incommingCallID != nil {
-                        Model.shared.hangUpCall(callID: self.incommingCallID!)
-                        self.incommingCallID = nil
-                    }
-                    self.goBack()
-                })
-            })
+    }
+    
+    private func finishCall() {
+        self.incommingCallID = nil
+        self.incommingCall = nil
+        self.ringPlayer?.stop()
+        self.busyPlayer?.stop()
+        VoipStreamHandler.sharedInstance().hangUp()
+        if !self.videoView.isHidden {
+            self.videoController!.shutdown()
         }
     }
     
-    override func goBack() {
-        if delegate == nil {
-            return
-        }
-        if incommingCall != nil || incommingCallID != nil {
-            let alert = createQuestion("Want you hang up?", acceptTitle: "Yes", cancelTitle: "Cancel", acceptHandler: {
-                self.ringPlayer?.stop()
+    func acceptCall(_ notify:Notification) {
+        if let callID = notify.object as? String, callID == incommingCallID!, notify.userInfo != nil, let accept = notify.userInfo!["accept"] as? Bool {
+            self.ringPlayer?.stop()
+            self.userImage.stopAnimating()
+            if accept {
+                self.navigationItem.setRightBarButtonItems(self.rightButtonItems(), animated: true)
+                self.userImage.image = UIImage(data: self.contact!.avatar as! Data)?.withSize(self.userImage.frame.size).inCircle()
+                startCall()
+            } else {
+                self.busyPlayer?.play()
                 VoipStreamHandler.sharedInstance().hangUp()
-                if self.incommingCallID != nil {
-                    Model.shared.hangUpCall(callID: self.incommingCallID!)
-                    self.incommingCallID = nil
-                }
-                if !self.videoView.isHidden {
-                    self.videoController!.shutdown()
-                }
-                self.delegate?.callDidFinish(self)
-            })
-            alert?.show()
-        } else {
-            self.busyPlayer?.stop()
-            VoipStreamHandler.sharedInstance().hangUp()
-            if !self.videoView.isHidden {
-                self.videoController!.shutdown()
             }
-            self.delegate?.callDidFinish(self)
         }
     }
     
     func hangUpCall(_ notify:Notification) {
-        if let callID = notify.object as? String {
-            if (self.incommingCallID != nil && self.incommingCallID! == callID) {
-                self.self.incommingCallID = nil
-                self.ringPlayer?.stop()
-                self.userImage.stopAnimating()
-                self.userImage.image = UIImage(named: "logo.png")
-                if self.busyPlayer!.prepareToPlay() {
-                    self.busyPlayer?.play()
-                }
+        if incommingCall != nil || incommingCallID != nil {
+            let selfCallID = incommingCallID != nil ? incommingCallID : incommingCall!["uid"] as? String
+            if let callID = notify.object as? String, callID == selfCallID {
+                self.finishCall()
+                self.delegate?.callDidFinish(self)
             }
         }
     }

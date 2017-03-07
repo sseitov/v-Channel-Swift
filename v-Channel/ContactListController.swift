@@ -23,6 +23,8 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Cal
         didSet {
             if inCall == nil {
                 Ringtone.shared.stop()
+            } else {
+                Ringtone.shared.play()
             }
             tableView.reloadData()
         }
@@ -230,17 +232,19 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Cal
                             acceptTitle: "Accept",
                             cancelTitle: "Reject",
                             acceptHandler: {
+                                Model.shared.acceptCall(callID, accept: true)
                                 self.performSegue(withIdentifier: "personalCall", sender: self.inCall)
                                 self.inCall = nil
                         },
                             cancelHandler: {
-                                Model.shared.hangUpCall(callID: callID)
+                                Model.shared.acceptCall(callID, accept: false)
                                 self.inCall = nil
                         })
                         alert?.show()
                     } else {
+                        Model.shared.acceptCall(callID, accept: false)
+                        self.inCall = nil
                         if audioGateway != nil && videoGateway != nil {
-                            Model.shared.hangUpCall(callID: callID)
                             performSegue(withIdentifier: "personalCall", sender: user)
                             self.inCall = nil
                         } else {
