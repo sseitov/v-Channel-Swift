@@ -215,8 +215,8 @@ NSString *const NOTIFICATION_CALL_STREAM_ROUTING_UPDATE = @"com.vchannel.upwork.
     
     receiver = vcNetworkingReceiverCreateWithSocket(vcNetworkingSenderGetSocket(sender), receiverRingBuffers, receiverCount);
     
-//    vcNetworkingSenderStart(sender);
-//    vcNetworkingReceiverStart(receiver, startReceiver, finishReceiver);
+    vcNetworkingSenderStart(sender);
+    vcNetworkingReceiverStart(receiver, startReceiver, finishReceiver);
 }
 
 void startReceiver() {
@@ -232,8 +232,6 @@ void finishReceiver() {
 }
 
 - (void)waitForStart:(void (^)(void))start {
-    start();
-/*
     dispatch_queue_t dispatchQueue = dispatch_queue_create("vcNetworkingReceiverHandlerStart", DISPATCH_QUEUE_SERIAL);
     dispatch_async(dispatchQueue, ^{
         [[VoipStreamHandler sharedInstance].startCondition lock];
@@ -244,7 +242,6 @@ void finishReceiver() {
                 start();
         });
     });
- */
 }
 
 - (void)waitForFinish:(void (^)(void))finish {
@@ -300,7 +297,7 @@ static void derive_key(const char *password, size_t password_size, uint8_t *key,
                 packetLength = *(int*)buffer;
                 NSData *packet = [NSData dataWithBytes:buffer+sizeof(packetLength) length:result-sizeof(packetLength)];
                 if (packetLength != packet.length) {
-                    printf("receive data %ld for packet %d\n", packet.length, packetLength);
+                    fprintf(stderr, "receive data %ld for packet %d\n", packet.length, packetLength);
                 } else {
                     message(packet);
                 }

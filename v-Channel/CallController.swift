@@ -179,6 +179,7 @@ class CallController: UIViewController {
         sender.image = videoView.isHidden ? UIImage(named: "videoOff") : UIImage(named: "videoOn")
         if videoController != nil {
             if videoView.isHidden {
+                VoipStreamHandler.sharedInstance().sendVideoMessage(CallVideoStopMessage())
                 VoipStreamHandler.sharedInstance().stopVideo()
                 videoController!.shutdown()
             } else {

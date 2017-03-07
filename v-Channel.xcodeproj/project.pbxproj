@@ -61,15 +61,12 @@
 		2C5897E01E5D7C64004F8B46 /* ring_frame_21.gif in Resources */ = {isa = PBXBuildFile; fileRef = 2C5897C81E5D7C64004F8B46 /* ring_frame_21.gif */; };
 		2C5897E11E5D7C64004F8B46 /* ring_frame_22.gif in Resources */ = {isa = PBXBuildFile; fileRef = 2C5897C91E5D7C64004F8B46 /* ring_frame_22.gif */; };
 		2C5897E21E5D7C64004F8B46 /* ring_frame_23.gif in Resources */ = {isa = PBXBuildFile; fileRef = 2C5897CA1E5D7C64004F8B46 /* ring_frame_23.gif */; };
-		2C5897F61E5D8051004F8B46 /* CallGatewayInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C5897E51E5D8051004F8B46 /* CallGatewayInfo.m */; };
-		2C5897F71E5D8051004F8B46 /* IP_Getter.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C5897E71E5D8051004F8B46 /* IP_Getter.m */; };
 		2C5897F81E5D8051004F8B46 /* ipGetter.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C5897E81E5D8051004F8B46 /* ipGetter.c */; };
 		2C5897F91E5D8051004F8B46 /* voipcodec.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C5897EA1E5D8051004F8B46 /* voipcodec.c */; };
 		2C5897FA1E5D8051004F8B46 /* voipcoreaudio.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C5897EC1E5D8051004F8B46 /* voipcoreaudio.c */; };
 		2C5897FB1E5D8051004F8B46 /* voipcrypto.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C5897EE1E5D8051004F8B46 /* voipcrypto.c */; };
 		2C5897FC1E5D8051004F8B46 /* voipnetworking.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C5897F01E5D8051004F8B46 /* voipnetworking.c */; };
 		2C5897FD1E5D8051004F8B46 /* voipringbuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C5897F21E5D8051004F8B46 /* voipringbuffer.c */; };
-		2C5897FE1E5D8051004F8B46 /* VoipStreamHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C5897F51E5D8051004F8B46 /* VoipStreamHandler.m */; };
 		2C5898011E5D80E2004F8B46 /* opus.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C5898001E5D80E2004F8B46 /* opus.framework */; };
 		2C5898031E5D8F6F004F8B46 /* LoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5898021E5D8F6F004F8B46 /* LoginController.swift */; };
 		2C5898051E5D8F94004F8B46 /* SignUpController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5898041E5D8F94004F8B46 /* SignUpController.swift */; };
@@ -114,6 +111,9 @@
 		2CF8FBD71E5606BF003FC98E /* ContactListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CF8FBD61E5606BF003FC98E /* ContactListController.swift */; };
 		2CF8FBD91E5606E1003FC98E /* CallController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CF8FBD81E5606E1003FC98E /* CallController.swift */; };
 		2CF8FBDB1E560AE4003FC98E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2CF8FBDA1E560AE4003FC98E /* GoogleService-Info.plist */; };
+		2CFC4F7D1E6EB91100DF34EA /* CallGatewayInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 2CFC4F781E6EB91000DF34EA /* CallGatewayInfo.m */; };
+		2CFC4F7E1E6EB91100DF34EA /* IP_Getter.m in Sources */ = {isa = PBXBuildFile; fileRef = 2CFC4F7A1E6EB91000DF34EA /* IP_Getter.m */; };
+		2CFC4F7F1E6EB91100DF34EA /* VoipStreamHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 2CFC4F7C1E6EB91000DF34EA /* VoipStreamHandler.m */; };
 		6A46458D2066723416EB9CF3 /* Pods_v_Channel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2F146A25207587E5EB019F /* Pods_v_Channel.framework */; };
 /* End PBXBuildFile section */
 
@@ -172,10 +172,6 @@
 		2C5897C81E5D7C64004F8B46 /* ring_frame_21.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = ring_frame_21.gif; path = animation/ring/ring_frame_21.gif; sourceTree = "<group>"; };
 		2C5897C91E5D7C64004F8B46 /* ring_frame_22.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = ring_frame_22.gif; path = animation/ring/ring_frame_22.gif; sourceTree = "<group>"; };
 		2C5897CA1E5D7C64004F8B46 /* ring_frame_23.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = ring_frame_23.gif; path = animation/ring/ring_frame_23.gif; sourceTree = "<group>"; };
-		2C5897E41E5D8051004F8B46 /* CallGatewayInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CallGatewayInfo.h; path = voip/CallGatewayInfo.h; sourceTree = "<group>"; };
-		2C5897E51E5D8051004F8B46 /* CallGatewayInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CallGatewayInfo.m; path = voip/CallGatewayInfo.m; sourceTree = "<group>"; };
-		2C5897E61E5D8051004F8B46 /* IP_Getter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IP_Getter.h; path = voip/IP_Getter.h; sourceTree = "<group>"; };
-		2C5897E71E5D8051004F8B46 /* IP_Getter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IP_Getter.m; path = voip/IP_Getter.m; sourceTree = "<group>"; };
 		2C5897E81E5D8051004F8B46 /* ipGetter.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ipGetter.c; path = voip/ipGetter.c; sourceTree = "<group>"; };
 		2C5897E91E5D8051004F8B46 /* ipGetter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ipGetter.h; path = voip/ipGetter.h; sourceTree = "<group>"; };
 		2C5897EA1E5D8051004F8B46 /* voipcodec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = voipcodec.c; path = voip/voipcodec.c; sourceTree = "<group>"; };
@@ -188,8 +184,6 @@
 		2C5897F11E5D8051004F8B46 /* voipnetworking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = voipnetworking.h; path = voip/voipnetworking.h; sourceTree = "<group>"; };
 		2C5897F21E5D8051004F8B46 /* voipringbuffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = voipringbuffer.c; path = voip/voipringbuffer.c; sourceTree = "<group>"; };
 		2C5897F31E5D8051004F8B46 /* voipringbuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = voipringbuffer.h; path = voip/voipringbuffer.h; sourceTree = "<group>"; };
-		2C5897F41E5D8051004F8B46 /* VoipStreamHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VoipStreamHandler.h; path = voip/VoipStreamHandler.h; sourceTree = "<group>"; };
-		2C5897F51E5D8051004F8B46 /* VoipStreamHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VoipStreamHandler.m; path = voip/VoipStreamHandler.m; sourceTree = "<group>"; };
 		2C5898001E5D80E2004F8B46 /* opus.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opus.framework; sourceTree = "<group>"; };
 		2C5898021E5D8F6F004F8B46 /* LoginController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginController.swift; sourceTree = "<group>"; };
 		2C5898041E5D8F94004F8B46 /* SignUpController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignUpController.swift; sourceTree = "<group>"; };
@@ -248,6 +242,12 @@
 		2CF8FBD61E5606BF003FC98E /* ContactListController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactListController.swift; sourceTree = "<group>"; };
 		2CF8FBD81E5606E1003FC98E /* CallController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CallController.swift; sourceTree = "<group>"; };
 		2CF8FBDA1E560AE4003FC98E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		2CFC4F771E6EB91000DF34EA /* CallGatewayInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CallGatewayInfo.h; path = handler/CallGatewayInfo.h; sourceTree = "<group>"; };
+		2CFC4F781E6EB91000DF34EA /* CallGatewayInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CallGatewayInfo.m; path = handler/CallGatewayInfo.m; sourceTree = "<group>"; };
+		2CFC4F791E6EB91000DF34EA /* IP_Getter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IP_Getter.h; path = handler/IP_Getter.h; sourceTree = "<group>"; };
+		2CFC4F7A1E6EB91000DF34EA /* IP_Getter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IP_Getter.m; path = handler/IP_Getter.m; sourceTree = "<group>"; };
+		2CFC4F7B1E6EB91000DF34EA /* VoipStreamHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VoipStreamHandler.h; path = handler/VoipStreamHandler.h; sourceTree = "<group>"; };
+		2CFC4F7C1E6EB91000DF34EA /* VoipStreamHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VoipStreamHandler.m; path = handler/VoipStreamHandler.m; sourceTree = "<group>"; };
 		7BD9BF50F7EBEB89EAFA1572 /* Pods-v-Channel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-v-Channel.debug.xcconfig"; path = "Pods/Target Support Files/Pods-v-Channel/Pods-v-Channel.debug.xcconfig"; sourceTree = "<group>"; };
 		7C2F146A25207587E5EB019F /* Pods_v_Channel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_v_Channel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C55A54370BD411B724397158 /* Pods-v-Channel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-v-Channel.release.xcconfig"; path = "Pods/Target Support Files/Pods-v-Channel/Pods-v-Channel.release.xcconfig"; sourceTree = "<group>"; };
@@ -359,7 +359,6 @@
 		2C5897E31E5D8040004F8B46 /* VOIP */ = {
 			isa = PBXGroup;
 			children = (
-				2C5897FF1E5D805B004F8B46 /* wrapper */,
 				2C5897E81E5D8051004F8B46 /* ipGetter.c */,
 				2C5897E91E5D8051004F8B46 /* ipGetter.h */,
 				2C5897EA1E5D8051004F8B46 /* voipcodec.c */,
@@ -374,19 +373,6 @@
 				2C5897F31E5D8051004F8B46 /* voipringbuffer.h */,
 			);
 			name = VOIP;
-			sourceTree = "<group>";
-		};
-		2C5897FF1E5D805B004F8B46 /* wrapper */ = {
-			isa = PBXGroup;
-			children = (
-				2C5897E41E5D8051004F8B46 /* CallGatewayInfo.h */,
-				2C5897E51E5D8051004F8B46 /* CallGatewayInfo.m */,
-				2C5897E61E5D8051004F8B46 /* IP_Getter.h */,
-				2C5897E71E5D8051004F8B46 /* IP_Getter.m */,
-				2C5897F41E5D8051004F8B46 /* VoipStreamHandler.h */,
-				2C5897F51E5D8051004F8B46 /* VoipStreamHandler.m */,
-			);
-			name = wrapper;
 			sourceTree = "<group>";
 		};
 		2C5B2AC91E560F57006CC809 /* Model */ = {
@@ -464,7 +450,7 @@
 			name = Profile;
 			sourceTree = "<group>";
 		};
-		2C8174611E6D77A8001E2AF7 /* Video */ = {
+		2C8174611E6D77A8001E2AF7 /* Video Call */ = {
 			isa = PBXGroup;
 			children = (
 				2C8174761E6D8A3E001E2AF7 /* CallMessage.h */,
@@ -482,7 +468,7 @@
 				2C81746E1E6D8011001E2AF7 /* VTEncoder.h */,
 				2C81746F1E6D8011001E2AF7 /* VTEncoder.m */,
 			);
-			name = Video;
+			name = "Video Call";
 			sourceTree = "<group>";
 		};
 		2CE75B991E55D40600EEE103 = {
@@ -509,8 +495,9 @@
 		2CE75BA41E55D40800EEE103 /* v-Channel */ = {
 			isa = PBXGroup;
 			children = (
-				2C8174611E6D77A8001E2AF7 /* Video */,
 				2C5897E31E5D8040004F8B46 /* VOIP */,
+				2CFC4F761E6EB88E00DF34EA /* Call Handler */,
+				2C8174611E6D77A8001E2AF7 /* Video Call */,
 				2C5B2AD91E5618B8006CC809 /* CustomViews */,
 				2C5B2AD81E5618AB006CC809 /* Extensions */,
 				2C5B2AC91E560F57006CC809 /* Model */,
@@ -538,6 +525,19 @@
 				2CE75BB31E55D40800EEE103 /* Info.plist */,
 			);
 			name = Resources;
+			sourceTree = "<group>";
+		};
+		2CFC4F761E6EB88E00DF34EA /* Call Handler */ = {
+			isa = PBXGroup;
+			children = (
+				2CFC4F771E6EB91000DF34EA /* CallGatewayInfo.h */,
+				2CFC4F781E6EB91000DF34EA /* CallGatewayInfo.m */,
+				2CFC4F791E6EB91000DF34EA /* IP_Getter.h */,
+				2CFC4F7A1E6EB91000DF34EA /* IP_Getter.m */,
+				2CFC4F7B1E6EB91000DF34EA /* VoipStreamHandler.h */,
+				2CFC4F7C1E6EB91000DF34EA /* VoipStreamHandler.m */,
+			);
+			name = "Call Handler";
 			sourceTree = "<group>";
 		};
 		DC932FA6565E079E9D64F008 /* Frameworks */ = {
@@ -743,7 +743,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2C5B2AF51E561935006CC809 /* ActionSheet.swift in Sources */,
-				2C5897F61E5D8051004F8B46 /* CallGatewayInfo.m in Sources */,
 				2C5B2B051E561968006CC809 /* UIViewExtensions.swift in Sources */,
 				2C5B2AF91E561935006CC809 /* TextFieldContainer.swift in Sources */,
 				2C5B2B031E561968006CC809 /* UIImageExtensions.swift in Sources */,
@@ -758,9 +757,12 @@
 				2C5897FB1E5D8051004F8B46 /* voipcrypto.c in Sources */,
 				2C8174721E6D8011001E2AF7 /* VideoController.m in Sources */,
 				2C5898031E5D8F6F004F8B46 /* LoginController.swift in Sources */,
+				2CFC4F7D1E6EB91100DF34EA /* CallGatewayInfo.m in Sources */,
 				2C5B2AD41E56110A006CC809 /* User+CoreDataProperties.swift in Sources */,
+				2CFC4F7E1E6EB91100DF34EA /* IP_Getter.m in Sources */,
 				2C5B2B021E561968006CC809 /* UIFontExtensions.swift in Sources */,
 				2C8174701E6D8011001E2AF7 /* Camera.m in Sources */,
+				2CFC4F7F1E6EB91100DF34EA /* VoipStreamHandler.m in Sources */,
 				2C5B2B011E561968006CC809 /* UIColorExtensions.swift in Sources */,
 				2C5897FA1E5D8051004F8B46 /* voipcoreaudio.c in Sources */,
 				2C8174491E6D3EFD001E2AF7 /* RingtonePlayer.swift in Sources */,
@@ -771,12 +773,10 @@
 				2C5B2B041E561968006CC809 /* UIViewControllerExtensions.swift in Sources */,
 				2CF8FBD91E5606E1003FC98E /* CallController.swift in Sources */,
 				2C5897FD1E5D8051004F8B46 /* voipringbuffer.c in Sources */,
-				2C5897F71E5D8051004F8B46 /* IP_Getter.m in Sources */,
 				2C5B2AEC1E5618F7006CC809 /* LGProgressView.m in Sources */,
 				2C8174711E6D8011001E2AF7 /* DragView.m in Sources */,
 				2CF8FBD71E5606BF003FC98E /* ContactListController.swift in Sources */,
 				2C8174781E6D8A3E001E2AF7 /* CallMessage.m in Sources */,
-				2C5897FE1E5D8051004F8B46 /* VoipStreamHandler.m in Sources */,
 				2C161D201E5E260F002FF97D /* SoundSettingsController.swift in Sources */,
 				2C5B2AE81E5618F7006CC809 /* LGAlertView.m in Sources */,
 				2CE75BA61E55D40800EEE103 /* AppDelegate.swift in Sources */,
