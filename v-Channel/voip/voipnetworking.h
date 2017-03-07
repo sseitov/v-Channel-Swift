@@ -31,8 +31,7 @@ int vcNetworkingSenderGetSocket(vcNetworkingSenderContext *context);
 void vcNetworkingSenderStart(vcNetworkingSenderContext *context);
 void vcNetworkingSenderDestroy(vcNetworkingSenderContext *context);
 
-vcNetworkingReceiverContext *vcNetworkingReceiverCreate(const char *port, vcRingBuffer **ringBuffer, uint8_t ringBufferCount);
-vcNetworkingReceiverContext *vcNetworkingReceiverCreateWithSocket(int socket, vcRingBuffer **ringBuffer, uint8_t ringBufferCount);
+vcNetworkingReceiverContext *vcNetworkingReceiverCreateWithSocket(int socket, int videoSocket, vcRingBuffer **ringBuffer, uint8_t ringBufferCount);
 size_t vcNetworkingReceiverGetReceived(vcNetworkingReceiverContext *context);
 void vcNetworkingReceiverStart(vcNetworkingReceiverContext *context, receiver_callback_t start, receiver_callback_t finish);
 void vcNetworkingReceiverDestroy(vcNetworkingReceiverContext *context);

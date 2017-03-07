@@ -73,7 +73,7 @@ class CallController: UIViewController {
         
         setupTitle(contact!.name!)
         
-        VoipStreamHandler.sharedInstance().open(withGateway: audioGateway, receiverCount: 1, senderId: 0, silenceSuppression: 24)
+        VoipStreamHandler.sharedInstance().open(withGateway: audioGateway, videoGateway: videoGateway, receiverCount: 1, senderId: 0, silenceSuppression: 24);
     }
     
     private func rightButtonItems() -> [UIBarButtonItem] {
@@ -93,6 +93,24 @@ class CallController: UIViewController {
         }
 
         VoipStreamHandler.sharedInstance().startVoIP()
+        VoipStreamHandler.sharedInstance().startVideo({ data in
+            if data != nil {
+                if let dictionary = try? (data! as NSData).mp_dict(), let messageType = dictionary["type"] as? String {
+                    if messageType == "frame" {
+                        self.videoController?.receiveVideoMessage(CallVideoFrameMessage(dictionary: dictionary))
+                    } else if messageType == "start" {
+                        self.videoController?.receiveVideoMessage(CallVideoStartMessage(dictionary: dictionary))
+                    } else if messageType == "accept" {
+                        self.videoController?.receiveVideoMessage(CallVideoAcceptMessage())
+                    } else if messageType == "stop" {
+                        self.videoController?.receiveVideoMessage(CallVideoStopMessage())
+                    }
+                } else {
+                    print("invalid data")
+                }
+            }
+        })
+
         if incommingCall != nil {
             navigationItem.setRightBarButtonItems(rightButtonItems(), animated: true)
             VoipStreamHandler.sharedInstance().wait(forFinish: {
@@ -180,28 +198,10 @@ class CallController: UIViewController {
         if videoController != nil {
             if videoView.isHidden {
                 VoipStreamHandler.sharedInstance().sendVideoMessage(CallVideoStopMessage())
-                VoipStreamHandler.sharedInstance().stopVideo()
                 videoController!.shutdown()
             } else {
                 videoController?.peerView.image = userImage.image
                 videoController!.start()
-                VoipStreamHandler.sharedInstance().startVideo(withGateway: videoGateway, message: { data in
-                    if data != nil {
-                        if let dictionary = try? (data! as NSData).mp_dict(), let messageType = dictionary["type"] as? String {
-                            if messageType == "frame" {
-                                self.videoController?.receiveVideoMessage(CallVideoFrameMessage(dictionary: dictionary))
-                            } else if messageType == "start" {
-                                self.videoController?.receiveVideoMessage(CallVideoStartMessage(dictionary: dictionary))
-                            } else if messageType == "accept" {
-                                self.videoController?.receiveVideoMessage(CallVideoAcceptMessage())
-                            } else if messageType == "stop" {
-                                self.videoController?.receiveVideoMessage(CallVideoStopMessage())
-                            }
-                        } else {
-                            print("invalid data")
-                        }
-                    }
-                })
             }
         }
     }

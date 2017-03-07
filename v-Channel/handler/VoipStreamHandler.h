@@ -38,10 +38,10 @@
     vcNetworkingSenderContext *videoSender;
     vcNetworkingReceiverContext *videoReceiver;
     
-    CallGatewayInfo *gatewayInfo;
+    CallGatewayInfo *audioGatewayInfo;
+    CallGatewayInfo *videoGatewayInfo;
     
     int videoSocket;
-    bool videoStopped;
 }
 
 @property (assign, nonatomic, readonly) int senderId;
@@ -51,7 +51,11 @@ extern NSString *const NOTIFICATION_CALL_STREAM_ROUTING_UPDATE;
 
 + (VoipStreamHandler *)sharedInstance;
 
-- (void)openWithGateway:(CallGatewayInfo*)_gatewayInfo ReceiverCount:(size_t)_receiverCount SenderId:(int)_senderId SilenceSuppression:(int)silence;
+- (void)openWithGateway:(CallGatewayInfo*)audioGateway
+           videoGateway:(CallGatewayInfo*)videoGateway
+          ReceiverCount:(size_t)_receiverCount
+               SenderId:(int)_senderId
+     SilenceSuppression:(int)silence;
 
 - (void)startVoIP;
 - (void)waitForStart:(void (^)(void))start;
@@ -62,8 +66,7 @@ extern NSString *const NOTIFICATION_CALL_STREAM_ROUTING_UPDATE;
 - (void)enableLoudspeaker:(bool)speaker;
 - (BOOL)isLoudSpeaker;
 
-- (void)startVideoWithGateway:(CallGatewayInfo*)_gatewayInfo message:(void (^)(NSData*))message;
+- (void)startVideo:(void (^)(NSData*))message;
 - (void)sendVideoMessage:(CallMessage*)message;
-- (void)stopVideo;
 
 @end

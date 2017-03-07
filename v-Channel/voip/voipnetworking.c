@@ -33,6 +33,7 @@
 
 struct vcNetworkingReceiverContext {
     int socket;
+    int videoSocket;
     vcRingBuffer **ringBuffer;
     uint8_t ringBufferCount;
     
@@ -211,19 +212,11 @@ void vcNetworkingSenderDestroy(vcNetworkingSenderContext *context)
     }
 }
 
-vcNetworkingReceiverContext *vcNetworkingReceiverCreate(const char *port, vcRingBuffer **ringBuffer, uint8_t ringBufferCount) {
-    
-    int socket = create_socket("", port, 1);
-    if(socket == -1) {
-        fprintf(stderr, "Socket creation failed.\n");
-        return NULL;
-    }
-    return vcNetworkingReceiverCreateWithSocket(socket, ringBuffer, ringBufferCount);
-}
-
-vcNetworkingReceiverContext *vcNetworkingReceiverCreateWithSocket(int socket, vcRingBuffer **ringBuffer, uint8_t ringBufferCount) {
+vcNetworkingReceiverContext *vcNetworkingReceiverCreateWithSocket(int socket, int videoSocket, vcRingBuffer **ringBuffer, uint8_t ringBufferCount)
+{
     vcNetworkingReceiverContext *context = calloc(1, sizeof(vcNetworkingReceiverContext));
     context->socket = socket;
+    context->videoSocket = videoSocket;
     context->ringBuffer = ringBuffer;
     context->ringBufferCount = ringBufferCount;
     pthread_mutex_init(&context->destructionMutex, NULL);
@@ -236,12 +229,21 @@ size_t vcNetworkingReceiverGetReceived(vcNetworkingReceiverContext *context) {
     return context->received;
 }
 
+static bool socketReady(int socket, struct pollfd *pollfds, int nfds) {
+    for (int i=0; i<nfds; i++) {
+        if (pollfds[i].fd == socket && pollfds[i].revents == POLLIN) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void vcNetworkingReceiverStart(vcNetworkingReceiverContext *context, receiver_callback_t start, receiver_callback_t finish) {
     
     context->dispatchQueue = dispatch_queue_create("vcNetworkingReceiver", DISPATCH_QUEUE_SERIAL);
     dispatch_async(context->dispatchQueue, ^{
         struct pollfd pollfds[] = {
-            { context->socket, POLLIN, 0 }
+            { context->socket, POLLIN, 0 }, { context->videoSocket, POLLIN, 0 }
         };
         
         pthread_mutex_lock(&context->destructionMutex);
@@ -250,7 +252,6 @@ void vcNetworkingReceiverStart(vcNetworkingReceiverContext *context, receiver_ca
         
         uint8_t buffer[VC_RINGBUFFER_CELL_SIZE];
         
-        // TODO: read stopped atomically somehow?
         while (!context->stopped) {
             int pret = poll(pollfds, 1, 16);
             if (pret == -1) {
@@ -258,13 +259,16 @@ void vcNetworkingReceiverStart(vcNetworkingReceiverContext *context, receiver_ca
                 break;
             } else if (pret == 0) {
                 continue;
+            } else {
+                if (!socketReady(context->socket, pollfds, 2)) {
+                    continue;
+                }
             }
             
             ssize_t result = read(context->socket, buffer, VC_RINGBUFFER_CELL_SIZE);
             
             if (result > 0) {
                 uint8_t ringBufferId = buffer[0];
-                //                fprintf(stderr, "Received %zd bytes for %d\n", result, ringBufferId);
                 if(ringBufferId >= context->ringBufferCount) {
                     fprintf(stderr, "GOT DATA FOR INVALID RINGBUFFER (%d of %d)", ringBufferId, context->ringBufferCount);
                     continue;
@@ -276,25 +280,19 @@ void vcNetworkingReceiverStart(vcNetworkingReceiverContext *context, receiver_ca
                 } else if (buffer[1] == 'S' && buffer[2] == 'T' && buffer[3] == 'A' && buffer[4] == 'R' && buffer[5] == 'T') {
                     start();
                 } else {
-                    //fprintf(stderr, "RECEIVED %ld BYTES\n", result);
                     uint8_t *targetBuffer = vcRingBufferProducerGetCurrent(context->ringBuffer[ringBufferId]);
                     context->received += result;
-                    // memcpy unavoidable as we need to look into the received buffer
-                    // before we know which ringbuffer is the right one..
                     memcpy(targetBuffer, buffer+1, result-1);
                     vcRingBufferProducerProduced(context->ringBuffer[ringBufferId], result);
                 }
-            }
-            else if (result == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+            } else if (result == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
                 continue;
-            }
-            else {
+            } else {
                 context->stopped = true;
             }
         }
         
         fprintf(stderr, "Stopping receiver thread\n");
-        
         pthread_mutex_unlock(&context->destructionMutex);
     });
 }
@@ -335,7 +333,6 @@ int create_socket(const char *host, const char *port, int server)
     
     error = getaddrinfo(host, port, &hints, &result);
     if (error != 0) {
-        // TODO: We probably want to remove this errx
         fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(error));
         return -1;
     }

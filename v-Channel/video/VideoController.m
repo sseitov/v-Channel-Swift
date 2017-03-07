@@ -70,6 +70,7 @@
     [self stopCapture];
     [_decoder close];
     [_peerView clear];
+    self.videoAccepted = false;
     
     [[Camera shared] shutdown];
     [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
@@ -108,10 +109,13 @@
     } else if ([message isKindOfClass:[CallVideoAcceptMessage class]]) {
         self.videoAccepted = true;
     } else if ([message isKindOfClass:[CallVideoStopMessage class]]) {
+        self.videoAccepted = false;
         if (_decoder.isOpened) {
             [_decoder close];
             [_peerView clear];
-            _peerView.image = _avatar;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                _peerView.image = _avatar;
+            });
         }
     }
 }

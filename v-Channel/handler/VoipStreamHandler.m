@@ -30,8 +30,6 @@
 
 @implementation VoipStreamHandler
 
-static void derive_key(const char *password, size_t password_size, uint8_t *key, size_t key_size);
-
 NSString *const NOTIFICATION_CALL_STREAM_ROUTING_UPDATE = @"com.vchannel.upwork.SimpleVOIP";
 
 + (VoipStreamHandler *)sharedInstance
@@ -140,11 +138,12 @@ NSString *const NOTIFICATION_CALL_STREAM_ROUTING_UPDATE = @"com.vchannel.upwork.
     }
 }
 
-- (void)openWithGateway:(CallGatewayInfo*)_gatewayInfo ReceiverCount:(size_t)_receiverCount SenderId:(int)senderId SilenceSuppression:(int)silence
+- (void)openWithGateway:(CallGatewayInfo*)audioGateway videoGateway:(CallGatewayInfo*)videoGateway ReceiverCount:(size_t)_receiverCount SenderId:(int)audioSenderId SilenceSuppression:(int)silence
 {
-    gatewayInfo = _gatewayInfo;
+    audioGatewayInfo = audioGateway;
+    videoGatewayInfo = videoGateway;
     receiverCount = _receiverCount;
-    _senderId = senderId;
+    _senderId = audioSenderId;
     _silenceSuppression = silence;
     
     // configure audio session
@@ -175,13 +174,19 @@ NSString *const NOTIFICATION_CALL_STREAM_ROUTING_UPDATE = @"com.vchannel.upwork.
             vcDecoderDestroy(decoders[i]);
         }
         receiverCount = 0;
+        close(videoSocket);
     }
+}
+
+static void derive_key(const char *password, size_t password_size, uint8_t *key, size_t key_size) {
+    uint8_t salt[] = {-106, -111, -100, -9, -25, -26, -21, 68, 6, 100, 45, -38, 109, -119, -76, -116};
+    CCKeyDerivationPBKDF(kCCPBKDF2, password, password_size, salt, sizeof(salt), kCCPRFHmacAlgSHA256, 1<<20, key, key_size);
 }
 
 - (void)startVoIP
 {
-    const char *host = gatewayInfo.publicIP.UTF8String;
-    const char *port = gatewayInfo.publicPort.UTF8String;
+    const char *host = audioGatewayInfo.publicIP.UTF8String;
+    const char *port = audioGatewayInfo.publicPort.UTF8String;
     
     // Setup sender
     uint8_t key[16];
@@ -213,7 +218,11 @@ NSString *const NOTIFICATION_CALL_STREAM_ROUTING_UPDATE = @"com.vchannel.upwork.
         vcCoreAudioOutputStart(audioOutputs[i]);
     }
     
-    receiver = vcNetworkingReceiverCreateWithSocket(vcNetworkingSenderGetSocket(sender), receiverRingBuffers, receiverCount);
+    host = videoGatewayInfo.publicIP.UTF8String;
+    port = videoGatewayInfo.publicPort.UTF8String;
+    videoSocket = create_socket(host, port, 0);
+    
+    receiver = vcNetworkingReceiverCreateWithSocket(vcNetworkingSenderGetSocket(sender), videoSocket, receiverRingBuffers, receiverCount);
     
     vcNetworkingSenderStart(sender);
     vcNetworkingReceiverStart(receiver, startReceiver, finishReceiver);
@@ -259,19 +268,8 @@ void finishReceiver() {
     });
 }
 
-// TODO: Put this somewhere else
-static void derive_key(const char *password, size_t password_size, uint8_t *key, size_t key_size) {
-    uint8_t salt[] = {-106, -111, -100, -9, -25, -26, -21, 68, 6, 100, 45, -38, 109, -119, -76, -116};
-    CCKeyDerivationPBKDF(kCCPBKDF2, password, password_size, salt, sizeof(salt), kCCPRFHmacAlgSHA256, 1<<20, key, key_size);
-}
-
-
-- (void)startVideoWithGateway:(CallGatewayInfo*)_gatewayInfo message:(void (^)(NSData*))message
+- (void)startVideo:(void (^)(NSData*))message
 {
-    const char *host = gatewayInfo.publicIP.UTF8String;
-    const char *port = gatewayInfo.publicPort.UTF8String;
-    videoSocket = create_socket(host, port, 0);
-    
     dispatch_queue_t videoDispatchQueue = dispatch_queue_create("vcNetworkingVideoReceiver", DISPATCH_QUEUE_SERIAL);
     dispatch_async(videoDispatchQueue, ^{
         struct pollfd pollfds[] = {
@@ -279,32 +277,29 @@ static void derive_key(const char *password, size_t password_size, uint8_t *key,
         };
         
         static uint8_t buffer[VC_VIDEO_BUFFER_SIZE];
-        int packetLength = 0;
         
-        videoStopped = false;
-        while (!videoStopped) {
+        while (true) {
             int pret = poll(pollfds, 1, 16);
             if (pret == -1) {
                 fprintf(stderr, "socket error\n");
                 break;
-            }
-            else if (pret == 0) {
+            } else if (pret == 0) {
                 continue;
             }
             ssize_t result = (int)read(videoSocket, buffer, VC_VIDEO_BUFFER_SIZE);
             
             if (result > 0) {
-                packetLength = *(int*)buffer;
-                NSData *packet = [NSData dataWithBytes:buffer+sizeof(packetLength) length:result-sizeof(packetLength)];
-                if (packetLength != packet.length) {
-                    fprintf(stderr, "receive data %ld for packet %d\n", packet.length, packetLength);
+                int packetSize = *(int*)buffer;
+                NSData *packet = [NSData dataWithBytes:buffer+sizeof(packetSize) length:result-sizeof(packetSize)];
+                if (packetSize != packet.length) {
+                    fprintf(stderr, "receive data %ld for packet %d\n", packet.length, packetSize);
                 } else {
                     message(packet);
                 }
             } else if (result == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
                 continue;
             } else {
-                videoStopped = true;
+                break;  // socket closed
             }
         }
         
@@ -315,16 +310,9 @@ static void derive_key(const char *password, size_t password_size, uint8_t *key,
 
 - (void)sendVideoMessage:(CallMessage*)message {
     NSMutableData* data = [NSMutableData dataWithData: message.encrypt];
-    int length = (int)data.length;
-    [data replaceBytesInRange:NSMakeRange(0, 0) withBytes:&length length:sizeof(length)];
+    int packetSize = (int)data.length;
+    [data replaceBytesInRange:NSMakeRange(0, 0) withBytes:&packetSize length:sizeof(packetSize)];
     write(videoSocket, data.bytes, data.length);
-}
-
-- (void)stopVideo
-{
-    videoStopped = true;
-    close(videoSocket);
-    videoSocket = -1;
 }
 
 @end
