@@ -10,12 +10,6 @@ import UIKit
 import Firebase
 import SVProgressHUD
 
-
-//let IP_STUN_SERVER_VOIP = "95.31.31.166"
-let IP_STUN_SERVER_VOIP = "192.168.1.15"
-let IP_AUDIO_PORT_VOIP = "6888"
-let IP_VIDEO_PORT_VOIP = "6889"
-
 class ContactListController: UITableViewController, LoginControllerDelegate, CallControllerDelegate {
 
     fileprivate var contacts:[User] = []

@@ -114,6 +114,7 @@
 		2CFC4F7D1E6EB91100DF34EA /* CallGatewayInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 2CFC4F781E6EB91000DF34EA /* CallGatewayInfo.m */; };
 		2CFC4F7E1E6EB91100DF34EA /* IP_Getter.m in Sources */ = {isa = PBXBuildFile; fileRef = 2CFC4F7A1E6EB91000DF34EA /* IP_Getter.m */; };
 		2CFC4F7F1E6EB91100DF34EA /* VoipStreamHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 2CFC4F7C1E6EB91000DF34EA /* VoipStreamHandler.m */; };
+		2CFC4F811E6ECFFE00DF34EA /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CFC4F801E6ECFFE00DF34EA /* Credentials.swift */; };
 		6A46458D2066723416EB9CF3 /* Pods_v_Channel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2F146A25207587E5EB019F /* Pods_v_Channel.framework */; };
 /* End PBXBuildFile section */
 
@@ -248,6 +249,7 @@
 		2CFC4F7A1E6EB91000DF34EA /* IP_Getter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IP_Getter.m; path = handler/IP_Getter.m; sourceTree = "<group>"; };
 		2CFC4F7B1E6EB91000DF34EA /* VoipStreamHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VoipStreamHandler.h; path = handler/VoipStreamHandler.h; sourceTree = "<group>"; };
 		2CFC4F7C1E6EB91000DF34EA /* VoipStreamHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VoipStreamHandler.m; path = handler/VoipStreamHandler.m; sourceTree = "<group>"; };
+		2CFC4F801E6ECFFE00DF34EA /* Credentials.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Credentials.swift; sourceTree = SOURCE_ROOT; };
 		7BD9BF50F7EBEB89EAFA1572 /* Pods-v-Channel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-v-Channel.debug.xcconfig"; path = "Pods/Target Support Files/Pods-v-Channel/Pods-v-Channel.debug.xcconfig"; sourceTree = "<group>"; };
 		7C2F146A25207587E5EB019F /* Pods_v_Channel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_v_Channel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C55A54370BD411B724397158 /* Pods-v-Channel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-v-Channel.release.xcconfig"; path = "Pods/Target Support Files/Pods-v-Channel/Pods-v-Channel.release.xcconfig"; sourceTree = "<group>"; };
@@ -507,6 +509,7 @@
 				2CF8FBD81E5606E1003FC98E /* CallController.swift */,
 				2CE75BA51E55D40800EEE103 /* AppDelegate.swift */,
 				2C5B2AD51E561190006CC809 /* Model.swift */,
+				2CFC4F801E6ECFFE00DF34EA /* Credentials.swift */,
 			);
 			path = "v-Channel";
 			sourceTree = "<group>";
@@ -756,6 +759,7 @@
 				2C5B2AF71E561935006CC809 /* EmailInput.swift in Sources */,
 				2C5897FB1E5D8051004F8B46 /* voipcrypto.c in Sources */,
 				2C8174721E6D8011001E2AF7 /* VideoController.m in Sources */,
+				2CFC4F811E6ECFFE00DF34EA /* Credentials.swift in Sources */,
 				2C5898031E5D8F6F004F8B46 /* LoginController.swift in Sources */,
 				2CFC4F7D1E6EB91100DF34EA /* CallGatewayInfo.m in Sources */,
 				2C5B2AD41E56110A006CC809 /* User+CoreDataProperties.swift in Sources */,

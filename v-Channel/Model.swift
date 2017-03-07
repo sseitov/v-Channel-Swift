@@ -42,10 +42,6 @@ let contactAddNotification = Notification.Name("ADD_CONTACT")
 let contactUpdateNotification = Notification.Name("UPDATE_CONTACT")
 let contactDeleteNotification = Notification.Name("DELETE_CONTACT")
 
-
-fileprivate let firStorage = "gs://v-channel-679e6.appspot.com"
-fileprivate let pushServerKey = "AAAAnbgiMKU:APA91bEAODIVeRXzRh0qB65iG0VldafHQULvRyabbmxILr5a7RPeygUTSSCHIHHFNuPR5czeWAVDP4KcxVQFedN-GTqKieMUGomcCMo_y38P_69B7IqVWrIQY_uQ9QFC8LYnXJ1Tdo5a"
-
 class Model: NSObject {
     
     static let shared = Model()
