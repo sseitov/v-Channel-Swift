@@ -256,10 +256,10 @@ void vcNetworkingReceiverStart(vcNetworkingReceiverContext *context, receiver_ca
             if (pret == -1) {
                 fprintf(stderr, "socket error\n");
                 break;
-            }
-            else if (pret == 0) {
+            } else if (pret == 0) {
                 continue;
             }
+            
             ssize_t result = read(context->socket, buffer, VC_RINGBUFFER_CELL_SIZE);
             
             if (result > 0) {

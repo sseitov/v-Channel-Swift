@@ -12,7 +12,7 @@ UDP_BIND_REMOTE_IP = "192.168.1.15"
 
 UDP_BIND_IP = "192.168.1.15"
 UDP_BIND_PORT = 6888
-DATAGRAM_SIZE = 1024
+DATAGRAM_SIZE = 16384
 
 class DistributionPool(threading.Thread):
         def __init__(self):
@@ -25,7 +25,6 @@ class DistributionPool(threading.Thread):
 
 
         def run(self):
-                print "RECEIVING"
                 while True:
                         data, addr = self.socket.recvfrom(DATAGRAM_SIZE)
                         if not (addr in self.addresses):
@@ -43,9 +42,7 @@ sock.bind((UDP_BIND_IP, UDP_BIND_PORT))
 
 while True:
         data, addr = sock.recvfrom(DATAGRAM_SIZE)
-        print "GOT MSG"
         dp = DistributionPool()
-        print "PORT ", dp.incoming_port
         gatewayInfo = {
                 "PublicIP": UDP_BIND_REMOTE_IP,
                 "PublicPort": "%d" % dp.incoming_port,

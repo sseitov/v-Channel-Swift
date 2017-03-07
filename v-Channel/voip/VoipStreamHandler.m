@@ -19,7 +19,7 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#define VC_VIDEO_BUFFER_SIZE 65536
+#define VC_VIDEO_BUFFER_SIZE 16384
 
 @interface VoipStreamHandler ()
 
@@ -215,8 +215,8 @@ NSString *const NOTIFICATION_CALL_STREAM_ROUTING_UPDATE = @"com.vchannel.upwork.
     
     receiver = vcNetworkingReceiverCreateWithSocket(vcNetworkingSenderGetSocket(sender), receiverRingBuffers, receiverCount);
     
-    vcNetworkingSenderStart(sender);    
-    vcNetworkingReceiverStart(receiver, startReceiver, finishReceiver);
+//    vcNetworkingSenderStart(sender);
+//    vcNetworkingReceiverStart(receiver, startReceiver, finishReceiver);
 }
 
 void startReceiver() {
@@ -232,6 +232,8 @@ void finishReceiver() {
 }
 
 - (void)waitForStart:(void (^)(void))start {
+    start();
+/*
     dispatch_queue_t dispatchQueue = dispatch_queue_create("vcNetworkingReceiverHandlerStart", DISPATCH_QUEUE_SERIAL);
     dispatch_async(dispatchQueue, ^{
         [[VoipStreamHandler sharedInstance].startCondition lock];
@@ -242,6 +244,7 @@ void finishReceiver() {
                 start();
         });
     });
+ */
 }
 
 - (void)waitForFinish:(void (^)(void))finish {
@@ -279,6 +282,8 @@ static void derive_key(const char *password, size_t password_size, uint8_t *key,
         };
         
         static uint8_t buffer[VC_VIDEO_BUFFER_SIZE];
+        int packetLength = 0;
+        
         videoStopped = false;
         while (!videoStopped) {
             int pret = poll(pollfds, 1, 16);
@@ -289,12 +294,16 @@ static void derive_key(const char *password, size_t password_size, uint8_t *key,
             else if (pret == 0) {
                 continue;
             }
-            ssize_t result = read(videoSocket, buffer, VC_VIDEO_BUFFER_SIZE);
+            ssize_t result = (int)read(videoSocket, buffer, VC_VIDEO_BUFFER_SIZE);
             
             if (result > 0) {
-                NSData* data = [[NSData alloc] initWithBytes:buffer length:result];
-                NSLog(@"message %ld", result);
-                message(data);
+                packetLength = *(int*)buffer;
+                NSData *packet = [NSData dataWithBytes:buffer+sizeof(packetLength) length:result-sizeof(packetLength)];
+                if (packetLength != packet.length) {
+                    printf("receive data %ld for packet %d\n", packet.length, packetLength);
+                } else {
+                    message(packet);
+                }
             } else if (result == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
                 continue;
             } else {
@@ -308,7 +317,9 @@ static void derive_key(const char *password, size_t password_size, uint8_t *key,
 }
 
 - (void)sendVideoMessage:(CallMessage*)message {
-    NSData* data = message.encrypt;
+    NSMutableData* data = [NSMutableData dataWithData: message.encrypt];
+    int length = (int)data.length;
+    [data replaceBytesInRange:NSMakeRange(0, 0) withBytes:&length length:sizeof(length)];
     write(videoSocket, data.bytes, data.length);
 }
 

@@ -8,32 +8,36 @@
 
 #import <Foundation/Foundation.h>
 
-enum VideoMessageType {
-    messageNone = 0,
-    messageFrame,
-    messageStop
-};
-
 @interface CallMessage : NSObject
 
-@property (nonatomic) enum VideoMessageType messageType;
+@property (strong, nonatomic) NSString* messageType;
 
-- (instancetype)initWithDictionary:(NSDictionary*)dictionary;
 - (NSDictionary*)pack;
 - (NSData*)encrypt;
 
 @end
 
-@interface CallVideoFrameMessage : CallMessage
+@interface CallVideoStartMessage : CallMessage
 
-@property (strong, nonatomic, readonly) NSData* sps;
-@property (strong, nonatomic, readonly) NSData* pps;
-@property (nonatomic, readonly) int width;
-@property (nonatomic, readonly) int height;
-@property (strong, nonatomic, readonly) NSData* frame;
+- (instancetype)initWithDictionary:(NSDictionary*)dictionary;
+
+@property (strong, nonatomic) NSData* sps;
+@property (strong, nonatomic) NSData* pps;
+@property (nonatomic) int width;
+@property (nonatomic) int height;
 
 @end
 
-@interface CallVideoStopMessage : CallMessage
+@interface CallVideoFrameMessage : CallMessage
 
+- (instancetype)initWithDictionary:(NSDictionary*)dictionary;
+
+@property (strong, nonatomic) NSData* frame;
+
+@end
+
+@interface CallVideoAcceptMessage : CallMessage
+@end
+
+@interface CallVideoStopMessage : CallMessage
 @end

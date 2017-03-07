@@ -11,18 +11,9 @@
 
 @implementation CallMessage
 
-- (instancetype)initWithDictionary:(NSDictionary*)dictionary
-{
-    self = [super init];
-    if (self) {
-        self.messageType = [dictionary[@"messageType"] intValue];
-    }
-    return self;
-}
-
 - (NSDictionary*)pack
 {
-    return @{@"messageType" : [NSNumber numberWithInt:messageNone]};
+    return nil;
 }
 
 - (NSData*)encrypt
@@ -32,37 +23,99 @@
 
 @end
 
-@implementation CallVideoFrameMessage
+@implementation CallVideoStartMessage
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.messageType = @"start";
+    }
+    return self;
+}
 
 - (instancetype)initWithDictionary:(NSDictionary*)dictionary
 {
-    self = [super initWithDictionary:dictionary];
+    self = [super init];
     if (self) {
+        self.messageType = dictionary[@"type"];
         _sps = dictionary[@"sps"];
         _pps = dictionary[@"pps"];
         _width = [dictionary[@"width"] intValue];
         _height = [dictionary[@"height"] intValue];
+    }
+    return self;
+}
+
+- (NSDictionary*)pack {
+    return @{@"type" : @"start",
+             @"sps" : _sps,
+             @"pps" : _pps,
+             @"width": [NSNumber numberWithInt:_width],
+             @"height": [NSNumber numberWithInt:_height]};
+}
+
+@end
+
+@implementation CallVideoFrameMessage
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.messageType = @"frame";
+    }
+    return self;
+}
+
+- (instancetype)initWithDictionary:(NSDictionary*)dictionary
+{
+    self = [super init];
+    if (self) {
+        self.messageType = dictionary[@"type"];
         _frame = dictionary[@"frame"];
     }
     return self;
 }
 
 - (NSDictionary*)pack {
-    return @{@"messageType" : [NSNumber numberWithInt:messageFrame],
-             @"sps" : _sps,
-             @"pps" : _pps,
-             @"width": [NSNumber numberWithInt:_width],
-             @"height": [NSNumber numberWithInt:_height],
-             @"frame": _frame};
+    return @{@"type" : @"frame", @"frame": _frame};
+}
+
+@end
+
+@implementation CallVideoAcceptMessage
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.messageType = @"accept";
+    }
+    return self;
+}
+
+- (NSDictionary*)pack
+{
+    return @{@"type" : @"accept"};
 }
 
 @end
 
 @implementation CallVideoStopMessage
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.messageType = @"stop";
+    }
+    return self;
+}
+
 - (NSDictionary*)pack
 {
-    return @{@"messageType" : [NSNumber numberWithInt:messageStop]};
+    return @{@"type" : @"stop"};
 }
 
 @end

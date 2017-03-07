@@ -26,6 +26,8 @@
 @property (strong, nonatomic) UIImage* avatar;
 @property (nonatomic) UIDeviceOrientation orientation;
 
+@property (atomic) bool videoAccepted;
+
 @end
 
 @implementation VideoController
@@ -59,6 +61,7 @@
                                                object:nil];
     _orientation = [[UIDevice currentDevice] orientation];
     _avatar = _peerView.image;
+    self.videoAccepted = false;
     [self startCapture];
 }
 
@@ -87,32 +90,30 @@
 
 - (void)receiveVideoMessage:(CallMessage*)message
 {
-    switch (message.messageType) {
-        case messageFrame:
-        {
-            CallVideoFrameMessage* frameMessage = (CallVideoFrameMessage*)message;
-            if (!_decoder.isOpened) {
-                [_decoder openForWidth:frameMessage.width
-                                height:frameMessage.height
-                                   sps:frameMessage.sps
-                                   pps:frameMessage.pps];
-            }
-            else {
-                [_decoder decodeData:frameMessage.frame];
-            }
-            break;
+    if ([message isKindOfClass:[CallVideoStartMessage class]]) {
+        CallVideoStartMessage* startMessage = (CallVideoStartMessage*)message;
+        if (!_decoder.isOpened) {
+            [_decoder openForWidth:startMessage.width
+                            height:startMessage.height
+                               sps:startMessage.sps
+                               pps:startMessage.pps];
         }
-        case messageStop:
-            if (_decoder.isOpened) {
-                [_decoder close];
-                [_peerView clear];
-                _peerView.image = _avatar;
-            }
-            break;
-        default:
-            break;
+        if (_decoder.isOpened) {
+            CallVideoAcceptMessage *message = [[CallVideoAcceptMessage alloc] init];
+            [self.delegate sendVideoMessage:message];
+        }
+    } else if ([message isKindOfClass:[CallVideoFrameMessage class]]) {
+        CallVideoFrameMessage* frameMessage = (CallVideoFrameMessage*)message;
+        [_decoder decodeData:frameMessage.frame];
+    } else if ([message isKindOfClass:[CallVideoAcceptMessage class]]) {
+        self.videoAccepted = true;
+    } else if ([message isKindOfClass:[CallVideoStopMessage class]]) {
+        if (_decoder.isOpened) {
+            [_decoder close];
+            [_peerView clear];
+            _peerView.image = _avatar;
+        }
     }
-
 }
 
 - (void)deviceOrientationDidChange:(NSNotification*)notify
@@ -151,17 +152,18 @@
 
 - (void)encoder:(VTEncoder*)encoder encodedData:(NSData*)data
 {
-    NSDictionary *params = @{@"messageType" : [NSNumber numberWithInt:messageFrame],
-                             @"sps" : _encoder.sps,
-                             @"pps" : _encoder.pps,
-                             @"width" : [NSNumber numberWithInt:_encoder.width],
-                             @"height" : [NSNumber numberWithInt:_encoder.height],
-                             @"frame" : data};
-    CallMessage *message = [[CallVideoFrameMessage alloc] initWithDictionary:params];
-    [self.delegate sendVideoMessage:message];
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//        [self receiveVideoMessage:message];
-//    });
+    if (self.videoAccepted) {
+        CallVideoFrameMessage* message = [[CallVideoFrameMessage alloc] init];
+        message.frame = data;
+        [self.delegate sendVideoMessage:message];
+    } else {
+        CallVideoStartMessage* message = [[CallVideoStartMessage alloc] init];
+        message.sps = _encoder.sps;
+        message.pps = _encoder.pps;
+        message.width = _encoder.width;
+        message.height = _encoder.height;
+        [self.delegate sendVideoMessage:message];
+    }
 }
 
 #pragma mark - VTDeccoder delegare

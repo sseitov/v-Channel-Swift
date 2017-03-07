@@ -186,12 +186,18 @@ class CallController: UIViewController {
                 videoController!.start()
                 VoipStreamHandler.sharedInstance().startVideo(withGateway: videoGateway, message: { data in
                     if data != nil {
-                        if let dictionary = try? (data! as NSData).mp_dict(), let messageType = dictionary["messageType"] as? Int {
-                            if messageType == Int(messageFrame.rawValue) {
+                        if let dictionary = try? (data! as NSData).mp_dict(), let messageType = dictionary["type"] as? String {
+                            if messageType == "frame" {
                                 self.videoController?.receiveVideoMessage(CallVideoFrameMessage(dictionary: dictionary))
-                            } else if messageType == Int(messageStop.rawValue) {
-                                self.videoController?.receiveVideoMessage(CallVideoStopMessage(dictionary: dictionary))
+                            } else if messageType == "start" {
+                                self.videoController?.receiveVideoMessage(CallVideoStartMessage(dictionary: dictionary))
+                            } else if messageType == "accept" {
+                                self.videoController?.receiveVideoMessage(CallVideoAcceptMessage())
+                            } else if messageType == "stop" {
+                                self.videoController?.receiveVideoMessage(CallVideoStopMessage())
                             }
+                        } else {
+                            print("invalid data")
                         }
                     }
                 })
