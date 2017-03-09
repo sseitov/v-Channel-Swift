@@ -15,7 +15,7 @@ protocol LoginControllerDelegate {
     func didLogout()
 }
 
-class LoginController: UIViewController, TextFieldContainerDelegate {
+class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate, TextFieldContainerDelegate {
 
     @IBOutlet weak var userField: TextFieldContainer!
     @IBOutlet weak var passwordField: TextFieldContainer!
@@ -26,6 +26,10 @@ class LoginController: UIViewController, TextFieldContainerDelegate {
         super.viewDidLoad()
         setupTitle("Authentication")
         
+        GIDSignIn.sharedInstance().clientID = FIRApp.defaultApp()?.options.clientID
+        GIDSignIn.sharedInstance().delegate = self
+        GIDSignIn.sharedInstance().uiDelegate = self
+   
         userField.textType = .emailAddress
         userField.placeholder = "email"
         userField.returnType = .next
@@ -80,7 +84,7 @@ class LoginController: UIViewController, TextFieldContainerDelegate {
             }
             
             SVProgressHUD.show(withStatus: "Login...") // interested_in
-            let params = ["fields" : "name,email,first_name,last_name,birthday,picture.width(480).height(480)"]
+            let params = ["fields" : "name,email,picture.width(480).height(480)"]
             let request = FBSDKGraphRequest(graphPath: "me", parameters: params)
             request!.start(completionHandler: { _, result, fbError in
                 if fbError != nil {

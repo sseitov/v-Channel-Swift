@@ -99,6 +99,7 @@
 		2C7E3F1E1E7123E20019CB7F /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C7E3F1B1E7123E20019CB7F /* FBSDKLoginKit.framework */; };
 		2C7E3F1F1E7123E20019CB7F /* FBSDKShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C7E3F1C1E7123E20019CB7F /* FBSDKShareKit.framework */; };
 		2C7E3F211E7124850019CB7F /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C7E3F201E7124850019CB7F /* Bolts.framework */; };
+		2C7E3F241E71BF1D0019CB7F /* ProfileCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7E3F231E71BF1D0019CB7F /* ProfileCell.swift */; };
 		2C8174491E6D3EFD001E2AF7 /* RingtonePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8174481E6D3EFD001E2AF7 /* RingtonePlayer.swift */; };
 		2C8174701E6D8011001E2AF7 /* Camera.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C8174651E6D8011001E2AF7 /* Camera.m */; };
 		2C8174711E6D8011001E2AF7 /* DragView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C8174671E6D8011001E2AF7 /* DragView.m */; };
@@ -227,6 +228,7 @@
 		2C7E3F1C1E7123E20019CB7F /* FBSDKShareKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKShareKit.framework; sourceTree = "<group>"; };
 		2C7E3F201E7124850019CB7F /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Bolts.framework; sourceTree = "<group>"; };
 		2C7E3F221E712B980019CB7F /* vChannel 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "vChannel 2.xcdatamodel"; sourceTree = "<group>"; };
+		2C7E3F231E71BF1D0019CB7F /* ProfileCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileCell.swift; sourceTree = "<group>"; };
 		2C8174481E6D3EFD001E2AF7 /* RingtonePlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RingtonePlayer.swift; sourceTree = "<group>"; };
 		2C8174641E6D8011001E2AF7 /* Camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Camera.h; path = video/Camera.h; sourceTree = "<group>"; };
 		2C8174651E6D8011001E2AF7 /* Camera.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Camera.m; path = video/Camera.m; sourceTree = "<group>"; };
@@ -459,6 +461,7 @@
 				2C5898021E5D8F6F004F8B46 /* LoginController.swift */,
 				2C5898041E5D8F94004F8B46 /* SignUpController.swift */,
 				2C161D1D1E5E23EB002FF97D /* SettingsController.swift */,
+				2C7E3F231E71BF1D0019CB7F /* ProfileCell.swift */,
 				2C161D1F1E5E260F002FF97D /* SoundSettingsController.swift */,
 				2C8174481E6D3EFD001E2AF7 /* RingtonePlayer.swift */,
 			);
@@ -786,6 +789,7 @@
 				2CFC4F7F1E6EB91100DF34EA /* VoipStreamHandler.m in Sources */,
 				2C5B2B011E561968006CC809 /* UIColorExtensions.swift in Sources */,
 				2C5897FA1E5D8051004F8B46 /* voipcoreaudio.c in Sources */,
+				2C7E3F241E71BF1D0019CB7F /* ProfileCell.swift in Sources */,
 				2C8174491E6D3EFD001E2AF7 /* RingtonePlayer.swift in Sources */,
 				2C5897F81E5D8051004F8B46 /* ipGetter.c in Sources */,
 				2C5B2B001E561968006CC809 /* StringExtensions.swift in Sources */,

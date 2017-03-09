@@ -14,8 +14,16 @@ import AFNetworking
 import SDWebImage
 
 func currentUser() -> User? {
-    if let user = FIRAuth.auth()?.currentUser {
-        return (user.isEmailVerified || testUser(user.email!)) ? Model.shared.getUser(user.uid) : nil
+    if let firUser = FIRAuth.auth()?.currentUser {
+        if let user = Model.shared.getUser(firUser.uid) {
+            if user.socialType == .email {
+                return (firUser.isEmailVerified || testUser(user.email!)) ? user : nil
+            } else {
+                return user;
+            }
+        } else {
+            return nil;
+        }
     } else {
         return nil
     }
@@ -246,6 +254,7 @@ class Model: NSObject {
             if error != nil {
                 result(error as NSError?)
             } else {
+                cashedUser.avatarURL = metadata!.path!
                 self.updateUser(cashedUser)
                 result(nil)
             }

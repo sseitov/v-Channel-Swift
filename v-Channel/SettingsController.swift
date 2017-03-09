@@ -9,7 +9,7 @@
 import UIKit
 import SVProgressHUD
 
-class SettingsController: UITableViewController {
+class SettingsController: UITableViewController, ProfileCellDelegate {
 
     var delegate:LoginControllerDelegate?
     
@@ -19,12 +19,12 @@ class SettingsController: UITableViewController {
         super.viewDidLoad()
         setupTitle("My Profile")
         setupBackButton()
-        defaultSoundSetting = UserDefaults.standard.url(forKey: "ringtone")
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        defaultSoundSetting = UserDefaults.standard.url(forKey: "ringtone")
+        tableView.reloadData()
     }
 
     // MARK: - Table view data source
@@ -36,12 +36,9 @@ class SettingsController: UITableViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
     }
+    
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 40
-    }
-    
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 44
     }
     
     override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
@@ -53,13 +50,11 @@ class SettingsController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: .value1, reuseIdentifier: nil)
-        cell.textLabel?.font = UIFont.condensedFont(15)
-        cell.detailTextLabel?.font = UIFont.mainFont(15)
         if indexPath.section == 0 {
-            cell.textLabel?.text = currentUser()!.email!
-            cell.detailTextLabel?.text = "Sign Out"
-        } else {
+            let cell = UITableViewCell(style: .value1, reuseIdentifier: nil)
+            cell.textLabel?.font = UIFont.condensedFont()
+            cell.textLabel?.textColor = UIColor.mainColor()
+            cell.detailTextLabel?.font = UIFont.mainFont()
             cell.textLabel?.text = "Ringtone"
             if defaultSoundSetting == nil {
                 cell.detailTextLabel?.text = "Default"
@@ -68,23 +63,31 @@ class SettingsController: UITableViewController {
                 let ext = defaultSoundSetting!.pathExtension
                 cell.detailTextLabel?.text = name.replacingOccurrences(of: ".\(ext)", with: "")
             }
+            cell.accessoryType = .disclosureIndicator
+            cell.selectionStyle = .none
+            return cell
+        } else {
+            let profileCell = tableView.dequeueReusableCell(withIdentifier: "profile", for: indexPath) as! ProfileCell
+            profileCell.accountType.text = currentUser()!.socialTypeName()
+            profileCell.account.text = currentUser()!.email!
+            profileCell.delegate = self
+            return profileCell
         }
-        cell.accessoryType = .disclosureIndicator
-        cell.selectionStyle = .none
-        return cell
+    }
+    
+    func signOut() {
+        let alert = createQuestion("Are you really want to sign out?", acceptTitle: "Sure", cancelTitle: "Cancel", acceptHandler: {
+            SVProgressHUD.show(withStatus: "SignOut...")
+            Model.shared.signOut({
+                SVProgressHUD.dismiss()
+                self.delegate?.didLogout()
+            })
+        })
+        alert?.show()
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.section == 0 {
-            let alert = createQuestion("Are you sure you want to delete account?", acceptTitle: "Sure", cancelTitle: "Cancel", acceptHandler: {
-                SVProgressHUD.show(withStatus: "SignOut...")
-                Model.shared.signOut({
-                    SVProgressHUD.dismiss()
-                    self.delegate?.didLogout()
-                })
-            })
-            alert?.show()
-        } else {
             performSegue(withIdentifier: "selectRingtone", sender: nil)
         }
     }
