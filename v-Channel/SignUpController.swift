@@ -18,7 +18,10 @@ class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigati
     @IBOutlet weak var passwordField: TextFieldContainer!
     @IBOutlet weak var signUpButton: UIButton!
    
-    var avatar:UIImage?
+    var userName:String?
+    var userPassword:String?
+    
+    private var avatar:UIImage?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,11 +39,17 @@ class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigati
         emailField.placeholder = "email"
         emailField.returnType = .next
         emailField.delegate = self
+        if userName != nil {
+            emailField.setText(userName!)
+        }
         
         passwordField.placeholder = "password"
         passwordField.returnType = .go
         passwordField.secure = true
         passwordField.delegate = self
+        if userPassword != nil {
+            passwordField.setText(userPassword!)
+        }
         
         signUpButton.setupBorder(UIColor.clear, radius: 30)
 

@@ -2,7 +2,7 @@
 //  User+CoreDataProperties.swift
 //  v-Channel
 //
-//  Created by Сергей Сейтов on 16.02.17.
+//  Created by Сергей Сейтов on 09.03.17.
 //  Copyright © 2017 V-Channel. All rights reserved.
 //
 
@@ -21,6 +21,8 @@ extension User {
     @NSManaged public var name: String?
     @NSManaged public var token: String?
     @NSManaged public var uid: String?
+    @NSManaged public var avatarURL: String?
+    @NSManaged public var type: Int16
     @NSManaged public var contacts: NSSet?
 
 }

@@ -100,6 +100,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     
     // MARK: - Application delegate
     
+    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+        if url.scheme! == FACEBOOK_SCHEME {
+            return FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
+        } else {
+            return GIDSignIn.sharedInstance().handle(url,
+                                                     sourceApplication: options[.sourceApplication] as! String!,
+                                                     annotation: options[.annotation])
+        }
+    }
+
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
                      fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         if application.applicationState != .active {

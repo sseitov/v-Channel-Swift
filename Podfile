@@ -8,11 +8,13 @@ target 'v-Channel' do
     pod 'Firebase/Auth'
     pod 'Firebase/Database'
     pod 'Firebase/Messaging'
+    pod 'Google/SignIn'
     
     pod 'AFNetworking'
     pod 'MPMessagePack'
     
     pod 'SVProgressHUD'
     pod 'IQKeyboardManager'
-
+    pod 'SDWebImage'
+    
 end

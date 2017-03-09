@@ -11,6 +11,7 @@ import UIKit
 import CoreData
 import Firebase
 import AFNetworking
+import SDWebImage
 
 func currentUser() -> User? {
     if let user = FIRAuth.auth()?.currentUser {
@@ -138,64 +139,6 @@ class Model: NSObject {
     
     // MARK: - User table
     
-    func createEmailUser(_ user:FIRUser, email:String, nick:String, image:UIImage, result: @escaping(NSError?) -> ()) {
-        let cashedUser = createUser(user.uid)
-        cashedUser.email = email
-        cashedUser.name = nick
-        cashedUser.avatar = UIImagePNGRepresentation(image) as NSData?
-        saveContext()
-        let meta = FIRStorageMetadata()
-        meta.contentType = "image/png"
-        self.storageRef.child(generateUDID()).put(cashedUser.avatar as! Data, metadata: meta, completion: { metadata, error in
-            if error != nil {
-                result(error as NSError?)
-            } else {
-                let ref = FIRDatabase.database().reference()
-                let data:[String : Any] = ["email": cashedUser.email!, "name": cashedUser.name!, "image": metadata!.path!]
-                ref.child("users").child(cashedUser.uid!).setValue(data)
-                result(nil)
-            }
-        })
-    }
-    
-    func getEmailUser(_ uid:String, result: @escaping(User?) -> ()) {
-        if let existingUser = getUser(uid) {
-            result(existingUser)
-        } else {
-            let ref = FIRDatabase.database().reference()
-            ref.child("users").child(uid).observeSingleEvent(of: .value, with: { snapshot in
-                if let userData = snapshot.value as? [String:Any] {
-                    let user = self.createUser(uid)
-                    user.email = userData["email"] as? String
-                    user.name = userData["name"] as? String
-                    let imageURL = userData["image"] as? String
-                    let ref = self.storageRef.child(imageURL!)
-                    ref.data(withMaxSize: INT64_MAX, completion: { data, error in
-                        user.avatar = data as NSData?
-                        self.getUserToken(uid, token: { token in
-                            user.token = token
-                            self.saveContext()
-                            result(user)
-                        })
-                    })
-                } else {
-                    result(nil)
-                }
-            })
-        }
-    }
-    
-    fileprivate func getUserToken(_ uid:String, token: @escaping(String?) -> ()) {
-        let ref = FIRDatabase.database().reference()
-        ref.child("tokens").child(uid).observeSingleEvent(of: .value, with: { snapshot in
-            if let result = snapshot.value as? String {
-                token(result)
-            } else {
-                token(nil)
-            }
-        })
-    }
-    
     func createUser(_ uid:String) -> User {
         var user = getUser(uid)
         if user == nil {
@@ -221,6 +164,45 @@ class Model: NSObject {
             self.managedObjectContext.delete(user)
             self.saveContext()
         }
+    }
+    
+    func uploadUser(_ uid:String, result: @escaping(User?) -> ()) {
+        if let existingUser = getUser(uid) {
+            result(existingUser)
+        } else {
+            let ref = FIRDatabase.database().reference()
+            ref.child("users").child(uid).observeSingleEvent(of: .value, with: { snapshot in
+                if let userData = snapshot.value as? [String:Any] {
+                    let user = self.createUser(uid)
+                    user.setData(userData, completion: {
+                        self.getUserToken(uid, token: { token in
+                            user.token = token
+                            self.saveContext()
+                            result(user)
+                        })
+                    })
+                } else {
+                    result(nil)
+                }
+            })
+        }
+    }
+    
+    func updateUser(_ user:User) {
+        saveContext()
+        let ref = FIRDatabase.database().reference()
+        ref.child("users").child(user.uid!).setValue(user.getData())
+    }
+
+    fileprivate func getUserToken(_ uid:String, token: @escaping(String?) -> ()) {
+        let ref = FIRDatabase.database().reference()
+        ref.child("tokens").child(uid).observeSingleEvent(of: .value, with: { snapshot in
+            if let result = snapshot.value as? String {
+                token(result)
+            } else {
+                token(nil)
+            }
+        })
     }
     
     func publishToken(_ user:FIRUser,  token:String) {
@@ -250,7 +232,76 @@ class Model: NSObject {
             }
         })
     }
+
+    func createEmailUser(_ user:FIRUser, email:String, nick:String, image:UIImage, result: @escaping(NSError?) -> ()) {
+        let cashedUser = createUser(user.uid)
+        cashedUser.email = email
+        cashedUser.name = nick
+        cashedUser.type = Int16(SocialType.email.rawValue)
+        cashedUser.avatar = UIImagePNGRepresentation(image) as NSData?
+        saveContext()
+        let meta = FIRStorageMetadata()
+        meta.contentType = "image/png"
+        self.storageRef.child(generateUDID()).put(cashedUser.avatar as! Data, metadata: meta, completion: { metadata, error in
+            if error != nil {
+                result(error as NSError?)
+            } else {
+                self.updateUser(cashedUser)
+                result(nil)
+            }
+        })
+    }
     
+    func createFacebookUser(_ user:FIRUser, profile:[String:Any], completion: @escaping() -> ()) {
+        let cashedUser = createUser(user.uid)
+        cashedUser.type = Int16(SocialType.facebook.rawValue)
+        cashedUser.email = profile["email"] as? String
+        cashedUser.name = profile["name"] as? String
+        if let picture = profile["picture"] as? [String:Any] {
+            if let data = picture["data"] as? [String:Any] {
+                cashedUser.avatarURL = data["url"] as? String
+            }
+        }
+        if cashedUser.avatarURL != nil, let url = URL(string: cashedUser.avatarURL!) {
+            SDWebImageDownloader.shared().downloadImage(with: url, options: [], progress: { _ in}, completed: { _, data, error, _ in
+                if data != nil {
+                    cashedUser.avatar = data as NSData?
+                }
+                self.updateUser(cashedUser)
+                completion()
+            })
+        } else {
+            cashedUser.avatar = nil
+            updateUser(cashedUser)
+            completion()
+        }
+    }
+    
+    func createGoogleUser(_ user:FIRUser, googleProfile: GIDProfileData!, completion: @escaping() -> ()) {
+        let cashedUser = createUser(user.uid)
+        cashedUser.type = Int16(SocialType.google.rawValue)
+        cashedUser.email = googleProfile.email
+        cashedUser.name = googleProfile.name
+        if googleProfile.hasImage {
+            if let url = googleProfile.imageURL(withDimension: 100) {
+                cashedUser.avatarURL = url.absoluteString
+            }
+        }
+        if cashedUser.avatarURL != nil, let url = URL(string: cashedUser.avatarURL!) {
+            SDWebImageDownloader.shared().downloadImage(with: url, options: [], progress: { _ in}, completed: { _, data, error, _ in
+                if data != nil {
+                    cashedUser.avatar = data as NSData?
+                }
+                self.updateUser(cashedUser)
+                completion()
+            })
+        } else {
+            cashedUser.avatar = nil
+            updateUser(cashedUser)
+            completion()
+        }
+    }
+
     func myContacts() -> [User] {
         if let contacts = currentUser()!.contacts?.allObjects as? [Contact] {
             var users:[User] = []
@@ -343,7 +394,7 @@ class Model: NSObject {
                     if let from = contactData["initiator"] as? String, let to = contactData["requester"] as? String {
                         if from == currentUser()!.uid! || to == currentUser()!.uid {
                             let userID = (from == currentUser()!.uid!) ? to : from
-                            self.getEmailUser(userID, result: { user in
+                            self.uploadUser(userID, result: { user in
                                 if user != nil {
                                     let contact = self.createContact(snapshot.key)
                                     contact.owner = currentUser()

@@ -280,7 +280,7 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Cal
                             SVProgressHUD.dismiss()
                             self.showMessage("This user is in list already.", messageType: .information)
                         } else {
-                            Model.shared.getEmailUser(uid, result: { user in
+                            Model.shared.uploadUser(uid, result: { user in
                                 SVProgressHUD.dismiss()
                                 if user != nil {
                                     Model.shared.addContact(with: user!)

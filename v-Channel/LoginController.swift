@@ -19,14 +19,12 @@ class LoginController: UIViewController, TextFieldContainerDelegate {
 
     @IBOutlet weak var userField: TextFieldContainer!
     @IBOutlet weak var passwordField: TextFieldContainer!
-    @IBOutlet weak var signInButton: UIButton!
-    @IBOutlet weak var signUpButton: UIButton!
     
     var delegate:LoginControllerDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupTitle("Sign In")
+        setupTitle("Authentication")
         
         userField.textType = .emailAddress
         userField.placeholder = "email"
@@ -38,19 +36,12 @@ class LoginController: UIViewController, TextFieldContainerDelegate {
         passwordField.secure = true
         passwordField.delegate = self
         
-        signInButton.setupBorder(UIColor.clear, radius: 40)
-        signUpButton.setupBorder(UIColor.clear, radius: 40)
-        
         let tap = UITapGestureRecognizer(target: self, action: #selector(self.tap))
         self.view.addGestureRecognizer(tap)
     }
-    
+
     func tap() {
         UIApplication.shared.sendAction(#selector(UIApplication.resignFirstResponder), to: nil, from: nil, for: nil)
-    }
-    
-    override func goBack() {
-        dismiss(animated: true, completion: nil)
     }
     
     func textDone(_ sender:TextFieldContainer, text:String?) {
@@ -79,31 +70,97 @@ class LoginController: UIViewController, TextFieldContainerDelegate {
         return true
     }
     
-    @IBAction func login(_ sender: Any) {
-        userField.activate(false)
-        passwordField.activate(false)
-        if !userField.text().isEmail() {
-            showMessage("Email should have xxxx@domain.prefix format", messageType: .error, messageHandler: {
-                self.userField.activate(true)
+    // MARK: - Facebook Auth
+    
+    @IBAction func facebookSignIn(_ sender: Any) { // read_custom_friendlists
+        FBSDKLoginManager().logIn(withReadPermissions: ["public_profile","email"], from: self, handler: { result, error in
+            if error != nil {
+                self.showMessage("Facebook authorization error.", messageType: .error)
+                return
+            }
+            
+            SVProgressHUD.show(withStatus: "Login...") // interested_in
+            let params = ["fields" : "name,email,first_name,last_name,birthday,picture.width(480).height(480)"]
+            let request = FBSDKGraphRequest(graphPath: "me", parameters: params)
+            request!.start(completionHandler: { _, result, fbError in
+                if fbError != nil {
+                    SVProgressHUD.dismiss()
+                    self.showMessage(fbError!.localizedDescription, messageType: .error)
+                } else {
+                    let credential = FIRFacebookAuthProvider.credential(withAccessToken: FBSDKAccessToken.current().tokenString)
+                    FIRAuth.auth()?.signIn(with: credential, completion: { firUser, error in
+                        if error != nil {
+                            SVProgressHUD.dismiss()
+                            self.showMessage((error as NSError?)!.localizedDescription, messageType: .error)
+                        } else {
+                            if let profile = result as? [String:Any] {
+                                Model.shared.createFacebookUser(firUser!, profile: profile, completion: {
+                                    SVProgressHUD.dismiss()
+                                    self.delegate?.didLogin()
+                                })
+                            } else {
+                                self.showMessage("Can not read user profile.", messageType: .error)
+                                try? FIRAuth.auth()?.signOut()
+                            }
+                        }
+                    })
+                }
             })
-        } else if passwordField.text().isEmpty {
-            showMessage("Password field required", messageType: .error, messageHandler: {
-                self.passwordField.activate(true)
-            })
-        } else {
-            emailAuth(user: userField.text(), password: passwordField.text())
-        }
+        })
     }
+    
+    // MARK: - Google+ Auth
+    
+    @IBAction func googleSitnIn(_ sender: Any) {
+        GIDSignIn.sharedInstance().signIn()
+    }
+    
+    func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
+        if error != nil {
+            showMessage(error.localizedDescription, messageType: .error)
+            return
+        }
+        let authentication = user.authentication
+        let credential = FIRGoogleAuthProvider.credential(withIDToken: (authentication?.idToken)!,
+                                                          accessToken: (authentication?.accessToken)!)
+        SVProgressHUD.show(withStatus: "Login...")
+        FIRAuth.auth()?.signIn(with: credential, completion: { firUser, error in
+            if error != nil {
+                SVProgressHUD.dismiss()
+                self.showMessage((error as NSError?)!.localizedDescription, messageType: .error)
+            } else {
+                Model.shared.createGoogleUser(firUser!, googleProfile: user.profile, completion: {
+                    SVProgressHUD.dismiss()
+                    self.delegate?.didLogin()
+                })
+            }
+        })
+    }
+    
+    func sign(_ signIn: GIDSignIn!, didDisconnectWith user: GIDGoogleUser!, withError error: Error!) {
+        try? FIRAuth.auth()?.signOut()
+    }
+
+    // MARK: - Email Auth
     
     func emailAuth(user:String, password:String) {
         SVProgressHUD.show(withStatus: "Login...")
         FIRAuth.auth()?.signIn(withEmail: user, password: password, completion: { firUser, error in
             if error != nil {
+                let err = error as? NSError
                 SVProgressHUD.dismiss()
-                self.showMessage((error as! NSError).localizedDescription, messageType: .error)
+                if let reason = err!.userInfo["error_name"] as? String  {
+                    if reason == "ERROR_USER_NOT_FOUND" {
+                        self.performSegue(withIdentifier: "signUp", sender: nil)
+                    } else {
+                        self.showMessage(error!.localizedDescription, messageType: .error)
+                    }
+                } else {
+                    self.showMessage(error!.localizedDescription, messageType: .error)
+                }
             } else {
                 if firUser!.isEmailVerified || testUser(user) {
-                    Model.shared.getEmailUser(firUser!.uid, result: { user in
+                    Model.shared.uploadUser(firUser!.uid, result: { user in
                         SVProgressHUD.dismiss()
                         if user != nil {
                             self.delegate?.didLogin()
@@ -118,4 +175,13 @@ class LoginController: UIViewController, TextFieldContainerDelegate {
             }
         })
     }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "signUp" {
+            let next = segue.destination as! SignUpController
+            next.userName = userField.text()
+            next.userPassword = passwordField.text()
+        }
+    }
+
 }
