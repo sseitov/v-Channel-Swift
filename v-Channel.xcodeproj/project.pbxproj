@@ -100,6 +100,7 @@
 		2C7E3F1F1E7123E20019CB7F /* FBSDKShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C7E3F1C1E7123E20019CB7F /* FBSDKShareKit.framework */; };
 		2C7E3F211E7124850019CB7F /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C7E3F201E7124850019CB7F /* Bolts.framework */; };
 		2C7E3F241E71BF1D0019CB7F /* ProfileCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7E3F231E71BF1D0019CB7F /* ProfileCell.swift */; };
+		2C7E3F261E71CFBE0019CB7F /* InviteController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7E3F251E71CFBE0019CB7F /* InviteController.swift */; };
 		2C8174491E6D3EFD001E2AF7 /* RingtonePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8174481E6D3EFD001E2AF7 /* RingtonePlayer.swift */; };
 		2C8174701E6D8011001E2AF7 /* Camera.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C8174651E6D8011001E2AF7 /* Camera.m */; };
 		2C8174711E6D8011001E2AF7 /* DragView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C8174671E6D8011001E2AF7 /* DragView.m */; };
@@ -229,6 +230,7 @@
 		2C7E3F201E7124850019CB7F /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Bolts.framework; sourceTree = "<group>"; };
 		2C7E3F221E712B980019CB7F /* vChannel 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "vChannel 2.xcdatamodel"; sourceTree = "<group>"; };
 		2C7E3F231E71BF1D0019CB7F /* ProfileCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileCell.swift; sourceTree = "<group>"; };
+		2C7E3F251E71CFBE0019CB7F /* InviteController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InviteController.swift; sourceTree = "<group>"; };
 		2C8174481E6D3EFD001E2AF7 /* RingtonePlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RingtonePlayer.swift; sourceTree = "<group>"; };
 		2C8174641E6D8011001E2AF7 /* Camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Camera.h; path = video/Camera.h; sourceTree = "<group>"; };
 		2C8174651E6D8011001E2AF7 /* Camera.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Camera.m; path = video/Camera.m; sourceTree = "<group>"; };
@@ -521,6 +523,7 @@
 				2C5B2AC91E560F57006CC809 /* Model */,
 				2C81744A1E6D4E1F001E2AF7 /* Profile */,
 				2CF8FBD61E5606BF003FC98E /* ContactListController.swift */,
+				2C7E3F251E71CFBE0019CB7F /* InviteController.swift */,
 				2C58977E1E5D7A97004F8B46 /* ContactCell.swift */,
 				2CF8FBD81E5606E1003FC98E /* CallController.swift */,
 				2CE75BA51E55D40800EEE103 /* AppDelegate.swift */,
@@ -801,6 +804,7 @@
 				2C5B2AEC1E5618F7006CC809 /* LGProgressView.m in Sources */,
 				2C8174711E6D8011001E2AF7 /* DragView.m in Sources */,
 				2CF8FBD71E5606BF003FC98E /* ContactListController.swift in Sources */,
+				2C7E3F261E71CFBE0019CB7F /* InviteController.swift in Sources */,
 				2C8174781E6D8A3E001E2AF7 /* CallMessage.m in Sources */,
 				2C161D201E5E260F002FF97D /* SoundSettingsController.swift in Sources */,
 				2C5B2AE81E5618F7006CC809 /* LGAlertView.m in Sources */,

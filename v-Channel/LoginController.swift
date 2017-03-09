@@ -77,7 +77,7 @@ class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate,
     // MARK: - Facebook Auth
     
     @IBAction func facebookSignIn(_ sender: Any) { // read_custom_friendlists
-        FBSDKLoginManager().logIn(withReadPermissions: ["public_profile","email"], from: self, handler: { result, error in
+        FBSDKLoginManager().logIn(withReadPermissions: ["public_profile","email","user_friends","user_photos"], from: self, handler: { result, error in
             if error != nil {
                 self.showMessage("Facebook authorization error.", messageType: .error)
                 return
@@ -91,6 +91,9 @@ class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate,
                     SVProgressHUD.dismiss()
                     self.showMessage(fbError!.localizedDescription, messageType: .error)
                 } else {
+                    print(FBSDKAccessToken.current().tokenString)
+                    UserDefaults.standard.set(FBSDKAccessToken.current().tokenString, forKey: "fbToken")
+                    UserDefaults.standard.synchronize()
                     let credential = FIRFacebookAuthProvider.credential(withAccessToken: FBSDKAccessToken.current().tokenString)
                     FIRAuth.auth()?.signIn(with: credential, completion: { firUser, error in
                         if error != nil {

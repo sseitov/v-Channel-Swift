@@ -180,6 +180,7 @@
                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <connections>
                                 <action selector="addContact:" destination="7bK-jq-Zjz" id="Zjp-gN-v5a"/>
+                                <segue destination="hol-99-PaL" kind="show" identifier="addContact" id="4G1-wK-8ZU"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -191,6 +192,35 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Rux-fX-hf1" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="709" y="-630"/>
+        </scene>
+        <!--Invite Controller-->
+        <scene sceneID="5sa-pN-OCG">
+            <objects>
+                <tableViewController id="hol-99-PaL" customClass="InviteController" customModule="v_Channel" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="44" sectionHeaderHeight="18" sectionFooterHeight="18" id="Cpe-z0-PaW">
+                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                        <connections>
+                            <outlet property="dataSource" destination="hol-99-PaL" id="cdk-id-5M5"/>
+                            <outlet property="delegate" destination="hol-99-PaL" id="Cag-Dc-da4"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" id="DPk-lL-o7b">
+                        <barButtonItem key="leftBarButtonItem" image="back" id="bss-ho-3cH">
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" title="By email" id="faB-ap-ohU">
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <connections>
+                                <action selector="byEmail" destination="hol-99-PaL" id="Vox-gt-qG6"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="E8t-eH-9RP" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1579" y="-1353"/>
         </scene>
         <!--Settings Controller-->
         <scene sceneID="Uwf-kS-Nzd">
@@ -276,7 +306,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ezy-HC-lJe" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1579" y="-1352"/>
+            <point key="canvasLocation" x="2436" y="-1352"/>
         </scene>
         <!--Sound Settings Controller-->
         <scene sceneID="ZcB-TO-IR1">
@@ -299,7 +329,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="DhS-fI-PJF" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2436" y="-1352"/>
+            <point key="canvasLocation" x="3294" y="-1352"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="HqK-2t-ZMy">

@@ -114,6 +114,7 @@ class Model: NSObject {
             self.newContactRefHandle = nil
             self.updateContactRefHandle = nil
             self.deleteContactRefHandle = nil
+            UserDefaults.standard.removeObject(forKey: "fbToken")
             completion()
         })
     }
@@ -264,6 +265,7 @@ class Model: NSObject {
     func createFacebookUser(_ user:FIRUser, profile:[String:Any], completion: @escaping() -> ()) {
         let cashedUser = createUser(user.uid)
         cashedUser.type = Int16(SocialType.facebook.rawValue)
+        cashedUser.facebookID = profile["id"] as? String
         cashedUser.email = profile["email"] as? String
         cashedUser.name = profile["name"] as? String
         if let picture = profile["picture"] as? [String:Any] {

@@ -17,12 +17,13 @@ extension User {
     }
 
     @NSManaged public var avatar: NSData?
+    @NSManaged public var avatarURL: String?
     @NSManaged public var email: String?
     @NSManaged public var name: String?
     @NSManaged public var token: String?
-    @NSManaged public var uid: String?
-    @NSManaged public var avatarURL: String?
     @NSManaged public var type: Int16
+    @NSManaged public var uid: String?
+    @NSManaged public var facebookID: String?
     @NSManaged public var contacts: NSSet?
 
 }

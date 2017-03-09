@@ -10,7 +10,7 @@ import UIKit
 import Firebase
 import SVProgressHUD
 
-class ContactListController: UITableViewController, LoginControllerDelegate, CallControllerDelegate {
+class ContactListController: UITableViewController, LoginControllerDelegate, CallControllerDelegate, InviteControllerDelegate {
 
     fileprivate var contacts:[User] = []
     
@@ -95,6 +95,15 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Cal
         performSegue(withIdentifier: "login", sender: self)
     }
 
+    func didAddContact(_ contact: User) {
+        Model.shared.addContact(with: contact)
+        self.tableView.beginUpdates()
+        let indexPath = IndexPath(row: self.contacts.count, section: 0)
+        self.contacts.append(contact)
+        self.tableView.insertRows(at: [indexPath], with: .bottom)
+        self.tableView.endUpdates()
+    }
+    
     func callDidFinish(_ call:CallController) {
         if IS_PAD() {
             performSegue(withIdentifier: "personalCall", sender: nil)
@@ -157,7 +166,6 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Cal
         } else {
             cell.incomming = false
         }
-        cell.accessoryType = .disclosureIndicator
         return cell
     }
 
@@ -265,48 +273,6 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Cal
     
     // MARK: - Contact management
     
-    @IBAction func addContact(_ sender: Any) {
-        let alert = EmailInput.getEmail(cancelHandler: {
-        }, acceptHandler: { email in
-            SVProgressHUD.show(withStatus: "Search...")
-            let ref = FIRDatabase.database().reference()
-            ref.child("users").queryOrdered(byChild: "email").queryEqual(toValue: email).observeSingleEvent(of: .value, with: { snapshot in
-                if let values = snapshot.value as? [String:Any] {
-                    for uid in values.keys {
-                        if uid == currentUser()!.uid! {
-                            continue
-                        }
-                        if Model.shared.contactWithUser(uid) != nil {
-                            SVProgressHUD.dismiss()
-                            self.showMessage("This user is in list already.", messageType: .information)
-                        } else {
-                            Model.shared.uploadUser(uid, result: { user in
-                                SVProgressHUD.dismiss()
-                                if user != nil {
-                                    Model.shared.addContact(with: user!)
-                                    self.tableView.beginUpdates()
-                                    let indexPath = IndexPath(row: self.contacts.count, section: 0)
-                                    self.contacts.append(user!)
-                                    self.tableView.insertRows(at: [indexPath], with: .bottom)
-                                    self.tableView.endUpdates()
-                                } else {
-                                    self.showMessage("Can not load user profile.", messageType: .error)
-                                }
-                            })
-                        }
-                        return
-                    }
-                    SVProgressHUD.dismiss()
-                    self.showMessage("User not found.", messageType: .error)
-                } else {
-                    SVProgressHUD.dismiss()
-                    self.showMessage("User not found.", messageType: .error)
-                }
-            })
-        })
-        alert?.show()
-    }
-    
     func addContactNotify(_ notify:Notification) {
         if let user = notify.object as? User {
             self.tableView.beginUpdates()
@@ -375,6 +341,9 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Cal
             }
         } else if segue.identifier == "settings" {
             let controller = segue.destination as! SettingsController
+            controller.delegate = self
+        } else if segue.identifier == "addContact" {
+            let controller = segue.destination as! InviteController
             controller.delegate = self
         }
     }

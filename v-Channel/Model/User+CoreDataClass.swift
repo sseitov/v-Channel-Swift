@@ -48,7 +48,9 @@ public class User: NSManagedObject {
         if avatarURL != nil {
             profile["avatarURL"] = avatarURL!
         }
-        
+        if facebookID != nil {
+            profile["facebookID"] = facebookID!
+        }
         return profile
     }
     
@@ -58,6 +60,7 @@ public class User: NSManagedObject {
         } else {
             type = 0
         }
+        facebookID = profile["facebookID"] as? String
         email = profile["email"] as? String
         name = profile["name"] as? String
         
