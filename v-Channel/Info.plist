@@ -15,7 +15,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.0</string>
+	<string>2.1</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -36,26 +36,26 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>2</string>
-    <key>FacebookAppID</key>
-    <string>958081360882958</string>
-    <key>FacebookDisplayName</key>
-    <string>v-Channel</string>
-    <key>FirebaseAppDelegateProxyEnabled</key>
-    <false/>
-    <key>LSApplicationCategoryType</key>
-    <string></string>
-    <key>LSApplicationQueriesSchemes</key>
-    <array>
-        <string>fbauth2</string>
-    </array>
+	<string>1</string>
+	<key>FacebookAppID</key>
+	<string>958081360882958</string>
+	<key>FacebookDisplayName</key>
+	<string>v-Channel</string>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>fbauth2</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-    <key>NSAppTransportSecurity</key>
-    <dict>
-        <key>NSAllowsArbitraryLoads</key>
-        <true/>
-    </dict>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>v-Channel needs your camera for video call.</string>
 	<key>NSMicrophoneUsageDescription</key>
