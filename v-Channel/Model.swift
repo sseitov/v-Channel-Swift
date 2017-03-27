@@ -560,23 +560,21 @@ class Model: NSObject {
 
     // MARK: - VOIP calls
     
-    func makeCall(to:User, audioIP:String, audioPort:String, videoIP:String, videoPort:String) -> String {
+    func makeCall(to:User) -> String {
         let ref = FIRDatabase.database().reference()
         let uid = generateUDID()
         let data:[String:Any] = ["from" : currentUser()!.uid!,
-                                 "audioIP" : audioIP, "audioPort" : audioPort,
-                                 "videoIP" : videoIP, "videoPort" : videoPort,
                                  "to" : to.uid!]
         ref.child("calls").child(uid).setValue(data)
         pushIncommingCall(to: to)
         return uid
     }
     
-    func acceptCall(_ callID:String, accept:Bool) {
+    func acceptCall(_ callID:String) {
         let ref = FIRDatabase.database().reference()
-        ref.child("calls").child(callID).setValue(["accept" : accept])
+        ref.child("calls").child(callID).setValue(["accept" : true])
     }
-    
+
     func hangUpCall(_ callID:String) {
         let ref = FIRDatabase.database().reference()
         ref.child("calls").child(callID).removeValue()
@@ -587,19 +585,18 @@ class Model: NSObject {
         let callQuery = ref.child("calls").queryLimited(toLast:25)
         
         newCallRefHandle = callQuery.observe(.childAdded, with: { (snapshot) -> Void in
-            if let call = snapshot.value as? [String:Any], let to = call["to"] as? String {
+            if let data = snapshot.value as? [String:Any], let to = data["to"] as? String, let from = data["from"] as? String {
                 if to == currentUser()!.uid! {
-                    NotificationCenter.default.post(name: incommingCallNotification, object: snapshot.key)
+                    let call = ["uid" : snapshot.key, "from" : from]
+                    NotificationCenter.default.post(name: incommingCallNotification, object: call)
                 }
             }
         })
         
         updateCallRefHandle = callQuery.observe(.childChanged, with: { (snapshot) -> Void in
-            if let call = snapshot.value as? [String:Any], let accept = call["accept"] as? Bool {
-                NotificationCenter.default.post(name: acceptCallNotification, object: snapshot.key, userInfo: ["accept" : accept])
-            }
+            NotificationCenter.default.post(name: acceptCallNotification, object: snapshot.key)
         })
-
+        
         deleteCallRefHandle = callQuery.observe(.childRemoved, with: { (snapshot) -> Void in
             NotificationCenter.default.post(name: hangUpCallNotification, object: snapshot.key)
         })

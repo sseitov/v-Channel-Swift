@@ -34,6 +34,7 @@ class Avatar : NSObject, JSQMessageAvatarImageDataSource {
 class ChatController: JSQMessagesViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
     
     var user:User?
+    var callHost:CallControllerDelegate?
     var messages:[JSQMessage] = []
     
     override func viewDidLoad() {
@@ -78,7 +79,37 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
         } else {
             setupBackButton()
         }
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(self.incommingCall(_:)),
+                                               name: incommingCallNotification,
+                                               object: nil)
     }
+    
+    override func goBack() {
+        _ = navigationController?.popViewController(animated: true)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        scrollToBottom(animated: true)
+    }
+   
+    // MARK: - Call management
+    
+    func incommingCall(_ notify:Notification) {
+        if let call = notify.object as? [String:Any], let callId = call["uid"] as? String, let from = call["from"] as? String, let user = Model.shared.getUser(from) {
+            let alert = createQuestion("\(user.name!) call you.", acceptTitle: "Accept", cancelTitle: "Reject", acceptHandler: {
+                Model.shared.acceptCall(callId)
+                self.performSegue(withIdentifier: "call", sender: callId)
+            }, cancelHandler: {
+                Model.shared.hangUpCall(callId)
+            })
+            alert?.show()
+        }
+    }
+
+    // MARK: - Message management
     
     func newMessage(_ notify:Notification) {
         if let message = notify.object as? Message {
@@ -110,15 +141,6 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
                 }
             }
         }
-    }
-    
-    override func goBack() {
-        _ = navigationController?.popViewController(animated: true)
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        scrollToBottom(animated: true)
     }
     
     // MARK: - Send / receive messages
@@ -338,6 +360,13 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
             let point = message.media as! LocationMediaItem
             controller.userLocation = point.messageLocation
             controller.locationDate = message.date
+        } else if segue.identifier == "call" {
+            let controller = segue.destination as! CallController
+            if let call = sender as? String {
+                controller.incommingCall = call
+            }
+            controller.user = self.user
+            controller.delegate = callHost
         }
     }
 }

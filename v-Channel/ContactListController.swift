@@ -9,11 +9,15 @@
 import UIKit
 import Firebase
 
-class ContactListController: UITableViewController, LoginControllerDelegate, InviteControllerDelegate {
+class ContactListController: UITableViewController, LoginControllerDelegate, InviteControllerDelegate, CallControllerDelegate {
 
     fileprivate var contacts:[Contact] = []
     
     // MARK: - Life cycle
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,7 +35,7 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Inv
                                                selector: #selector(self.refreshStatus),
                                                name: readMessageNotification,
                                                object: nil)
-        
+
         if currentUser() == nil {
             performSegue(withIdentifier: "login", sender: self)
         } else {
@@ -87,9 +91,14 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Inv
         self.tableView.insertRows(at: [indexPath], with: .bottom)
         self.tableView.endUpdates()
     }
-
-    deinit {
-        NotificationCenter.default.removeObserver(self)
+    
+    func callDidFinish(_ user:User) {
+        if IS_PAD() {
+            let contact = Model.shared.contactWithUser(user.uid!)
+            performSegue(withIdentifier: "chat", sender: contact)
+        } else {
+            _ = navigationController?.popViewController(animated: true)
+        }
     }
 
     // MARK: - Table view data source
@@ -194,6 +203,7 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Inv
                         controller.user = Model.shared.getUser(contact.initiator!)
                     }
                 }
+                controller.callHost = self
             }
         } else if segue.identifier == "settings" {
             let controller = segue.destination as! SettingsController

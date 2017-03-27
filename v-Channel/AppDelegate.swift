@@ -57,8 +57,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         // Initialize Google Maps
         GMSServices.provideAPIKey(GoolgleMapAPIKey)
         
-        //provideAPIKey(GoolgleMapAPIKey)
-
+        // Initialize SSL Peer Connection
+        RTCPeerConnectionFactory.initializeSSL()
+        
         let splitViewController = self.window!.rootViewController as! UISplitViewController
         let navigationController = splitViewController.viewControllers[splitViewController.viewControllers.count-1] as! UINavigationController
         navigationController.topViewController!.navigationItem.leftBarButtonItem = splitViewController.displayModeButtonItem
@@ -153,6 +154,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
+        RTCPeerConnectionFactory.deinitializeSSL()
     }
 
     // MARK: - SplitView delegate

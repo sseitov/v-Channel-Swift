@@ -19,6 +19,7 @@
 		2C4D32D41E88E4FC0059CAA2 /* LocationMediaItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4D32D21E88E4FC0059CAA2 /* LocationMediaItem.swift */; };
 		2C4D32D51E88E4FC0059CAA2 /* RouteController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4D32D31E88E4FC0059CAA2 /* RouteController.swift */; };
 		2C4D32D81E88EE750059CAA2 /* ColorUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C4D32D71E88EE750059CAA2 /* ColorUtility.m */; };
+		2C4D32E21E8967D90059CAA2 /* CallController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4D32E11E8967D90059CAA2 /* CallController.swift */; };
 		2C58977B1E5D7879004F8B46 /* busy.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2C5897781E5D7879004F8B46 /* busy.wav */; };
 		2C58977C1E5D7879004F8B46 /* calling.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2C5897791E5D7879004F8B46 /* calling.wav */; };
 		2C58977D1E5D7879004F8B46 /* ringtone.wav in Resources */ = {isa = PBXBuildFile; fileRef = 2C58977A1E5D7879004F8B46 /* ringtone.wav */; };
@@ -129,6 +130,7 @@
 		2C4D32D31E88E4FC0059CAA2 /* RouteController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RouteController.swift; path = chat/RouteController.swift; sourceTree = "<group>"; };
 		2C4D32D61E88EE750059CAA2 /* ColorUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ColorUtility.h; path = Extensions/ColorUtility.h; sourceTree = "<group>"; };
 		2C4D32D71E88EE750059CAA2 /* ColorUtility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ColorUtility.m; path = Extensions/ColorUtility.m; sourceTree = "<group>"; };
+		2C4D32E11E8967D90059CAA2 /* CallController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CallController.swift; path = chat/CallController.swift; sourceTree = "<group>"; };
 		2C5897781E5D7879004F8B46 /* busy.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = busy.wav; path = sounds/busy.wav; sourceTree = "<group>"; };
 		2C5897791E5D7879004F8B46 /* calling.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = calling.wav; path = sounds/calling.wav; sourceTree = "<group>"; };
 		2C58977A1E5D7879004F8B46 /* ringtone.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = ringtone.wav; path = sounds/ringtone.wav; sourceTree = "<group>"; };
@@ -268,6 +270,7 @@
 				2C4D32C71E88DB140059CAA2 /* PhotoController.swift */,
 				2C4D32D21E88E4FC0059CAA2 /* LocationMediaItem.swift */,
 				2C4D32D31E88E4FC0059CAA2 /* RouteController.swift */,
+				2C4D32E11E8967D90059CAA2 /* CallController.swift */,
 			);
 			name = Chat;
 			sourceTree = "<group>";
@@ -719,6 +722,7 @@
 				2C7E3F241E71BF1D0019CB7F /* ProfileCell.swift in Sources */,
 				2C8174491E6D3EFD001E2AF7 /* RingtonePlayer.swift in Sources */,
 				2C5B2B001E561968006CC809 /* StringExtensions.swift in Sources */,
+				2C4D32E21E8967D90059CAA2 /* CallController.swift in Sources */,
 				2C161D1E1E5E23EB002FF97D /* SettingsController.swift in Sources */,
 				2C5898051E5D8F94004F8B46 /* SignUpController.swift in Sources */,
 				2C4D32C11E88D1ED0059CAA2 /* Message+CoreDataClass.swift in Sources */,

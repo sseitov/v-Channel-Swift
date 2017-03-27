@@ -26,57 +26,6 @@
             </objects>
             <point key="canvasLocation" x="-399" y="-579"/>
         </scene>
-        <!--Detail-->
-        <scene sceneID="yUG-lL-AsK">
-            <objects>
-                <viewController title="Detail" id="JEX-9P-axG" customClass="CallController" customModule="v_Channel" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="SYR-Wa-9uf"/>
-                        <viewControllerLayoutGuide type="bottom" id="GAO-Cl-Wes"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="svH-Pt-448">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo.png" translatesAutoresizingMaskIntoConstraints="NO" id="out-nv-zEh">
-                                <rect key="frame" x="40" y="164" width="240" height="240"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="240" id="0us-rt-SGw"/>
-                                    <constraint firstAttribute="width" constant="240" id="TEx-kC-8vO"/>
-                                </constraints>
-                            </imageView>
-                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PSP-CF-Akv">
-                                <rect key="frame" x="0.0" y="20" width="320" height="548"/>
-                                <connections>
-                                    <segue destination="bJ0-Tr-NI4" kind="embed" identifier="videoView" id="kVV-AZ-lyk"/>
-                                </connections>
-                            </containerView>
-                        </subviews>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <constraints>
-                            <constraint firstAttribute="trailing" secondItem="PSP-CF-Akv" secondAttribute="trailing" id="PlE-TO-raE"/>
-                            <constraint firstItem="out-nv-zEh" firstAttribute="centerY" secondItem="svH-Pt-448" secondAttribute="centerY" id="QEY-WN-FZ3"/>
-                            <constraint firstItem="out-nv-zEh" firstAttribute="centerX" secondItem="svH-Pt-448" secondAttribute="centerX" id="R5E-lC-uhy"/>
-                            <constraint firstItem="PSP-CF-Akv" firstAttribute="top" secondItem="SYR-Wa-9uf" secondAttribute="bottom" id="YLE-GA-pEk"/>
-                            <constraint firstItem="PSP-CF-Akv" firstAttribute="leading" secondItem="svH-Pt-448" secondAttribute="leading" id="keX-uy-kCY"/>
-                            <constraint firstItem="GAO-Cl-Wes" firstAttribute="top" secondItem="PSP-CF-Akv" secondAttribute="bottom" id="tZE-cx-JxZ"/>
-                        </constraints>
-                    </view>
-                    <toolbarItems/>
-                    <navigationItem key="navigationItem" id="mOI-FS-AaM">
-                        <barButtonItem key="leftBarButtonItem" image="hangUp" id="oS7-WV-Hbr">
-                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        </barButtonItem>
-                    </navigationItem>
-                    <connections>
-                        <outlet property="userImage" destination="out-nv-zEh" id="roK-I6-JJi"/>
-                        <outlet property="videoView" destination="PSP-CF-Akv" id="3wb-ty-jbE"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="FJe-Yq-33r" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="341" y="1662"/>
-        </scene>
         <!--Split View Controller-->
         <scene sceneID="Nki-YV-4Qg">
             <objects>
@@ -353,7 +302,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5YM-SG-zHM" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="281" y="168"/>
+            <point key="canvasLocation" x="396" y="168"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="r7l-gg-dq7">
@@ -389,6 +338,12 @@
                         <barButtonItem key="leftBarButtonItem" image="back" id="d5Y-Mw-b4J">
                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" image="phone" id="Yt6-c9-0hw">
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <connections>
+                                <segue destination="WLf-0N-yGm" kind="show" identifier="call" id="Ee7-kl-XYp"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <segue destination="9qX-eR-2M8" kind="show" identifier="showPhoto" id="61b-a9-BuW"/>
@@ -398,6 +353,75 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="OSQ-fG-lYg" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-399" y="874"/>
+        </scene>
+        <!--Call Controller-->
+        <scene sceneID="nfT-pg-uV9">
+            <objects>
+                <viewController id="WLf-0N-yGm" customClass="CallController" customModule="v_Channel" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="1o6-MY-K0n"/>
+                        <viewControllerLayoutGuide type="bottom" id="tjc-eO-kqR"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="wTV-tH-lBR">
+                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ogq-ti-cJ2" customClass="RTCEAGLVideoView">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="504"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pG9-ad-01e" customClass="RTCEAGLVideoView">
+                                <rect key="frame" x="186" y="370" width="120" height="120"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="120" id="gSw-ax-pxV"/>
+                                    <constraint firstAttribute="width" constant="120" id="lP3-7h-sup"/>
+                                </constraints>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BXp-Fa-pmT">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="504"/>
+                                <subviews>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo.png" translatesAutoresizingMaskIntoConstraints="NO" id="OaB-hT-9GQ">
+                                        <rect key="frame" x="70" y="162" width="180" height="180"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="180" id="Cxv-tP-gXD"/>
+                                            <constraint firstAttribute="width" constant="180" id="aI3-VX-4yl"/>
+                                        </constraints>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstItem="OaB-hT-9GQ" firstAttribute="centerY" secondItem="BXp-Fa-pmT" secondAttribute="centerY" id="ZoT-pO-u6i"/>
+                                    <constraint firstItem="OaB-hT-9GQ" firstAttribute="centerX" secondItem="BXp-Fa-pmT" secondAttribute="centerX" id="nUb-TP-ftd"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="pG9-ad-01e" secondAttribute="trailing" constant="14" id="KRa-Ng-VnK"/>
+                            <constraint firstItem="BXp-Fa-pmT" firstAttribute="top" secondItem="1o6-MY-K0n" secondAttribute="bottom" id="KTf-4T-9ps"/>
+                            <constraint firstItem="tjc-eO-kqR" firstAttribute="top" secondItem="BXp-Fa-pmT" secondAttribute="bottom" id="PQD-tC-mer"/>
+                            <constraint firstItem="tjc-eO-kqR" firstAttribute="top" secondItem="pG9-ad-01e" secondAttribute="bottom" constant="14" id="RuG-iv-wGJ"/>
+                            <constraint firstItem="BXp-Fa-pmT" firstAttribute="leading" secondItem="wTV-tH-lBR" secondAttribute="leading" id="SgB-OG-cvs"/>
+                            <constraint firstAttribute="trailing" secondItem="BXp-Fa-pmT" secondAttribute="trailing" id="rvL-qR-2ii"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="tbM-Za-8J5">
+                        <barButtonItem key="leftBarButtonItem" image="hangUp" id="KiD-OG-lKE">
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="callImage" destination="OaB-hT-9GQ" id="3Fq-D2-0mA"/>
+                        <outlet property="callView" destination="BXp-Fa-pmT" id="Vq0-DY-SQj"/>
+                        <outlet property="localView" destination="pG9-ad-01e" id="B9k-3Z-ofg"/>
+                        <outlet property="remoteView" destination="ogq-ti-cJ2" id="85v-O3-8ne"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="8us-8J-N9g" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="396" y="874"/>
         </scene>
         <!--Login Controller-->
         <scene sceneID="w3T-g7-Oxg">
@@ -608,52 +632,6 @@
             </objects>
             <point key="canvasLocation" x="2006" y="168"/>
         </scene>
-        <!--Video Controller-->
-        <scene sceneID="K6E-pK-nUa">
-            <objects>
-                <viewController id="bJ0-Tr-NI4" customClass="VideoController" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="9ef-hq-PZ9"/>
-                        <viewControllerLayoutGuide type="bottom" id="mVs-Dc-Met"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="8Zb-vQ-UlH">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="548"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="1ER-vh-Djb" customClass="VideoLayerView">
-                                <rect key="frame" x="40" y="154" width="240" height="240"/>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="240" id="aFk-Ng-4rG"/>
-                                    <constraint firstAttribute="width" constant="240" id="d3s-k6-J7K"/>
-                                </constraints>
-                            </imageView>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XBV-Z3-0kb" customClass="DragView">
-                                <rect key="frame" x="20" y="20" width="100" height="100"/>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="100" id="ux2-za-5q1"/>
-                                    <constraint firstAttribute="height" constant="100" id="yt7-3g-yrL"/>
-                                </constraints>
-                            </view>
-                        </subviews>
-                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                        <constraints>
-                            <constraint firstItem="XBV-Z3-0kb" firstAttribute="leading" secondItem="8Zb-vQ-UlH" secondAttribute="leadingMargin" constant="4" id="7Jp-12-6Np"/>
-                            <constraint firstItem="1ER-vh-Djb" firstAttribute="centerY" secondItem="8Zb-vQ-UlH" secondAttribute="centerY" id="QJ2-yC-pVM"/>
-                            <constraint firstItem="XBV-Z3-0kb" firstAttribute="top" secondItem="8Zb-vQ-UlH" secondAttribute="topMargin" constant="20" id="rNZ-3s-KCz"/>
-                            <constraint firstItem="1ER-vh-Djb" firstAttribute="centerX" secondItem="8Zb-vQ-UlH" secondAttribute="centerX" id="xcJ-ip-BrQ"/>
-                        </constraints>
-                    </view>
-                    <connections>
-                        <outlet property="peerView" destination="1ER-vh-Djb" id="6LQ-AS-dgV"/>
-                        <outlet property="selfView" destination="XBV-Z3-0kb" id="ahn-Ts-BS2"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="zcq-fg-NxA" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="971" y="1652"/>
-        </scene>
         <!--Photo Controller-->
         <scene sceneID="Qnc-JI-rCu">
             <objects>
@@ -707,7 +685,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Glm-fh-pTo" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1133" y="1663"/>
+            <point key="canvasLocation" x="-399" y="1663"/>
         </scene>
         <!--Route Controller-->
         <scene sceneID="Gjr-Rp-qlX">
@@ -745,7 +723,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="AUp-Da-Dc4" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-399" y="1663"/>
+            <point key="canvasLocation" x="396" y="1663"/>
         </scene>
     </scenes>
     <resources>
@@ -754,8 +732,9 @@
         <image name="back" width="22" height="22"/>
         <image name="button-Facebook" width="260" height="40"/>
         <image name="button-Google" width="260" height="40"/>
-        <image name="hangUp" width="28" height="28"/>
+        <image name="hangUp" width="24" height="24"/>
         <image name="logo.png" width="1024" height="1024"/>
+        <image name="phone" width="24" height="24"/>
         <image name="settings" width="22" height="22"/>
     </resources>
     <inferredMetricsTieBreakers>
