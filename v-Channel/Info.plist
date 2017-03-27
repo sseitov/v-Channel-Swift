@@ -15,7 +15,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.1</string>
+	<string>3.0</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -56,6 +56,8 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>You can send your location as message in v-Channel chat.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>v-Channel needs your camera for video call.</string>
 	<key>NSMicrophoneUsageDescription</key>

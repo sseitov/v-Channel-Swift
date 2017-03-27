@@ -10,80 +10,86 @@ import UIKit
 
 class ContactCell: UITableViewCell {
     
-    var user:User? {
-        didSet {
-            contactImage.image = UIImage(data: user!.avatar as! Data)?.inCircle()
-            contactName.text = user!.name
-        }
-    }
+    @IBOutlet weak var contactView: UIImageView!
+    @IBOutlet weak var background: UIView!
+    @IBOutlet weak var nameLabel: UILabel!
+    @IBOutlet weak var contactLabel: UILabel!
+    @IBOutlet weak var statusView: UIImageView!
     
-    var incomming:Bool? {
-        didSet {
-            if incomming != nil && incomming! {
-                var anim:[UIImage] = []
-                for i in 0..<24 {
-                    anim.append(UIImage(named: "ring_frame_\(i).gif")!)
-                }
-                callStatus.animationImages = anim
-                callStatus.animationDuration = 2
-                callStatus.animationRepeatCount = 0
-                callStatus.startAnimating()
-                callStatus.isHidden = false
-            } else if contact!.contactStatus() == .approved {
-                callStatus.stopAnimating()
-                callStatus.isHidden = true
-            }
-        }
-    }
-    
+    fileprivate var user:User?
     var contact:Contact? {
         didSet {
-            if contact != nil {
-                if contact!.contactStatus() == .requested {
-                    if contact!.initiator! == currentUser()!.uid! {
-                        var anim:[UIImage] = []
-                        for i in 0..<24 {
-                            anim.append(UIImage(named: "frame_\(i).gif")!)
-                        }
-                        callStatus.animationImages = anim
-                        callStatus.animationDuration = 2
-                        callStatus.animationRepeatCount = 0
-                        callStatus.startAnimating()
-                    } else {
-                        let anim:[UIImage] = [UIImage(named: "alert")!,
-                                              UIImage.imageWithColor(UIColor.clear, size: callStatus.frame.size)]
-                        callStatus.animationImages = anim
-                        callStatus.animationDuration = 1
-                        callStatus.animationRepeatCount = 0
-                        callStatus.startAnimating()
-                    }
-                    callStatus.isHidden = false
-                    contactName.font = UIFont.thinFont()
-                    contactName.textColor = UIColor.black
-                } else if contact!.contactStatus() == .rejected {
-                    callStatus.stopAnimating()
-                    callStatus.image = UIImage(named: "stop")
-                    callStatus.isHidden = false
-                    contactName.font = UIFont.condensedFont()
-                    contactName.textColor = UIColor.errorColor()
+            if currentUser() == nil || contact == nil {
+                return
+            }
+            if contact!.initiator! == currentUser()!.uid! {
+                user = Model.shared.getUser(contact!.requester!)
+            } else {
+                user = Model.shared.getUser(contact!.initiator!)
+            }
+            if user!.name != nil {
+                nameLabel.text = user!.name
+            } else {
+                nameLabel.text = user!.email
+            }
+            
+            contactView.image = user!.getImage()
+            contactLabel.font = UIFont.condensedFont()
+            switch contact!.getContactStatus() {
+            case .requested:
+                if contact!.requester! == currentUser()!.uid {
+                    contactLabel.text = "REQUEST FOR CHAT"
+                    let anim:[UIImage] = [UIImage(named: "alert")!,
+                                          UIImage.imageWithColor(UIColor.clear, size: statusView.frame.size)]
+                    statusView.animationImages = anim
+                    statusView.animationDuration = 1
+                    statusView.animationRepeatCount = 0
+                    statusView.startAnimating()
                 } else {
-                    callStatus.stopAnimating()
-                    callStatus.isHidden = true
-                    contactName.font = UIFont.mainFont()
-                    contactName.textColor = UIColor.black
+                    contactLabel.text = "WAITING..."
+                    var anim:[UIImage] = []
+                    for i in 0..<24 {
+                        anim.append(UIImage(named: "frame_\(i).gif")!)
+                    }
+                    statusView.animationImages = anim
+                    statusView.animationDuration = 2
+                    statusView.animationRepeatCount = 0
+                    statusView.startAnimating()
+                }
+                statusView.isHidden = false
+            case .rejected:
+                contactLabel.text = "REJECTED"
+                statusView.stopAnimating()
+                statusView.image = UIImage(named: "stop")
+                statusView.isHidden = false
+            case .approved:
+                contactLabel.font = UIFont.mainFont()
+                if let message = Model.shared.lastMessageInChat(user!.uid!) {
+                    contactLabel.text = message.text
+                } else {
+                    contactLabel.text = ""
+                }
+                let unread = Model.shared.unreadCountInChat(user!.uid!)
+                if unread > 0 {
+                    let anim:[UIImage] = [UIImage(named: "alert")!,
+                                          UIImage.imageWithColor(UIColor.clear, size: statusView.frame.size)]
+                    statusView.animationImages = anim
+                    statusView.animationDuration = 1
+                    statusView.animationRepeatCount = 0
+                    statusView.startAnimating()
+                    statusView.isHidden = false
+                } else {
+                    statusView.stopAnimating()
+                    statusView.isHidden = true
                 }
             }
         }
     }
-    
-    @IBOutlet weak var contactImage: UIImageView!
-    @IBOutlet weak var contactName: UILabel!
-    @IBOutlet weak var callStatus: UIImageView!
-    @IBOutlet weak var cellContainer: UIView!
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        callStatus.isHidden = true
-        cellContainer.setupBorder(UIColor.white, radius: 10)
+        contactView.setupCircle()
+        background.setupBorder(UIColor.clear, radius: 5)
     }
+    
 }

@@ -10,7 +10,6 @@ import Foundation
 import CoreData
 
 enum ContactStatus:Int16 {
-    case none           = 0
     case requested      = 1
     case approved       = 2
     case rejected       = 3
@@ -18,16 +17,14 @@ enum ContactStatus:Int16 {
 
 public class Contact: NSManagedObject {
     
-    func contactStatus() -> ContactStatus {
+    func getContactStatus() -> ContactStatus {
         switch status {
         case 1:
             return .requested
         case 2:
             return .approved
-        case 3:
-            return .rejected
         default:
-            return .none
+            return .rejected
         }
     }
     

@@ -8,7 +8,6 @@
 
 import Foundation
 import CoreData
-import SDWebImage
 
 enum SocialType:Int16 {
     case email = 0
@@ -86,21 +85,6 @@ public class User: NSManagedObject {
             completion()
         }
     }
-
-    func contactStatus(_ user:User) -> ContactStatus {
-        if let contacts = self.contacts?.allObjects as? [Contact] {
-            for contact in contacts {
-                if contact.initiator! == self.uid! && contact.requester! == user.uid! {
-                    return ContactStatus(rawValue: contact.status)!
-                } else if contact.initiator! == user.uid! && contact.requester! == self.uid! {
-                    return ContactStatus(rawValue: contact.status)!
-                }
-            }
-            return .none
-        } else {
-            return .none
-        }
-    }
     
     func containsContact(contact:Contact) -> Bool {
         if let contacts = self.contacts?.allObjects as? [Contact] {
@@ -109,4 +93,15 @@ public class User: NSManagedObject {
             return false
         }
     }
+    
+    func getImage() -> UIImage {
+        if avatar != nil {
+            return UIImage(data: avatar! as Data)!
+        } else {
+            return UIImage.imageWithColor(
+                ColorUtility.md5color(email!),
+                size: CGSize(width: 100, height: 100)).addImage(UIImage(named: "question")!)
+        }
+    }
+
 }

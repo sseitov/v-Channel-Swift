@@ -17,6 +17,11 @@ extension UIView {
         self.clipsToBounds = true
     }
     
+    func setupCircle() {
+        self.layer.cornerRadius = self.bounds.size.width / 2
+        self.clipsToBounds = true
+    }
+
     func addDashedBorder(_ color:UIColor = UIColor.mainColor()) {
         let shapeLayer:CAShapeLayer = CAShapeLayer()
         let frameSize = self.frame.size

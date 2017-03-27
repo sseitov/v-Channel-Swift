@@ -8,27 +8,10 @@
 
 import UIKit
 import Firebase
-import SVProgressHUD
 
-class ContactListController: UITableViewController, LoginControllerDelegate, CallControllerDelegate, InviteControllerDelegate {
+class ContactListController: UITableViewController, LoginControllerDelegate, InviteControllerDelegate {
 
-    fileprivate var contacts:[User] = []
-    
-    fileprivate var ipGetter:IP_Getter?
-    fileprivate var audioGateway:CallGatewayInfo?
-    fileprivate var videoGateway:CallGatewayInfo?
-    fileprivate var getterTimer:Timer?
-    
-    fileprivate var inCall:[String:Any]? {
-        didSet {
-            if inCall == nil {
-                Ringtone.shared.stop()
-            } else {
-                Ringtone.shared.play()
-            }
-            tableView.reloadData()
-        }
-    }
+    fileprivate var contacts:[Contact] = []
     
     // MARK: - Life cycle
 
@@ -37,48 +20,49 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Cal
         setupTitle("My Contacts")
         
         NotificationCenter.default.addObserver(self,
-                                               selector: #selector(self.addContactNotify(_:)),
-                                               name: contactAddNotification,
+                                               selector: #selector(self.refresh),
+                                               name: contactNotification,
                                                object: nil)
         NotificationCenter.default.addObserver(self,
-                                               selector: #selector(self.updateContactNotify(_:)),
-                                               name: contactUpdateNotification,
+                                               selector: #selector(self.refreshStatus),
+                                               name: newMessageNotification,
                                                object: nil)
         NotificationCenter.default.addObserver(self,
-                                               selector: #selector(self.deleteContactNotify(_:)),
-                                               name: contactDeleteNotification,
+                                               selector: #selector(self.refreshStatus),
+                                               name: readMessageNotification,
                                                object: nil)
         
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(self.incommingCall(_:)),
-                                               name: incommingCallNotification,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(self.hangUpCall(_:)),
-                                               name: hangUpCallNotification,
-                                               object: nil)
         if currentUser() == nil {
             performSegue(withIdentifier: "login", sender: self)
         } else {
             Model.shared.startObservers()
-            contacts = Model.shared.myContacts()
-            tableView.reloadData()
-            audioGateway = nil
-            videoGateway = nil
-            ipGetter = IP_Getter(IP_STUN_SERVER_VOIP, port: IP_AUDIO_PORT_VOIP)
-            getterTimer = Timer.scheduledTimer(timeInterval: 0.4, target: self, selector: #selector(self.checkGateway(_:)), userInfo: nil, repeats: true);
+            refresh()
         }
     }
     
+    func refresh() {
+        if let allContacts = currentUser()!.contacts?.allObjects as? [Contact] {
+            contacts.removeAll()
+            contacts = allContacts
+        }
+        tableView.reloadData()
+        if IS_PAD() {
+            if contacts.count > 0 {
+                performSegue(withIdentifier: "chat", sender: contacts[0])
+            } else {
+                performSegue(withIdentifier: "chat", sender: nil)
+            }
+        }
+    }
+    
+    func refreshStatus() {
+        tableView.reloadData()
+    }
+
     func didLogin() {
         dismiss(animated: true, completion: {
             Model.shared.startObservers()
-            self.contacts = Model.shared.myContacts()
-            self.tableView.reloadData()
-            self.audioGateway = nil
-            self.videoGateway = nil
-            self.ipGetter = IP_Getter(IP_STUN_SERVER_VOIP, port: IP_AUDIO_PORT_VOIP)
-            self.getterTimer = Timer.scheduledTimer(timeInterval: 0.4, target: self, selector: #selector(self.checkGateway(_:)), userInfo: nil, repeats: true);
+            self.refresh()
         })
     }
     
@@ -95,43 +79,17 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Cal
         performSegue(withIdentifier: "login", sender: self)
     }
 
-    func didAddContact(_ contact: User) {
-        Model.shared.addContact(with: contact)
+    func didAddContact(_ user: User) {
+        let contact = Model.shared.addContact(with: user)
         self.tableView.beginUpdates()
         let indexPath = IndexPath(row: self.contacts.count, section: 0)
         self.contacts.append(contact)
         self.tableView.insertRows(at: [indexPath], with: .bottom)
         self.tableView.endUpdates()
     }
-    
-    func callDidFinish(_ call:CallController) {
-        if IS_PAD() {
-            performSegue(withIdentifier: "personalCall", sender: nil)
-        } else {
-            _ = navigationController?.popViewController(animated: true)
-        }
-    }
 
     deinit {
         NotificationCenter.default.removeObserver(self)
-    }
-    
-    func checkGateway(_ timer:Timer) {
-        if ipGetter != nil && ipGetter!.check() {
-            if audioGateway == nil {
-                audioGateway = CallGatewayInfo(ipGetter: ipGetter)
-                print("===== set audio gateway \(audioGateway!.publicIP!):\(audioGateway!.publicPort!)")
-                self.ipGetter = nil
-                self.ipGetter = IP_Getter(IP_STUN_SERVER_VOIP, port: IP_VIDEO_PORT_VOIP)
-            } else {
-                videoGateway = CallGatewayInfo(ipGetter: ipGetter)
-                print("===== set video gateway \(videoGateway!.publicIP!):\(videoGateway!.publicPort!)")
-                timer.invalidate()
-                self.ipGetter = nil
-            }
-        } else {
-            print("No gateway yet\n")
-        }
     }
 
     // MARK: - Table view data source
@@ -157,15 +115,8 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Cal
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "contact", for: indexPath) as! ContactCell
-        let user = contacts[indexPath.row]
-        cell.user = user
-        cell.contact = Model.shared.contactWithUser(user.uid!)
-        if inCall != nil && inCall!["group"] == nil && ((inCall!["from"] as! String) == user.uid!) {
-            cell.incomming = true
-        } else {
-            cell.incomming = false
-        }
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Contact", for: indexPath) as! ContactCell
+        cell.contact = contacts[indexPath.row]
         return cell
     }
 
@@ -175,169 +126,74 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Cal
 
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            let user = contacts[indexPath.row]
-            if let contact = Model.shared.contactWithUser(user.uid!) {
-                let question = createQuestion("Do you want to delete \(user.name!) from contact list?", acceptTitle: "Delete", cancelTitle: "Cancel", acceptHandler: {
-                    
-                    SVProgressHUD.show(withStatus: "Delete...")
-                    Model.shared.deleteContact(contact, completion: {
-                        SVProgressHUD.dismiss()
-                        tableView.beginUpdates()
-                        self.contacts.remove(at: indexPath.row)
-                        tableView.deleteRows(at: [indexPath], with: .top)
-                        tableView.endUpdates()
-                    })
-                })
-                question?.show()
+            let contact = contacts[indexPath.row]
+            if let index = contacts.index(of: contact) {
+                tableView.beginUpdates()
+                contacts.remove(at: index)
+                Model.shared.deleteContact(contact)
+                tableView.deleteRows(at: [indexPath], with: .top)
+                tableView.endUpdates()
+                if contacts.count == 0 && IS_PAD() {
+                    performSegue(withIdentifier: "chat", sender: nil)
+                }
             }
         }
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let user = contacts[indexPath.row]
-        if let contact = Model.shared.contactWithUser(user.uid!) {
-            if contact.contactStatus() == .requested {
-                if contact.requester! == currentUser()!.uid! {
-                    let question = ActionSheet.create(title: "\(user.name!) ask you to add him into contact list",
-                        actions: ["Add to list", "Reject request"], handler1: {
-                            Model.shared.approveContact(contact)
-                            self.tableView.reloadRows(at: [indexPath], with: .fade)
-                    }, handler2: {
-                        SVProgressHUD.show(withStatus: "Delete...")
-                        Model.shared.deleteContact(contact, completion: {
-                            SVProgressHUD.dismiss()
-                            tableView.beginUpdates()
-                            self.contacts.remove(at: indexPath.row)
-                            tableView.deleteRows(at: [indexPath], with: .top)
-                            tableView.endUpdates()
-                        })
-                    })
-                    question?.firstButton.backgroundColor = UIColor.mainColor()
-                    question?.secondButton.backgroundColor = UIColor.errorColor()
-                    question?.cancelButton.setTitle("Not now", for: .normal)
-                    question?.show()
-                } else {
-                    showMessage("You are wait approval from \(user.name!).", messageType: .information)
-                }
-            } else if contact.contactStatus() == .rejected {
-                let question = createQuestion("Contact was rejected. Are you want to delete it?", acceptTitle: "Delete", cancelTitle: "Not now", acceptHandler: {
-                    SVProgressHUD.show(withStatus: "Delete...")
-                    Model.shared.deleteContact(contact, completion: {
-                        SVProgressHUD.dismiss()
-                        tableView.beginUpdates()
-                        self.contacts.remove(at: indexPath.row)
-                        tableView.deleteRows(at: [indexPath], with: .top)
-                        tableView.endUpdates()
-                    })
+        let contact = contacts[indexPath.row]
+        switch contact.getContactStatus() {
+        case .requested:
+            if contact.initiator != currentUser()!.uid, let user = Model.shared.getUser(contact.initiator!) {
+                let question = createQuestion("\(user.name!) ask you to add him into contact list. Are you agree?",
+                    acceptTitle: "Yes", cancelTitle: "No",
+                    acceptHandler: {
+                        Model.shared.approveContact(contact)
+                }, cancelHandler: {
+                    Model.shared.rejectContact(contact)
+                    self.refresh()
                 })
                 question?.show()
-            } else {
-                if inCall != nil {
-                    let fromID = inCall!["from"] as! String
-                    let callID = inCall!["uid"] as! String
-                    if (fromID == user.uid!) {
-                        let alert = createQuestion("Do you want accept call from \(user.name!)",
-                            acceptTitle: "Accept",
-                            cancelTitle: "Reject",
-                            acceptHandler: {
-                                Model.shared.acceptCall(callID, accept: true)
-                                self.performSegue(withIdentifier: "personalCall", sender: self.inCall)
-                                self.inCall = nil
-                        },
-                            cancelHandler: {
-                                Model.shared.acceptCall(callID, accept: false)
-                                self.inCall = nil
-                        })
-                        alert?.show()
-                    } else {
-                        Model.shared.acceptCall(callID, accept: false)
-                        self.inCall = nil
-                        if audioGateway != nil && videoGateway != nil {
-                            performSegue(withIdentifier: "personalCall", sender: user)
-                            self.inCall = nil
-                        } else {
-                            showMessage("I have not yet received public IP address. Need some wait...", messageType: .information)
-                            self.inCall = nil
-                        }
-                    }
-                } else {
-                    if audioGateway != nil && videoGateway != nil {
-                        performSegue(withIdentifier: "personalCall", sender: user)
-                    } else {
-                        showMessage("You have not yet received public IP address. Need some wait...", messageType: .information)
-                    }
-                }
             }
-        }
-    }
-    
-    // MARK: - Contact management
-    
-    func addContactNotify(_ notify:Notification) {
-        if let user = notify.object as? User {
-            self.tableView.beginUpdates()
-            let indexPath = IndexPath(row: self.contacts.count, section: 0)
-            self.contacts.append(user)
-            self.tableView.insertRows(at: [indexPath], with: .bottom)
-            self.tableView.endUpdates()
-        }
-    }
-    
-    func updateContactNotify(_ notify:Notification) {
-        if let user = notify.object as? User {
-            if let index = self.contacts.index(of: user) {
-                let indexPath = IndexPath(row: index, section: 0)
-                self.tableView.reloadRows(at: [indexPath], with: .fade)
-            }
-        }
-    }
-    
-    func deleteContactNotify(_ notify:Notification) {
-        self.contacts = Model.shared.myContacts()
-        self.tableView.reloadData()
-    }
-    
-    // MARK: - Call management
-    
-    func incommingCall(_ notify:Notification) {
-        let callID = notify.object as! String
-        let ref = FIRDatabase.database().reference()
-        ref.child("calls").child(callID).observeSingleEvent(of: .value, with: { result in
-            if var call = result.value as? [String:Any] {
-                call["uid"] = callID
-                self.inCall = call
-            }
-        })
-    }
-    
-    func hangUpCall(_ notify:Notification) {
-        let callID = notify.object as! String
-        if (self.inCall != nil) && ((self.inCall!["uid"] as! String) == callID) {
-            self.inCall = nil
+        case .approved:
+            self.performSegue(withIdentifier: "chat", sender: contact)
+        default:
+            break
         }
     }
 
     // MARK: - Navigation
     
+    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
+        if identifier == "chat" {
+            if let contact = sender as? Contact {
+                if let user = Model.shared.getUser(contact.uid!) {
+                    if user.token == nil {
+                        self.showMessage("\(user.name!) does not available for chat now.", messageType: .information)
+                        return false
+                    }
+                }
+            }
+        }
+        return true
+    }
+
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "login" {
             let nav = segue.destination as! UINavigationController
             let controller = nav.topViewController as! LoginController
             controller.delegate = self
-        } else if segue.identifier == "personalCall" {
+        } else if segue.identifier == "chat" {
             let nav = segue.destination as! UINavigationController
-            let controller = nav.topViewController as! CallController
-            if sender != nil {
-                if let contact = sender as? User {
-                    controller.contact = contact
-                    controller.audioGateway = self.audioGateway
-                    controller.videoGateway = self.videoGateway
-                } else {
-                    controller.incommingCall = sender as? [String:Any]
+            let controller = nav.topViewController as! ChatController
+            if let contact = sender as? Contact {
+                if contact.getContactStatus() == .approved {
+                    if contact.initiator! == currentUser()!.uid! {
+                        controller.user = Model.shared.getUser(contact.requester!)
+                    } else {
+                        controller.user = Model.shared.getUser(contact.initiator!)
+                    }
                 }
-                controller.delegate = self
-            } else {
-                controller.delegate = nil
             }
         } else if segue.identifier == "settings" {
             let controller = segue.destination as! SettingsController

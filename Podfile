@@ -1,7 +1,7 @@
 platform :ios, '9.0'
 
 target 'v-Channel' do
-    use_frameworks!
+#    use_frameworks!
     
     pod 'Firebase/Core'
     pod 'Firebase/Storage'
@@ -11,7 +11,9 @@ target 'v-Channel' do
     pod 'Google/SignIn'
     
     pod 'AFNetworking'
-    pod 'MPMessagePack'
+    pod 'JSQMessagesViewController'
+    pod 'GoogleMaps'
+    pod 'AppRTC'
     
     pod 'SVProgressHUD'
     pod 'IQKeyboardManager'

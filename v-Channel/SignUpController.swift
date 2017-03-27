@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import SVProgressHUD
 import Firebase
 
 class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate {

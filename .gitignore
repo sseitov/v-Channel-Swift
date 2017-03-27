@@ -31,7 +31,3 @@ Podfile.lock
 
 GoogleService-Info.plist
 Credentials.swift
-opus.framework
-.opus
-audioGateway.py
-videoGateway.py

@@ -45,4 +45,17 @@ extension UIImage {
         UIGraphicsEndImageContext()
         return finalImage!
     }
+    
+    func addImage(_ image:UIImage) -> UIImage {
+        UIGraphicsBeginImageContextWithOptions(self.size, false, 1.0)
+        let bounds = CGRect(origin: CGPoint(), size: self.size)
+        let pt = CGPoint(x: (self.size.width - image.size.width)/2.0, y: (self.size.height - image.size.height)/2.0)
+        let imageBounds = CGRect(origin: pt, size: image.size)
+        self.draw(in: bounds)
+        image.draw(in: imageBounds)
+        let finalImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return finalImage!
+    }
+
 }

@@ -10,8 +10,6 @@
 import UIKit
 import CoreData
 import Firebase
-import AFNetworking
-import SDWebImage
 
 func currentUser() -> User? {
     if let firUser = FIRAuth.auth()?.currentUser {
@@ -41,15 +39,18 @@ enum PushType:Int {
     case none = 0
     case incommingCall = 1
     case hangUpCall = 2
+    case newMessage = 3
 }
+
+let newMessageNotification = Notification.Name("NEW_MESSAGE")
+let deleteMessageNotification = Notification.Name("DELETE_MESSAGE")
+let readMessageNotification = Notification.Name("READ_MESSAGE")
 
 let incommingCallNotification = Notification.Name("INCOMMING_CALL")
 let acceptCallNotification = Notification.Name("ACCEPT_CALL")
 let hangUpCallNotification = Notification.Name("HANGUP_CALL")
 
-let contactAddNotification = Notification.Name("ADD_CONTACT")
-let contactUpdateNotification = Notification.Name("UPDATE_CONTACT")
-let contactDeleteNotification = Notification.Name("DELETE_CONTACT")
+let contactNotification = Notification.Name("CONTACT")
 
 class Model: NSObject {
     
@@ -59,6 +60,29 @@ class Model: NSObject {
         super.init()
     }
     
+    // MARK: - Date formatter
+    
+    lazy var dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        return formatter
+    }()
+    
+    lazy var textDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .short
+        formatter.doesRelativeDateFormatting = true
+        return formatter
+    }()
+    
+    lazy var textYearFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .long
+        formatter.timeStyle = .none
+        return formatter
+    }()
+
     // MARK: - CoreData stack
     
     lazy var applicationDocumentsDirectory: URL = {
@@ -106,6 +130,8 @@ class Model: NSObject {
         let ref = FIRDatabase.database().reference()
         ref.child("tokens").child(currentUser()!.uid!).removeValue(completionBlock: { _, _ in
             try? FIRAuth.auth()?.signOut()
+            self.newMessageRefHandle = nil
+            self.deleteMessageRefHandle = nil
             self.newTokenRefHandle = nil
             self.updateTokenRefHandle = nil
             self.newCallRefHandle = nil
@@ -122,6 +148,9 @@ class Model: NSObject {
     // MARK: - Cloud observers
     
     func startObservers() {
+        if newMessageRefHandle == nil {
+            observeMessages()
+        }
         if newTokenRefHandle == nil {
             observeTokens()
         }
@@ -135,6 +164,9 @@ class Model: NSObject {
     
     lazy var storageRef: FIRStorageReference = FIRStorage.storage().reference(forURL: firStorage)
     
+    private var newMessageRefHandle: FIRDatabaseHandle?
+    private var deleteMessageRefHandle: FIRDatabaseHandle?
+
     private var newTokenRefHandle: FIRDatabaseHandle?
     private var updateTokenRefHandle: FIRDatabaseHandle?
     
@@ -352,7 +384,7 @@ class Model: NSObject {
         }
     }
     
-    func addContact(with:User) {
+    func addContact(with:User) -> Contact {
         let contact = createContact(generateUDID())
         contact.initiator = currentUser()!.uid
         contact.requester = with.uid!
@@ -363,6 +395,7 @@ class Model: NSObject {
         let ref = FIRDatabase.database().reference()
         ref.child("contacts").child(contact.uid!).setValue(contact.getData())
         pushContactRequest(to: with)
+        return contact
     }
     
     func approveContact(_ contact:Contact) {
@@ -375,16 +408,6 @@ class Model: NSObject {
         let ref = FIRDatabase.database().reference()
         contact.status = ContactStatus.rejected.rawValue
         ref.child("contacts").child(contact.uid!).setValue(contact.getData())
-    }
-    
-    func deleteContact(_ contact:Contact, completion: @escaping() -> ()) {
-        currentUser()?.removeFromContacts(contact)
-        let ref = FIRDatabase.database().reference()
-        ref.child("contacts").child(contact.uid!).removeValue(completionBlock: { _, _ in
-            self.managedObjectContext.delete(contact)
-            self.saveContext()
-            completion()
-        })
     }
     
     func deleteContact(_ contact:Contact) {
@@ -403,15 +426,18 @@ class Model: NSObject {
             if self.getContact(snapshot.key) == nil {
                 if let contactData = snapshot.value as? [String:Any] {
                     if let from = contactData["initiator"] as? String, let to = contactData["requester"] as? String {
-                        if from == currentUser()!.uid! || to == currentUser()!.uid {
-                            let userID = (from == currentUser()!.uid!) ? to : from
-                            self.uploadUser(userID, result: { user in
-                                if user != nil {
-                                    let contact = self.createContact(snapshot.key)
-                                    contact.owner = currentUser()
-                                    currentUser()?.addToContacts(contact)
-                                    contact.setData(contactData)
-                                    NotificationCenter.default.post(name: contactAddNotification, object: user)
+                        if from == currentUser()!.uid! || to == currentUser()!.uid! {
+                            self.uploadUser(from, result: { fromUser in
+                                if fromUser != nil {
+                                    self.uploadUser(to, result: { toUser in
+                                        if toUser != nil {
+                                            let contact = self.createContact(snapshot.key)
+                                            contact.owner = currentUser()
+                                            currentUser()?.addToContacts(contact)
+                                            contact.setData(contactData)
+                                            NotificationCenter.default.post(name: contactNotification, object: nil)
+                                        }
+                                    })
                                 }
                             })
                         }
@@ -422,25 +448,19 @@ class Model: NSObject {
         
         updateContactRefHandle = contactQuery.observe(.childChanged, with: { (snapshot) -> Void in
             if let contact = self.getContact(snapshot.key) {
-                if let contactData = snapshot.value as? [String:Any] {
-                    if let from = contactData["initiator"] as? String, let to = contactData["requester"] as? String {
-                        if from == currentUser()!.uid, let toUser = self.getUser(to) {
-                            contact.setData(contactData)
-                            NotificationCenter.default.post(name: contactUpdateNotification, object: toUser)
-                        }
-                    }
+                if let data = snapshot.value as? [String:Any] {
+                    contact.setData(data)
+                    NotificationCenter.default.post(name: contactNotification, object: contact)
                 }
             }
         })
         
         deleteContactRefHandle = contactQuery.observe(.childRemoved, with: { (snapshot) -> Void in
-            if currentUser() != nil, let contact = self.getContact(snapshot.key) {
-                if currentUser()!.containsContact(contact: contact) {
-                    currentUser()!.removeFromContacts(contact)
-                    self.managedObjectContext.delete(contact)
-                    self.saveContext()
-                    NotificationCenter.default.post(name: contactDeleteNotification, object: nil)
-                }
+            if let contact = self.getContact(snapshot.key) {
+                currentUser()!.removeFromContacts(contact)
+                self.managedObjectContext.delete(contact)
+                self.saveContext()
+                NotificationCenter.default.post(name: contactNotification, object: nil)
             }
         })
         
@@ -521,6 +541,23 @@ class Model: NSObject {
         }
     }
     
+    fileprivate func messagePush(_ text:String, to:User, from:User) {
+        if to.token != nil {
+            let data:[String:Int] = ["pushType" : PushType.newMessage.rawValue]
+            let notification:[String:Any] = ["title" : "New message from \(from.name!):",
+                "body": text,
+                "sound":"default",
+                "content_available": true]
+            let message:[String:Any] = ["to" : to.token!, "priority" : "high", "notification" : notification, "data" : data]
+            httpManager.post("send", parameters: message, progress: nil, success: { task, response in
+            }, failure: { task, error in
+                print("SEND PUSH ERROR: \(error)")
+            })
+        } else {
+            print("USER HAVE NO TOKEN")
+        }
+    }
+
     // MARK: - VOIP calls
     
     func makeCall(to:User, audioIP:String, audioPort:String, videoIP:String, videoPort:String) -> String {
@@ -567,6 +604,237 @@ class Model: NSObject {
             NotificationCenter.default.post(name: hangUpCallNotification, object: snapshot.key)
         })
         
+    }
+    
+    // MARK: - Message table
+    
+    func createMessage(_ uid:String) -> Message {
+        var message = getMessage(uid)
+        if message == nil {
+            message = NSEntityDescription.insertNewObject(forEntityName: "Message", into: managedObjectContext) as? Message
+            message!.uid = uid
+        }
+        return message!
+    }
+    
+    func getMessage(_ uid:String) -> Message? {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Message")
+        let predicate = NSPredicate(format: "uid = %@", uid)
+        fetchRequest.predicate = predicate
+        if let message = try? managedObjectContext.fetch(fetchRequest).first as? Message {
+            return message
+        } else {
+            return nil
+        }
+    }
+    
+    func getMessage(from:User, date:Date) -> Message? {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Message")
+        let predicate1 = NSPredicate(format: "from = %@", from.uid!)
+        let predicate2 = NSPredicate(format: "date = %@", date as NSDate)
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate1, predicate2])
+        if let message = try? managedObjectContext.fetch(fetchRequest).first as? Message {
+            return message
+        } else {
+            return nil
+        }
+    }
+    
+    func deleteMessage(_ message:Message, completion: @escaping() -> ()) {
+        let ref = FIRDatabase.database().reference()
+        if let image = message.imageURL {
+            self.storageRef.child(image).delete(completion: { _ in
+                ref.child("messages").child(message.uid!).removeValue(completionBlock:{_, _ in
+                    completion()
+                })
+            })
+        } else {
+            ref.child("messages").child(message.uid!).removeValue(completionBlock: { _, _ in
+                completion()
+            })
+        }
+    }
+    
+    private func chatPredicate(with:String) -> NSPredicate {
+        let predicate1  = NSPredicate(format: "from == %@", with)
+        let predicate2 = NSPredicate(format: "to == %@", currentUser()!.uid!)
+        let toPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate1, predicate2])
+        let predicate3  = NSPredicate(format: "from == %@", currentUser()!.uid!)
+        let predicate4 = NSPredicate(format: "to == %@", with)
+        let fromPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate3, predicate4])
+        return NSCompoundPredicate(orPredicateWithSubpredicates: [toPredicate, fromPredicate])
+    }
+    
+    func chatMessages(with:String) -> [Message] {
+        if currentUser() == nil {
+            return []
+        }
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Message")
+        fetchRequest.predicate = chatPredicate(with: with)
+        let sortDescriptor = NSSortDescriptor(key: "date", ascending: true)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        
+        if let all = try? managedObjectContext.fetch(fetchRequest) as! [Message] {
+            return all
+        } else {
+            return []
+        }
+    }
+    
+    func unreadCountInChat(_ uid:String) -> Int {
+        if currentUser() == nil {
+            return 0
+        }
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Message")
+        let predicate = NSPredicate(format: "isNew == YES")
+        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [chatPredicate(with: uid), predicate])
+        
+        do {
+            return try managedObjectContext.count(for: fetchRequest)
+        } catch {
+            return 0
+        }
+    }
+    
+    func lastMessageInChat(_ uid:String) -> Message? {
+        if currentUser() == nil {
+            return nil
+        }
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Message")
+        fetchRequest.predicate = chatPredicate(with: uid)
+        let sortDescriptor = NSSortDescriptor(key: "date", ascending: false)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        fetchRequest.fetchLimit = 1
+        if let all = try? managedObjectContext.fetch(fetchRequest) as! [Message] {
+            return all.first
+        } else {
+            return nil
+        }
+    }
+    
+    func allUnreadCount() -> Int {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Message")
+        fetchRequest.predicate = NSPredicate(format: "isNew == YES")
+        do {
+            return try managedObjectContext.count(for: fetchRequest)
+        } catch {
+            return 0
+        }
+    }
+    
+    func readMessage(_ message:Message) {
+        message.isNew = false
+        saveContext()
+        NotificationCenter.default.post(name: readMessageNotification, object: message)
+    }
+    
+    func sendTextMessage(_ text:String, to:String) {
+        let ref = FIRDatabase.database().reference()
+        let dateStr = dateFormatter.string(from: Date())
+        let messageItem:[String:Any] = ["from" : currentUser()!.uid!,
+                                        "to" : to,
+                                        "text" : text,
+                                        "date" : dateStr]
+        ref.child("messages").childByAutoId().setValue(messageItem)
+        if let toUser = getUser(to) {
+            self.messagePush(text, to: toUser, from: currentUser()!)
+        }
+    }
+    
+    func sendImageMessage(_ image:UIImage, to:String, result:@escaping (NSError?) -> ()) {
+        let toUser = getUser(to)
+        if toUser == nil || currentUser() == nil {
+            return
+        }
+        if let imageData = UIImageJPEGRepresentation(image, 0.5) {
+            let meta = FIRStorageMetadata()
+            meta.contentType = "image/jpeg"
+            self.storageRef.child(generateUDID()).put(imageData, metadata: meta, completion: { metadata, error in
+                if error != nil {
+                    result(error as NSError?)
+                } else {
+                    let ref = FIRDatabase.database().reference()
+                    let dateStr = self.dateFormatter.string(from: Date())
+                    let messageItem:[String:Any] = ["from" : currentUser()!.uid!,
+                                                    "to" : to,
+                                                    "image" : metadata!.path!,
+                                                    "date" : dateStr]
+                    ref.child("messages").childByAutoId().setValue(messageItem)
+                    self.messagePush("\(currentUser()!.name!) sent photo.", to: toUser!, from: currentUser()!)
+                    result(nil)
+                }
+            })
+        }
+    }
+    
+    func sendLocationMessage(_ coordinate:CLLocationCoordinate2D, to:String) {
+        let ref = FIRDatabase.database().reference()
+        let dateStr = dateFormatter.string(from: Date())
+        let messageItem:[String:Any] = ["from" : currentUser()!.uid!,
+                                        "to" : to,
+                                        "date" : dateStr,
+                                        "latitude" : coordinate.latitude,
+                                        "longitude" : coordinate.longitude]
+        ref.child("messages").childByAutoId().setValue(messageItem)
+        if let toUser = getUser(to) {
+            self.messagePush("\(currentUser()!.name!) sent location.", to: toUser, from: currentUser()!)
+        }
+    }
+
+    private func observeMessages() {
+        let ref = FIRDatabase.database().reference()
+        let messageQuery = ref.child("messages").queryLimited(toLast:25)
+        
+        newMessageRefHandle = messageQuery.observe(.childAdded, with: { (snapshot) -> Void in
+            let messageData = snapshot.value as! [String:Any]
+            if let from = messageData["from"] as? String, let to = messageData["to"] as? String {
+                if currentUser() != nil && self.getMessage(snapshot.key) == nil {
+                    let received = (to == currentUser()!.uid!)
+                    let sended = (from == currentUser()!.uid!)
+                    if received || sended {
+                        let message = self.createMessage(snapshot.key)
+                        message.setData(messageData, new: received, completion: {
+                            NotificationCenter.default.post(name: newMessageNotification, object: message)
+                        })
+                    }
+                }
+            } else {
+                print("Error! Could not decode message data \(messageData)")
+            }
+        })
+        
+        deleteMessageRefHandle = messageQuery.observe(.childRemoved, with: { (snapshot) -> Void in
+            if let message = self.getMessage(snapshot.key) {
+                NotificationCenter.default.post(name: deleteMessageNotification, object: message)
+                self.managedObjectContext.delete(message)
+                self.saveContext()
+            }
+        })
+    }
+    
+    func refreshMessages() {
+        let ref = FIRDatabase.database().reference()
+        ref.child("messages").queryOrdered(byChild: "date").observeSingleEvent(of: .value, with: { snapshot in
+            if let values = snapshot.value as? [String:Any] {
+                for (key, value) in values {
+                    let messageData = value as! [String:Any]
+                    if let from = messageData["from"] as? String, let to = messageData["to"] as? String {
+                        if currentUser() != nil && self.getMessage(snapshot.key) == nil {
+                            let received = (to == currentUser()!.uid!)
+                            let sended = (from == currentUser()!.uid!)
+                            if received || sended {
+                                let message = self.createMessage(key)
+                                message.setData(messageData, new: false, completion: {
+                                    NotificationCenter.default.post(name: newMessageNotification, object: message)
+                                })
+                            }
+                        }
+                    } else {
+                        print("Error! Could not decode message data \(messageData)")
+                    }
+                }
+            }
+        })
     }
 
 }

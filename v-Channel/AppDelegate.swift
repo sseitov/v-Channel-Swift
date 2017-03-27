@@ -9,8 +9,7 @@
 import UIKit
 import Firebase
 import UserNotifications
-import SVProgressHUD
-import IQKeyboardManager
+import GoogleMaps
 
 func IS_PAD() -> Bool {
     return UIDevice.current.userInterfaceIdiom == .pad
@@ -54,6 +53,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
                 Model.shared.publishToken(currUser, token:token)
             }
         })
+        
+        // Initialize Google Maps
+        GMSServices.provideAPIKey(GoolgleMapAPIKey)
+        
+        //provideAPIKey(GoolgleMapAPIKey)
 
         let splitViewController = self.window!.rootViewController as! UISplitViewController
         let navigationController = splitViewController.viewControllers[splitViewController.viewControllers.count-1] as! UINavigationController
