@@ -67,6 +67,13 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
                                                    selector: #selector(ChatController.deleteMessage(_:)),
                                                    name: deleteMessageNotification,
                                                    object: nil)
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(self.checkIncomming),
+                                                   name: contactNotification,
+                                                   object: nil)
+            if !IS_PAD() {
+                checkIncomming()
+            }
         } else {
             self.senderId = ""
             self.senderDisplayName = ""
@@ -74,16 +81,13 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
             navigationItem.rightBarButtonItem = nil
             setupTitle("Contact list is empty")
         }
+        
         if IS_PAD() {
             navigationItem.leftBarButtonItem = nil
         } else {
             setupBackButton()
         }
         
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(self.incommingCall(_:)),
-                                               name: incommingCallNotification,
-                                               object: nil)
     }
     
     override func goBack() {
@@ -97,15 +101,17 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
    
     // MARK: - Call management
     
-    func incommingCall(_ notify:Notification) {
-        if let call = notify.object as? [String:Any], let callId = call["uid"] as? String, let from = call["from"] as? String, let user = Model.shared.getUser(from) {
-            let alert = createQuestion("\(user.name!) call you.", acceptTitle: "Accept", cancelTitle: "Reject", acceptHandler: {
-                Model.shared.acceptCall(callId)
-                self.performSegue(withIdentifier: "call", sender: callId)
-            }, cancelHandler: {
-                Model.shared.hangUpCall(callId)
-            })
-            alert?.show()
+    func checkIncomming() {
+        if let call = UserDefaults.standard.object(forKey: "incommingCall") as? [String:Any] {
+            if let callId = call["uid"] as? String, let from = call["from"] as? String, let user = Model.shared.getUser(from) {
+                let alert = createQuestion("\(user.name!) call you.", acceptTitle: "Accept", cancelTitle: "Reject", acceptHandler: {
+                    Model.shared.acceptCall(callId)
+                    self.performSegue(withIdentifier: "call", sender: callId)
+                }, cancelHandler: {
+                    Model.shared.hangUpCall(callId)
+                })
+                alert?.show()
+            }
         }
     }
 

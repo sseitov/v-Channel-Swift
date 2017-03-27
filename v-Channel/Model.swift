@@ -46,7 +46,6 @@ let newMessageNotification = Notification.Name("NEW_MESSAGE")
 let deleteMessageNotification = Notification.Name("DELETE_MESSAGE")
 let readMessageNotification = Notification.Name("READ_MESSAGE")
 
-let incommingCallNotification = Notification.Name("INCOMMING_CALL")
 let acceptCallNotification = Notification.Name("ACCEPT_CALL")
 let hangUpCallNotification = Notification.Name("HANGUP_CALL")
 
@@ -573,11 +572,21 @@ class Model: NSObject {
     func acceptCall(_ callID:String) {
         let ref = FIRDatabase.database().reference()
         ref.child("calls").child(callID).setValue(["accept" : true])
+        
+        Ringtone.shared.stop()
+        UserDefaults.standard.removeObject(forKey: "incommingCall")
+        UserDefaults.standard.synchronize()
+        NotificationCenter.default.post(name: contactNotification, object: nil)
     }
 
     func hangUpCall(_ callID:String) {
         let ref = FIRDatabase.database().reference()
         ref.child("calls").child(callID).removeValue()
+        
+        Ringtone.shared.stop()
+        UserDefaults.standard.removeObject(forKey: "incommingCall")
+        UserDefaults.standard.synchronize()
+        NotificationCenter.default.post(name: contactNotification, object: nil)
     }
     
     fileprivate func observeCalls() {
@@ -587,8 +596,11 @@ class Model: NSObject {
         newCallRefHandle = callQuery.observe(.childAdded, with: { (snapshot) -> Void in
             if let data = snapshot.value as? [String:Any], let to = data["to"] as? String, let from = data["from"] as? String {
                 if to == currentUser()!.uid! {
+                    Ringtone.shared.play()
                     let call = ["uid" : snapshot.key, "from" : from]
-                    NotificationCenter.default.post(name: incommingCallNotification, object: call)
+                    UserDefaults.standard.set(call, forKey: "incommingCall")
+                    UserDefaults.standard.synchronize()
+                    NotificationCenter.default.post(name: contactNotification, object: nil)
                 }
             }
         })
@@ -599,6 +611,12 @@ class Model: NSObject {
         
         deleteCallRefHandle = callQuery.observe(.childRemoved, with: { (snapshot) -> Void in
             NotificationCenter.default.post(name: hangUpCallNotification, object: snapshot.key)
+            if (UserDefaults.standard.object(forKey: "incommingCall") as? [String:Any]) != nil {
+                Ringtone.shared.stop()
+                UserDefaults.standard.removeObject(forKey: "incommingCall")
+                UserDefaults.standard.synchronize()
+                NotificationCenter.default.post(name: contactNotification, object: nil)
+            }
         })
         
     }

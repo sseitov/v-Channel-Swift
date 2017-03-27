@@ -35,52 +35,65 @@ class ContactCell: UITableViewCell {
             
             contactView.image = user!.getImage()
             contactLabel.font = UIFont.condensedFont()
-            switch contact!.getContactStatus() {
-            case .requested:
-                if contact!.requester! == currentUser()!.uid {
-                    contactLabel.text = "REQUEST FOR CHAT"
-                    let anim:[UIImage] = [UIImage(named: "alert")!,
-                                          UIImage.imageWithColor(UIColor.clear, size: statusView.frame.size)]
-                    statusView.animationImages = anim
-                    statusView.animationDuration = 1
-                    statusView.animationRepeatCount = 0
-                    statusView.startAnimating()
-                } else {
-                    contactLabel.text = "WAITING..."
-                    var anim:[UIImage] = []
-                    for i in 0..<24 {
-                        anim.append(UIImage(named: "frame_\(i).gif")!)
+            if let call = UserDefaults.standard.object(forKey: "incommingCall") as? [String:Any], let from = call["from"] as? String, let incomming = Model.shared.contactWithUser(from), incomming == contact! {
+                
+                var anim:[UIImage] = []
+                for i in 0..<24 {
+                    anim.append(UIImage(named: "ring_frame_\(i).gif")!)
+                }
+                statusView.animationImages = anim
+                statusView.animationDuration = 2
+                statusView.animationRepeatCount = 0
+                statusView.startAnimating()
+                statusView.isHidden = false
+            } else {
+                switch contact!.getContactStatus() {
+                case .requested:
+                    if contact!.requester! == currentUser()!.uid {
+                        contactLabel.text = "REQUEST FOR CHAT"
+                        let anim:[UIImage] = [UIImage(named: "alert")!,
+                                              UIImage.imageWithColor(UIColor.clear, size: statusView.frame.size)]
+                        statusView.animationImages = anim
+                        statusView.animationDuration = 1
+                        statusView.animationRepeatCount = 0
+                        statusView.startAnimating()
+                    } else {
+                        contactLabel.text = "WAITING..."
+                        var anim:[UIImage] = []
+                        for i in 0..<24 {
+                            anim.append(UIImage(named: "frame_\(i).gif")!)
+                        }
+                        statusView.animationImages = anim
+                        statusView.animationDuration = 2
+                        statusView.animationRepeatCount = 0
+                        statusView.startAnimating()
                     }
-                    statusView.animationImages = anim
-                    statusView.animationDuration = 2
-                    statusView.animationRepeatCount = 0
-                    statusView.startAnimating()
-                }
-                statusView.isHidden = false
-            case .rejected:
-                contactLabel.text = "REJECTED"
-                statusView.stopAnimating()
-                statusView.image = UIImage(named: "stop")
-                statusView.isHidden = false
-            case .approved:
-                contactLabel.font = UIFont.mainFont()
-                if let message = Model.shared.lastMessageInChat(user!.uid!) {
-                    contactLabel.text = message.text
-                } else {
-                    contactLabel.text = ""
-                }
-                let unread = Model.shared.unreadCountInChat(user!.uid!)
-                if unread > 0 {
-                    let anim:[UIImage] = [UIImage(named: "alert")!,
-                                          UIImage.imageWithColor(UIColor.clear, size: statusView.frame.size)]
-                    statusView.animationImages = anim
-                    statusView.animationDuration = 1
-                    statusView.animationRepeatCount = 0
-                    statusView.startAnimating()
                     statusView.isHidden = false
-                } else {
+                case .rejected:
+                    contactLabel.text = "REJECTED"
                     statusView.stopAnimating()
-                    statusView.isHidden = true
+                    statusView.image = UIImage(named: "stop")
+                    statusView.isHidden = false
+                case .approved:
+                    contactLabel.font = UIFont.mainFont()
+                    if let message = Model.shared.lastMessageInChat(user!.uid!) {
+                        contactLabel.text = message.text
+                    } else {
+                        contactLabel.text = ""
+                    }
+                    let unread = Model.shared.unreadCountInChat(user!.uid!)
+                    if unread > 0 {
+                        let anim:[UIImage] = [UIImage(named: "alert")!,
+                                              UIImage.imageWithColor(UIColor.clear, size: statusView.frame.size)]
+                        statusView.animationImages = anim
+                        statusView.animationDuration = 1
+                        statusView.animationRepeatCount = 0
+                        statusView.startAnimating()
+                        statusView.isHidden = false
+                    } else {
+                        statusView.stopAnimating()
+                        statusView.isHidden = true
+                    }
                 }
             }
         }

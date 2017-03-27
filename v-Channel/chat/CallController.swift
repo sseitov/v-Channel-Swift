@@ -107,8 +107,8 @@ class CallController: UIViewController {
             if self.busyPlayer != nil {
                 self.busyPlayer?.stop()
                 self.busyPlayer = nil
-            }
-            if self.rtcClient != nil {
+                self.delegate?.callDidFinish(self.user!)
+            } else if self.rtcClient != nil {
                 self.disconnect()
                 self.delegate?.callDidFinish(self.user!)
             }
