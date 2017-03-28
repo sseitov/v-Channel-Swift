@@ -8,17 +8,12 @@
 
 import UIKit
 
-protocol CallControllerDelegate {
-    func callDidFinish(_ user:User)
-}
-
 class CallController: UIViewController {
 
     let SERVER_HOST_URL = "https://appr.tc"
     
     var user:User?
     var incommingCall:String?
-    var delegate:CallControllerDelegate?
     
     @IBOutlet weak var callView: UIView!
     @IBOutlet weak var callImage: UIImageView!
@@ -99,7 +94,7 @@ class CallController: UIViewController {
                 Model.shared.hangUpCall(self.incommingCall!)
                 if self.rtcClient != nil {
                     self.disconnect()
-                    self.delegate?.callDidFinish(self.user!)
+                    super.goBack()
                 }
             })
             alert?.show()
@@ -107,10 +102,10 @@ class CallController: UIViewController {
             if self.busyPlayer != nil {
                 self.busyPlayer?.stop()
                 self.busyPlayer = nil
-                self.delegate?.callDidFinish(self.user!)
+                super.goBack()
             } else if self.rtcClient != nil {
                 self.disconnect()
-                self.delegate?.callDidFinish(self.user!)
+                super.goBack()
             }
         }
     }

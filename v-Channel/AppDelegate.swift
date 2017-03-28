@@ -11,10 +11,6 @@ import Firebase
 import UserNotifications
 import GoogleMaps
 
-func IS_PAD() -> Bool {
-    return UIDevice.current.userInterfaceIdiom == .pad
-}
-
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
 
@@ -59,12 +55,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         
         // Initialize SSL Peer Connection
         RTCPeerConnectionFactory.initializeSSL()
+
+        // UI Customization
         
-        let splitViewController = self.window!.rootViewController as! UISplitViewController
-        let navigationController = splitViewController.viewControllers[splitViewController.viewControllers.count-1] as! UINavigationController
-        navigationController.topViewController!.navigationItem.leftBarButtonItem = splitViewController.displayModeButtonItem
-        splitViewController.delegate = self
-                
         UIApplication.shared.statusBarStyle = .lightContent
         
         SVProgressHUD.setDefaultStyle(.custom)
@@ -156,34 +149,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     func applicationWillTerminate(_ application: UIApplication) {
         RTCPeerConnectionFactory.deinitializeSSL()
     }
-
-    // MARK: - SplitView delegate
-    
-    func splitViewController(_ svc: UISplitViewController, shouldHide vc: UIViewController, in orientation: UIInterfaceOrientation) -> Bool {
-        return false
-    }
-    
-    func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
-        return true
-    }
-    
-    func splitViewController(_ splitViewController: UISplitViewController, showDetail vc: UIViewController, sender: Any?) -> Bool {
-        if splitViewController.isCollapsed {
-            var secondViewController:UIViewController? = vc as? UINavigationController
-            if secondViewController != nil {
-                secondViewController = (secondViewController as! UINavigationController).topViewController
-            } else {
-                secondViewController = vc
-            }
-            
-            if let master = splitViewController.viewControllers[0] as? UINavigationController {
-                master.pushViewController(secondViewController!, animated: true)
-            }
-            return true
-        } else {
-            return false
-        }
-    }
 }
 
 // MARK: - NotificationCenter delegate
@@ -201,6 +166,8 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         center.removeAllDeliveredNotifications()
         UIApplication.shared.applicationIconBadgeNumber = -1
+        let nav = window!.rootViewController as! UINavigationController
+        nav.popToRootViewController(animated: false)
     }
 }
 

@@ -9,7 +9,7 @@
 import UIKit
 import Firebase
 
-class ContactListController: UITableViewController, LoginControllerDelegate, InviteControllerDelegate, CallControllerDelegate {
+class ContactListController: UITableViewController, LoginControllerDelegate, InviteControllerDelegate {
 
     fileprivate var contacts:[Contact] = []
     
@@ -50,13 +50,6 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Inv
             contacts = allContacts
         }
         tableView.reloadData()
-        if IS_PAD() {
-            if contacts.count > 0 {
-                performSegue(withIdentifier: "chat", sender: contacts[0])
-            } else {
-                performSegue(withIdentifier: "chat", sender: nil)
-            }
-        }
     }
     
     func refreshStatus() {
@@ -71,9 +64,6 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Inv
     }
     
     func didLogout() {
-        if IS_PAD() {
-            performSegue(withIdentifier: "personalCall", sender: nil)
-        }
         for user in contacts {
             Model.shared.deleteUser(user.uid!)
         }
@@ -90,15 +80,6 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Inv
         self.contacts.append(contact)
         self.tableView.insertRows(at: [indexPath], with: .bottom)
         self.tableView.endUpdates()
-    }
-    
-    func callDidFinish(_ user:User) {
-        if IS_PAD() {
-            let contact = Model.shared.contactWithUser(user.uid!)
-            performSegue(withIdentifier: "chat", sender: contact)
-        } else {
-            _ = navigationController?.popViewController(animated: true)
-        }
     }
 
     // MARK: - Table view data source
@@ -142,9 +123,6 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Inv
                 Model.shared.deleteContact(contact)
                 tableView.deleteRows(at: [indexPath], with: .top)
                 tableView.endUpdates()
-                if contacts.count == 0 && IS_PAD() {
-                    performSegue(withIdentifier: "chat", sender: nil)
-                }
             }
         }
     }
@@ -193,8 +171,7 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Inv
             let controller = nav.topViewController as! LoginController
             controller.delegate = self
         } else if segue.identifier == "chat" {
-            let nav = segue.destination as! UINavigationController
-            let controller = nav.topViewController as! ChatController
+            let controller = segue.destination as! ChatController
             if let contact = sender as? Contact {
                 if contact.getContactStatus() == .approved {
                     if contact.initiator! == currentUser()!.uid! {
@@ -203,7 +180,6 @@ class ContactListController: UITableViewController, LoginControllerDelegate, Inv
                         controller.user = Model.shared.getUser(contact.initiator!)
                     }
                 }
-                controller.callHost = self
             }
         } else if segue.identifier == "settings" {
             let controller = segue.destination as! SettingsController

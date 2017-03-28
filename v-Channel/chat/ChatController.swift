@@ -34,9 +34,12 @@ class Avatar : NSObject, JSQMessageAvatarImageDataSource {
 class ChatController: JSQMessagesViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
     
     var user:User?
-    var callHost:CallControllerDelegate?
     var messages:[JSQMessage] = []
     
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -45,7 +48,8 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
             self.senderDisplayName = currentUser()!.name!
             
             setupTitle(user!.name!)
-            
+            setupBackButton()
+         
             collectionView!.collectionViewLayout.incomingAvatarViewSize = CGSize(width: 36, height: 36)
             collectionView!.collectionViewLayout.outgoingAvatarViewSize = CGSize(width: 36, height: 36)
             let cashedMessages = Model.shared.chatMessages(with: user!.uid!)
@@ -71,9 +75,7 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
                                                    selector: #selector(self.checkIncomming),
                                                    name: contactNotification,
                                                    object: nil)
-            if !IS_PAD() {
-                checkIncomming()
-            }
+            checkIncomming()
         } else {
             self.senderId = ""
             self.senderDisplayName = ""
@@ -81,13 +83,6 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
             navigationItem.rightBarButtonItem = nil
             setupTitle("Contact list is empty")
         }
-        
-        if IS_PAD() {
-            navigationItem.leftBarButtonItem = nil
-        } else {
-            setupBackButton()
-        }
-        
     }
     
     override func goBack() {
@@ -102,15 +97,17 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
     // MARK: - Call management
     
     func checkIncomming() {
-        if let call = UserDefaults.standard.object(forKey: "incommingCall") as? [String:Any] {
-            if let callId = call["uid"] as? String, let from = call["from"] as? String, let user = Model.shared.getUser(from) {
-                let alert = createQuestion("\(user.name!) call you.", acceptTitle: "Accept", cancelTitle: "Reject", acceptHandler: {
-                    Model.shared.acceptCall(callId)
-                    self.performSegue(withIdentifier: "call", sender: callId)
-                }, cancelHandler: {
-                    Model.shared.hangUpCall(callId)
-                })
-                alert?.show()
+        if UIApplication.shared.applicationState == .active {
+            if let call = UserDefaults.standard.object(forKey: "incommingCall") as? [String:Any] {
+                if let callId = call["uid"] as? String, let from = call["from"] as? String, let user = Model.shared.getUser(from) {
+                    let alert = createQuestion("\(user.name!) call you.", acceptTitle: "Accept", cancelTitle: "Reject", acceptHandler: {
+                        Model.shared.acceptCall(callId)
+                        self.performSegue(withIdentifier: "call", sender: callId)
+                    }, cancelHandler: {
+                        Model.shared.hangUpCall(callId)
+                    })
+                    alert?.show()
+                }
             }
         }
     }
@@ -283,43 +280,76 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
         return cell
     }
     
+    private func IS_PAD() -> Bool {
+        return UIDevice.current.userInterfaceIdiom == .pad
+    }
+
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, didTapMessageBubbleAt indexPath: IndexPath!) {
         let message = messages[indexPath.item]
         if message.isMediaMessage || message.senderId == currentUser()!.uid! {
-            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            if (message.media as? JSQPhotoMediaItem) != nil {
-                alert.addAction(UIAlertAction(title: "show photo", style: .default, handler: { _ in
-                    self.performSegue(withIdentifier: "showPhoto", sender: message)
-                }))
-            }
-            if (message.media as? LocationMediaItem) != nil {
-                alert.addAction(UIAlertAction(title: "show map", style: .default, handler: { _ in
-                    self.performSegue(withIdentifier: "showMap", sender: message)
-                }))
-            }
-            
-            if message.senderId == currentUser()!.uid! {
-                alert.addAction(UIAlertAction(title: "delete message", style: .destructive, handler: { _ in
-                    if let msg = Model.shared.getMessage(from: currentUser()!, date: message.date) {
-                        SVProgressHUD.show(withStatus: "Delete...")
-                        Model.shared.deleteMessage(msg, completion: {
-                            SVProgressHUD.dismiss()
-                        })
-                    }
-                }))
-            }
-            alert.addAction(UIAlertAction(title: "cancel", style: .cancel, handler: nil))
             if IS_PAD() {
-                alert.popoverPresentationController?.permittedArrowDirections = .any
-                alert.popoverPresentationController?.sourceView = self.view
-                var rc = collectionView.layoutAttributesForItem(at: indexPath)!.frame
-                let sz = collectionView.collectionViewLayout.messageBubbleSizeForItem(at: indexPath)
-                rc.origin.x = collectionView.frame.size.width - sz.width - collectionView.collectionViewLayout.outgoingAvatarViewSize.width
-                rc.origin.y += 44
-                rc.size.height = sz.height
-                alert.popoverPresentationController?.sourceRect = rc
+                if message.senderId == currentUser()!.uid! {
+                    var handler:CompletionBlock?
+                    var titles = ["Delete message"]
+                    if (message.media as? JSQPhotoMediaItem) != nil {
+                        handler = {
+                            self.performSegue(withIdentifier: "showPhoto", sender: message)
+                        }
+                        titles.insert("Show photo", at: 0)
+                    } else if (message.media as? LocationMediaItem) != nil {
+                        handler = {
+                            self.performSegue(withIdentifier: "showMap", sender: message)
+                        }
+                        titles.insert("Show map", at: 0)
+                    }
+                    let alert = ActionSheet.create(title: "Action", actions: titles, handler1: handler, handler2: {
+                        if let msg = Model.shared.getMessage(from: currentUser()!, date: message.date) {
+                            SVProgressHUD.show(withStatus: "Delete...")
+                            Model.shared.deleteMessage(msg, completion: {
+                                SVProgressHUD.dismiss()
+                            })
+                        }
+                    })
+                    alert?.show()
+                } else {
+                    if (message.media as? JSQPhotoMediaItem) != nil {
+                        let alert = createQuestion("Show photo?", acceptTitle: "Show", cancelTitle: "Cancel", acceptHandler: {
+                            self.performSegue(withIdentifier: "showPhoto", sender: message)
+                        })
+                        alert?.show()
+                    } else if (message.media as? LocationMediaItem) != nil {
+                        let alert = createQuestion("Show map?", acceptTitle: "Show", cancelTitle: "Cancel", acceptHandler: {
+                            self.performSegue(withIdentifier: "showMap", sender: message)
+                        })
+                        alert?.show()
+                    }
+                }
+            } else {
+                let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+                if (message.media as? JSQPhotoMediaItem) != nil {
+                    alert.addAction(UIAlertAction(title: "show photo", style: .default, handler: { _ in
+                        self.performSegue(withIdentifier: "showPhoto", sender: message)
+                    }))
+                }
+                if (message.media as? LocationMediaItem) != nil {
+                    alert.addAction(UIAlertAction(title: "show map", style: .default, handler: { _ in
+                        self.performSegue(withIdentifier: "showMap", sender: message)
+                    }))
+                }
+                
+                if message.senderId == currentUser()!.uid! {
+                    alert.addAction(UIAlertAction(title: "delete message", style: .destructive, handler: { _ in
+                        if let msg = Model.shared.getMessage(from: currentUser()!, date: message.date) {
+                            SVProgressHUD.show(withStatus: "Delete...")
+                            Model.shared.deleteMessage(msg, completion: {
+                                SVProgressHUD.dismiss()
+                            })
+                        }
+                    }))
+                }
+                alert.addAction(UIAlertAction(title: "cancel", style: .cancel, handler: nil))
+                present(alert, animated: true, completion: nil)
             }
-            present(alert, animated: true, completion: nil)
         }
     }
     
@@ -372,7 +402,6 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
                 controller.incommingCall = call
             }
             controller.user = self.user
-            controller.delegate = callHost
         }
     }
 }
