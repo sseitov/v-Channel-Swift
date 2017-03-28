@@ -33,6 +33,7 @@ class CallController: UIViewController {
     
     var localAspect:CGFloat = 1
     var remoteAspect:CGFloat = 1
+    var remoteSize:CGSize = CGSize()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -142,28 +143,26 @@ class CallController: UIViewController {
     }
 
     func updateRemoteSize() {
-        var rect:CGRect
+        let aspect = view.frame.size.width / view.frame.size.height
+        let zoom = (aspect > 1) ? remoteSize.height / view.frame.size.height : remoteSize.width / view.frame.size.width
         if remoteAspect > 1 {
-            let h = self.view.frame.size.height / remoteAspect
-            rect = CGRect(x: 0, y: (self.view.frame.size.height - h) / 2, width: self.view.frame.size.width, height: h)
+            let h = (remoteSize.width / remoteAspect) / zoom
+            self.remoteView.frame = CGRect(x: 0, y: (self.view.frame.size.height - h) / 2, width: self.view.frame.size.width, height: h)
         } else {
-            let w = self.view.frame.size.width * remoteAspect
-            rect = CGRect(x: (self.view.frame.size.width - w) / 2 , y: 0, width: w, height: self.view.frame.size.height)
+            let w = (remoteSize.height * remoteAspect) / zoom
+            self.remoteView.frame = CGRect(x: (self.view.frame.size.width - w) / 2 , y: 0, width: w, height: self.view.frame.size.height)
         }
-        self.remoteView.frame = rect
     }
     
     func updateLocalSize() {
         let org = CGPoint(x: self.view.frame.size.width - 140, y: self.view.frame.size.height - 140)
-        var rect:CGRect
         if localAspect > 1 {
             let h = 120 / localAspect
-            rect = CGRect(x: org.x, y: org.y + (120 - h) / 2, width: 120, height: h)
+            self.localView.frame = CGRect(x: org.x, y: org.y + (120 - h) / 2, width: 120, height: h)
         } else {
             let w = 120 * localAspect
-            rect = CGRect(x: org.x + (120 - w) / 2 , y: org.y, width: w, height: 120)
+            self.localView.frame = CGRect(x: org.x + (120 - w) / 2 , y: org.y, width: w, height: 120)
         }
-        self.localView.frame = rect
     }
 }
 
@@ -201,6 +200,7 @@ extension CallController : RTCEAGLVideoViewDelegate {
         let aspect = size.width / size.height
         if videoView == self.remoteView {
             self.remoteAspect = aspect
+            self.remoteSize = size
             self.updateRemoteSize()
         } else if videoView == self.localView {
             self.localAspect = aspect
