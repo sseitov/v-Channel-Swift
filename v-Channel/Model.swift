@@ -249,6 +249,8 @@ class Model: NSObject {
     }
     
     func publishToken(_ user:AppUser,  token:String) {
+        user.token = token
+        saveContext()
         let ref = Database.database().reference()
         ref.child("tokens").child(user.uid!).setValue(token)
     }
@@ -282,6 +284,10 @@ class Model: NSObject {
         cashedUser.name = nick
         cashedUser.type = Int16(SocialType.email.rawValue)
         cashedUser.avatar = UIImagePNGRepresentation(image) as NSData?
+        if let token = Messaging.messaging().fcmToken {
+            Model.shared.publishToken(cashedUser, token: token)
+        }
+
         saveContext()
         let meta = StorageMetadata()
         meta.contentType = "image/png"
@@ -302,6 +308,10 @@ class Model: NSObject {
         cashedUser.facebookID = profile["id"] as? String
         cashedUser.email = profile["email"] as? String
         cashedUser.name = profile["name"] as? String
+        if let token = Messaging.messaging().fcmToken {
+            Model.shared.publishToken(cashedUser, token: token)
+        }
+
         if let picture = profile["picture"] as? [String:Any] {
             if let data = picture["data"] as? [String:Any] {
                 cashedUser.avatarURL = data["url"] as? String
@@ -327,6 +337,10 @@ class Model: NSObject {
         cashedUser.type = Int16(SocialType.google.rawValue)
         cashedUser.email = googleProfile.email
         cashedUser.name = googleProfile.name
+        if let token = Messaging.messaging().fcmToken {
+            Model.shared.publishToken(cashedUser, token: token)
+        }
+
         if googleProfile.hasImage {
             if let url = googleProfile.imageURL(withDimension: 100) {
                 cashedUser.avatarURL = url.absoluteString
@@ -561,7 +575,7 @@ class Model: NSObject {
     }
 
     // MARK: - VOIP calls
-    
+
     func makeCall(to:AppUser) -> String {
         let ref = Database.database().reference()
         let uid = generateUDID()

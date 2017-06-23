@@ -42,6 +42,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         
         application.registerForRemoteNotifications()
         
+        Messaging.messaging().delegate = self
+        
         // Initialize Google Maps
         GMSServices.provideAPIKey(GoolgleMapAPIKey)
 
@@ -141,13 +143,10 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
 extension AppDelegate : MessagingDelegate {
     
     func messaging(_ messaging: Messaging, didRefreshRegistrationToken fcmToken: String) {
+        Messaging.messaging().shouldEstablishDirectChannel = true
         if let currUser = currentUser() {
-            Messaging.messaging().shouldEstablishDirectChannel = true
             currUser.token = fcmToken
             Model.shared.publishToken(currUser, token: fcmToken)
-        } else {
-            UserDefaults.standard.set(fcmToken, forKey: "fcmToken")
-            UserDefaults.standard.synchronize()
         }
     }
     

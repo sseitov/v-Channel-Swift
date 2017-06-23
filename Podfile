@@ -15,9 +15,6 @@ target 'v-Channel' do
     pod 'GoogleMaps'
     pod 'GoogleSignIn'
     
-    pod 'Quickblox-WebRTC'
-    pod 'QuickBlox'
-    
     pod 'SVProgressHUD'
     pod 'IQKeyboardManager'
     pod 'SDWebImage'
