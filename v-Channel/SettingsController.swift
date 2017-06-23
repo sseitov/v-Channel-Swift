@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SVProgressHUD
 
 class SettingsController: UITableViewController, ProfileCellDelegate {
 
@@ -52,7 +53,7 @@ class SettingsController: UITableViewController, ProfileCellDelegate {
         if indexPath.section == 0 {
             let cell = UITableViewCell(style: .value1, reuseIdentifier: nil)
             cell.textLabel?.font = UIFont.condensedFont()
-            cell.textLabel?.textColor = UIColor.mainColor()
+            cell.textLabel?.textColor = MainColor
             cell.detailTextLabel?.font = UIFont.mainFont()
             cell.textLabel?.text = "Ringtone"
             if defaultSoundSetting == nil {
@@ -75,14 +76,13 @@ class SettingsController: UITableViewController, ProfileCellDelegate {
     }
     
     func signOut() {
-        let alert = createQuestion("Are you really want to sign out?", acceptTitle: "Sure", cancelTitle: "Cancel", acceptHandler: {
+        yesNoQuestion("Are you really want to sign out?", acceptLabel: "Sure", cancelLabel: "Cancel", acceptHandler: {
             SVProgressHUD.show(withStatus: "SignOut...")
             Model.shared.signOut({
                 SVProgressHUD.dismiss()
                 self.delegate?.didLogout()
             })
         })
-        alert?.show()
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

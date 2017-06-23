@@ -8,12 +8,14 @@
 
 import UIKit
 import Firebase
+import JSQMessagesViewController
+import SVProgressHUD
 
 class Avatar : NSObject, JSQMessageAvatarImageDataSource {
     
     var userImage:UIImage?
     
-    init(_ user:User) {
+    init(_ user:AppUser) {
         super.init()
         self.userImage = user.getImage().inCircle()
     }
@@ -31,9 +33,9 @@ class Avatar : NSObject, JSQMessageAvatarImageDataSource {
     }
 }
 
-class ChatController: JSQMessagesViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+class ChatController: JSQMessagesViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate, CameraDelegate {
     
-    var user:User?
+    var user:AppUser?
     var messages:[JSQMessage] = []
     
     deinit {
@@ -100,13 +102,12 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
         if UIApplication.shared.applicationState == .active {
             if let call = UserDefaults.standard.object(forKey: "incommingCall") as? [String:Any] {
                 if let callId = call["uid"] as? String, let from = call["from"] as? String, let user = Model.shared.getUser(from) {
-                    let alert = createQuestion("\(user.name!) call you.", acceptTitle: "Accept", cancelTitle: "Reject", acceptHandler: {
+                    yesNoQuestion("\(user.name!) call you.", acceptLabel: "Accept", cancelLabel: "Reject", acceptHandler: {
                         Model.shared.acceptCall(callId)
                         self.performSegue(withIdentifier: "call", sender: callId)
                     }, cancelHandler: {
                         Model.shared.hangUpCall(callId)
                     })
-                    alert?.show()
                 }
             }
         }
@@ -134,7 +135,7 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
     
     func deleteMessage(_ notify:Notification) {
         if let message = notify.object as? Message {
-            if let msg = getMsg(sender:message.from!, date:message.date as! Date) {
+            if let msg = getMsg(sender:message.from!, date:message.date! as Date) {
                 if let index = messages.index(of: msg) {
                     self.collectionView.performBatchUpdates({
                         self.messages.remove(at: index)
@@ -153,9 +154,9 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
             Model.shared.readMessage(message)
             let name = user.name!
             if message.imageData != nil {
-                let photo = JSQPhotoMediaItem(image: UIImage(data: message.imageData as! Data))
+                let photo = JSQPhotoMediaItem(image: UIImage(data: message.imageData! as Data))
                 photo!.appliesMediaViewMaskAsOutgoing = (message.from! == currentUser()!.uid!)
-                return JSQMessage(senderId: message.from!, senderDisplayName: name, date: message.date as! Date, media: photo)
+                return JSQMessage(senderId: message.from!, senderDisplayName: name, date: message.date! as Date, media: photo)
             } else if message.location() != nil {
                 let point = LocationMediaItem(location: nil)
                 point?.messageLocation = message.location()
@@ -163,9 +164,9 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
                 point!.setLocation(CLLocation(latitude: message.latitude, longitude: message.longitude), withCompletionHandler: {
                     self.collectionView.reloadData()
                 })
-                return JSQMessage(senderId: message.from!, senderDisplayName: name, date: message.date as! Date, media: point)
+                return JSQMessage(senderId: message.from!, senderDisplayName: name, date: message.date! as Date, media: point)
             } else if message.text != nil {
-                return JSQMessage(senderId: message.from!, senderDisplayName: name, date: message.date as! Date, text: message.text!)
+                return JSQMessage(senderId: message.from!, senderDisplayName: name, date: message.date! as Date, text: message.text!)
             } else {
                 return nil
             }
@@ -185,24 +186,23 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
         
         let actionView = ActionSheet.create(
             title: "Choose Data",
-            actions: ["Photo from Camera Roll", "Create photo use Camera", "My track for last day"],
+            actions: ["Photo from Camera Roll", "Create photo use Camera", "My current location"],
             handler1: {
                 let imagePicker = UIImagePickerController()
                 imagePicker.allowsEditing = false
                 imagePicker.sourceType = .photoLibrary
                 imagePicker.delegate = self
                 imagePicker.modalPresentationStyle = .formSheet
-                if let font = UIFont(name: "HelveticaNeue-CondensedBold", size: 15) {
-                    imagePicker.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName : UIColor.mainColor(), NSFontAttributeName : font]
-                }
-                imagePicker.navigationBar.tintColor = UIColor.mainColor()
+                imagePicker.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName : MainColor, NSFontAttributeName : UIFont.condensedFont(15)]
+                imagePicker.navigationBar.tintColor = MainColor
                 self.present(imagePicker, animated: true, completion: nil)
         }, handler2: {
-            let imagePicker = UIImagePickerController()
-            imagePicker.allowsEditing = false
-            imagePicker.sourceType = .camera
-            imagePicker.delegate = self
-            self.present(imagePicker, animated: true, completion: nil)
+            let camera = UIStoryboard(name: "Camera", bundle: nil)
+            let cameraController = camera.instantiateViewController(withIdentifier: "Camera") as! CameraController
+            cameraController.modalTransitionStyle = .flipHorizontal
+            cameraController.delegate = self
+            cameraController.isFront = false
+            self.present(cameraController, animated: true, completion: nil)
         }, handler3: {
             SVProgressHUD.show(withStatus: "Get Location...")
             LocationManager.shared.updateLocation({ location in
@@ -225,7 +225,7 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
     
     private func setupOutgoingBubble() -> JSQMessagesBubbleImage {
         let bubbleImageFactory = JSQMessagesBubbleImageFactory()
-        return bubbleImageFactory!.outgoingMessagesBubbleImage(with: UIColor.mainColor())
+        return bubbleImageFactory!.outgoingMessagesBubbleImage(with: MainColor)
     }
     
     private func setupIncomingBubble() -> JSQMessagesBubbleImage {
@@ -313,15 +313,13 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
                     alert?.show()
                 } else {
                     if (message.media as? JSQPhotoMediaItem) != nil {
-                        let alert = createQuestion("Show photo?", acceptTitle: "Show", cancelTitle: "Cancel", acceptHandler: {
+                        yesNoQuestion("Show photo?", acceptLabel: "Show", cancelLabel: "Cancel", acceptHandler: {
                             self.performSegue(withIdentifier: "showPhoto", sender: message)
                         })
-                        alert?.show()
                     } else if (message.media as? LocationMediaItem) != nil {
-                        let alert = createQuestion("Show map?", acceptTitle: "Show", cancelTitle: "Cancel", acceptHandler: {
+                        yesNoQuestion("Show map?", acceptLabel: "Show", cancelLabel: "Cancel", acceptHandler: {
                             self.performSegue(withIdentifier: "showMap", sender: message)
                         })
-                        alert?.show()
                     }
                 }
             } else {
@@ -376,6 +374,21 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
         dismiss(animated: true, completion: nil)
     }
     
+    func didTakePhoto(_ image:UIImage) {
+        dismiss(animated: true, completion: {
+            SVProgressHUD.show(withStatus: "Send...")
+            Model.shared.sendImageMessage(image, to: self.user!.uid!, result: { error in
+                SVProgressHUD.dismiss()
+                if error != nil {
+                    self.showMessage(error!.localizedDescription, messageType: .error)
+                } else {
+                    JSQSystemSoundPlayer.jsq_playMessageSentSound()
+                    self.finishSendingMessage()
+                }
+            })
+        })
+    }
+
     // MARK: - Navigation
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

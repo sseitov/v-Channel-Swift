@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import JSQMessagesViewController
 
 class LocationMediaItem : JSQLocationMediaItem {
     

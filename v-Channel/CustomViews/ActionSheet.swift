@@ -1,8 +1,8 @@
 //
 //  ActionSheet.swift
-//  v-Channel
+//  SimpleVOIP
 //
-//  Created by Сергей Сейтов on 16.02.17.
+//  Created by Сергей Сейтов on 03.02.17.
 //  Copyright © 2017 V-Channel. All rights reserved.
 //
 
@@ -43,7 +43,7 @@ class ActionSheet: LGAlertView {
                 actionView.thirdButton.setTitle(actions[2], for: .normal)
                 actionView.handler3 = handler3
             }
-            actionView.cancelButton.setupBorder(UIColor.mainColor(), radius: 15)
+            actionView.cancelButton.setupBorder(MainColor, radius: 15)
             return actionView
         } else {
             return nil

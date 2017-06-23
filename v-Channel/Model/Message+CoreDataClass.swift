@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import CoreLocation
 
 public class Message: NSManagedObject {
     
@@ -32,7 +33,7 @@ public class Message: NSManagedObject {
         
         if imageURL != nil {
             let ref = Model.shared.storageRef.child(imageURL!)
-            ref.data(withMaxSize: INT64_MAX, completion: { data, error in
+            ref.getData(maxSize: INT64_MAX, completion: { data, error in
                 self.imageData = data as NSData?
                 Model.shared.saveContext()
                 completion()

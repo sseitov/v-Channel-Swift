@@ -10,6 +10,10 @@ import UIKit
 import Firebase
 import UserNotifications
 import GoogleMaps
+import GoogleSignIn
+import FBSDKLoginKit
+import IQKeyboardManager
+import SVProgressHUD
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
@@ -18,6 +22,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
+        // Use Firebase library to configure APIs
+        FirebaseApp.configure()
+
         // Register_for_notifications
         if #available(iOS 10.0, *) {
             let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
@@ -26,7 +33,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
                 completionHandler: {_, _ in })
             
             UNUserNotificationCenter.current().delegate = self
-            FIRMessaging.messaging().remoteMessageDelegate = self
             
         } else {
             let settings: UIUserNotificationSettings =
@@ -36,64 +42,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         
         application.registerForRemoteNotifications()
         
-        // Use Firebase library to configure APIs
-        FIRApp.configure()
-        
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(self.tokenRefreshNotification),
-                                               name: .firInstanceIDTokenRefresh,
-                                               object: nil)
-        
-        FIRAuth.auth()?.addStateDidChangeListener({ auth, user in
-            if let token = FIRInstanceID.instanceID().token(), let currUser = auth.currentUser {
-                Model.shared.publishToken(currUser, token:token)
-            }
-        })
-        
         // Initialize Google Maps
         GMSServices.provideAPIKey(GoolgleMapAPIKey)
-        
-        // Initialize SSL Peer Connection
-        RTCPeerConnectionFactory.initializeSSL()
 
         // UI Customization
-        
         UIApplication.shared.statusBarStyle = .lightContent
         
         SVProgressHUD.setDefaultStyle(.custom)
-        SVProgressHUD.setBackgroundColor(UIColor.mainColor())
+        SVProgressHUD.setBackgroundColor(MainColor)
         SVProgressHUD.setForegroundColor(UIColor.white)
         
         if let font = UIFont(name: "HelveticaNeue-CondensedBold", size: 17) {
             UIBarButtonItem.appearance().setTitleTextAttributes([NSFontAttributeName : font], for: .normal)
             SVProgressHUD.setFont(font)
         }
-        IQKeyboardManager.shared().isEnableAutoToolbar = false
         
+        IQKeyboardManager.shared().isEnableAutoToolbar = false
+        Camera.shared().startup()
+
         return true
-    }
-    
-    // MARK: - Refresh FCM token
-    
-    func tokenRefreshNotification(_ notification: Notification) {
-        if let refreshedToken = FIRInstanceID.instanceID().token() {
-            print("InstanceID token: \(refreshedToken)")
-            connectToFcm()
-            if let user = FIRAuth.auth()?.currentUser {
-                Model.shared.publishToken(user, token: refreshedToken)
-            } else {
-                UserDefaults.standard.set(refreshedToken, forKey: "fcmToken")
-                UserDefaults.standard.synchronize()
-            }
-        }
-    }
-    
-    func connectToFcm() {
-        FIRMessaging.messaging().connect { (error) in
-            if error != nil {
-                print("Unable to connect with FCM. \(error)")
-            }
-        }
     }
     
     // MARK: - Application delegate
@@ -128,9 +95,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         #if DEBUG
-            FIRInstanceID.instanceID().setAPNSToken(deviceToken, type: FIRInstanceIDAPNSTokenType.sandbox)
+            Messaging.messaging().setAPNSToken(deviceToken, type: .sandbox)
         #else
-            FIRInstanceID.instanceID().setAPNSToken(deviceToken, type: FIRInstanceIDAPNSTokenType.prod)
+            Messaging.messaging().setAPNSToken(deviceToken, type: .prod)
         #endif
     }
 
@@ -147,7 +114,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
-        RTCPeerConnectionFactory.deinitializeSSL()
     }
 }
 
@@ -155,6 +121,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
 
 @available(iOS 10, *)
 extension AppDelegate : UNUserNotificationCenterDelegate {
+    
     // Receive displayed notifications for iOS 10 devices.
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
@@ -171,8 +138,17 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
     }
 }
 
-extension AppDelegate : FIRMessagingDelegate {
-    // Receive data message on iOS 10 devices while app is in the foreground.
-    func applicationReceivedRemoteMessage(_ remoteMessage: FIRMessagingRemoteMessage) {
+extension AppDelegate : MessagingDelegate {
+    
+    func messaging(_ messaging: Messaging, didRefreshRegistrationToken fcmToken: String) {
+        if let currUser = currentUser() {
+            Messaging.messaging().shouldEstablishDirectChannel = true
+            currUser.token = fcmToken
+            Model.shared.publishToken(currUser, token: fcmToken)
+        } else {
+            UserDefaults.standard.set(fcmToken, forKey: "fcmToken")
+            UserDefaults.standard.synchronize()
+        }
     }
+    
 }

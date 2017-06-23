@@ -10,9 +10,13 @@
 import UIKit
 import CoreData
 import Firebase
+import SDWebImage
+import GoogleSignIn
+import AFNetworking
+import CoreLocation
 
-func currentUser() -> User? {
-    if let firUser = FIRAuth.auth()?.currentUser {
+func currentUser() -> AppUser? {
+    if let firUser = Auth.auth().currentUser {
         if let user = Model.shared.getUser(firUser.uid) {
             if user.socialType == .email {
                 return (firUser.isEmailVerified || testUser(user.email!)) ? user : nil
@@ -126,9 +130,9 @@ class Model: NSObject {
     // MARK: - SignOut from cloud
     
     func signOut(_ completion: @escaping() -> ()) {
-        let ref = FIRDatabase.database().reference()
+        let ref = Database.database().reference()
         ref.child("tokens").child(currentUser()!.uid!).removeValue(completionBlock: { _, _ in
-            try? FIRAuth.auth()?.signOut()
+            try? Auth.auth().signOut()
             self.newMessageRefHandle = nil
             self.deleteMessageRefHandle = nil
             self.newTokenRefHandle = nil
@@ -139,7 +143,6 @@ class Model: NSObject {
             self.newContactRefHandle = nil
             self.updateContactRefHandle = nil
             self.deleteContactRefHandle = nil
-            UserDefaults.standard.removeObject(forKey: "fbToken")
             completion()
         })
     }
@@ -161,38 +164,38 @@ class Model: NSObject {
         }
     }
     
-    lazy var storageRef: FIRStorageReference = FIRStorage.storage().reference(forURL: firStorage)
+    lazy var storageRef: StorageReference = Storage.storage().reference(forURL: firStorage)
     
-    private var newMessageRefHandle: FIRDatabaseHandle?
-    private var deleteMessageRefHandle: FIRDatabaseHandle?
+    private var newMessageRefHandle: DatabaseHandle?
+    private var deleteMessageRefHandle: DatabaseHandle?
 
-    private var newTokenRefHandle: FIRDatabaseHandle?
-    private var updateTokenRefHandle: FIRDatabaseHandle?
+    private var newTokenRefHandle: DatabaseHandle?
+    private var updateTokenRefHandle: DatabaseHandle?
     
-    private var newCallRefHandle: FIRDatabaseHandle?
-    private var updateCallRefHandle: FIRDatabaseHandle?
-    private var deleteCallRefHandle: FIRDatabaseHandle?
+    private var newCallRefHandle: DatabaseHandle?
+    private var updateCallRefHandle: DatabaseHandle?
+    private var deleteCallRefHandle: DatabaseHandle?
     
-    private var newContactRefHandle: FIRDatabaseHandle?
-    private var updateContactRefHandle: FIRDatabaseHandle?
-    private var deleteContactRefHandle: FIRDatabaseHandle?
+    private var newContactRefHandle: DatabaseHandle?
+    private var updateContactRefHandle: DatabaseHandle?
+    private var deleteContactRefHandle: DatabaseHandle?
     
     // MARK: - User table
     
-    func createUser(_ uid:String) -> User {
+    func createUser(_ uid:String) -> AppUser {
         var user = getUser(uid)
         if user == nil {
-            user = NSEntityDescription.insertNewObject(forEntityName: "User", into: managedObjectContext) as? User
+            user = NSEntityDescription.insertNewObject(forEntityName: "AppUser", into: managedObjectContext) as? AppUser
             user!.uid = uid
         }
         return user!
     }
     
-    func getUser(_ uid:String) -> User? {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "User")
+    func getUser(_ uid:String) -> AppUser? {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "AppUser")
         let predicate = NSPredicate(format: "uid = %@", uid)
         fetchRequest.predicate = predicate
-        if let user = try? managedObjectContext.fetch(fetchRequest).first as? User {
+        if let user = try? managedObjectContext.fetch(fetchRequest).first as? AppUser {
             return user
         } else {
             return nil
@@ -206,11 +209,11 @@ class Model: NSObject {
         }
     }
     
-    func uploadUser(_ uid:String, result: @escaping(User?) -> ()) {
+    func uploadUser(_ uid:String, result: @escaping(AppUser?) -> ()) {
         if let existingUser = getUser(uid) {
             result(existingUser)
         } else {
-            let ref = FIRDatabase.database().reference()
+            let ref = Database.database().reference()
             ref.child("users").child(uid).observeSingleEvent(of: .value, with: { snapshot in
                 if let userData = snapshot.value as? [String:Any] {
                     let user = self.createUser(uid)
@@ -228,14 +231,14 @@ class Model: NSObject {
         }
     }
     
-    func updateUser(_ user:User) {
+    func updateUser(_ user:AppUser) {
         saveContext()
-        let ref = FIRDatabase.database().reference()
+        let ref = Database.database().reference()
         ref.child("users").child(user.uid!).setValue(user.getData())
     }
 
     fileprivate func getUserToken(_ uid:String, token: @escaping(String?) -> ()) {
-        let ref = FIRDatabase.database().reference()
+        let ref = Database.database().reference()
         ref.child("tokens").child(uid).observeSingleEvent(of: .value, with: { snapshot in
             if let result = snapshot.value as? String {
                 token(result)
@@ -245,13 +248,13 @@ class Model: NSObject {
         })
     }
     
-    func publishToken(_ user:FIRUser,  token:String) {
-        let ref = FIRDatabase.database().reference()
-        ref.child("tokens").child(user.uid).setValue(token)
+    func publishToken(_ user:AppUser,  token:String) {
+        let ref = Database.database().reference()
+        ref.child("tokens").child(user.uid!).setValue(token)
     }
     
     fileprivate func observeTokens() {
-        let ref = FIRDatabase.database().reference()
+        let ref = Database.database().reference()
         let coordQuery = ref.child("tokens").queryLimited(toLast:25)
         
         newTokenRefHandle = coordQuery.observe(.childAdded, with: { (snapshot) -> Void in
@@ -273,16 +276,16 @@ class Model: NSObject {
         })
     }
 
-    func createEmailUser(_ user:FIRUser, email:String, nick:String, image:UIImage, result: @escaping(NSError?) -> ()) {
+    func createEmailUser(_ user:User, email:String, nick:String, image:UIImage, result: @escaping(NSError?) -> ()) {
         let cashedUser = createUser(user.uid)
         cashedUser.email = email
         cashedUser.name = nick
         cashedUser.type = Int16(SocialType.email.rawValue)
         cashedUser.avatar = UIImagePNGRepresentation(image) as NSData?
         saveContext()
-        let meta = FIRStorageMetadata()
+        let meta = StorageMetadata()
         meta.contentType = "image/png"
-        self.storageRef.child(generateUDID()).put(cashedUser.avatar as! Data, metadata: meta, completion: { metadata, error in
+        self.storageRef.child(generateUDID()).putData(cashedUser.avatar! as Data, metadata: meta, completion: { metadata, error in
             if error != nil {
                 result(error as NSError?)
             } else {
@@ -293,7 +296,7 @@ class Model: NSObject {
         })
     }
     
-    func createFacebookUser(_ user:FIRUser, profile:[String:Any], completion: @escaping() -> ()) {
+    func createFacebookUser(_ user:User, profile:[String:Any], completion: @escaping() -> ()) {
         let cashedUser = createUser(user.uid)
         cashedUser.type = Int16(SocialType.facebook.rawValue)
         cashedUser.facebookID = profile["id"] as? String
@@ -319,7 +322,7 @@ class Model: NSObject {
         }
     }
     
-    func createGoogleUser(_ user:FIRUser, googleProfile: GIDProfileData!, completion: @escaping() -> ()) {
+    func createGoogleUser(_ user:User, googleProfile: GIDProfileData!, completion: @escaping() -> ()) {
         let cashedUser = createUser(user.uid)
         cashedUser.type = Int16(SocialType.google.rawValue)
         cashedUser.email = googleProfile.email
@@ -344,9 +347,9 @@ class Model: NSObject {
         }
     }
 
-    func myContacts() -> [User] {
+    func myContacts() -> [AppUser] {
         if let contacts = currentUser()!.contacts?.allObjects as? [Contact] {
-            var users:[User] = []
+            var users:[AppUser] = []
             for contact in contacts {
                 let userID = contact.initiator! == currentUser()!.uid! ? contact.requester! : contact.initiator!
                 if let user = getUser(userID) {
@@ -383,7 +386,7 @@ class Model: NSObject {
         }
     }
     
-    func addContact(with:User) -> Contact {
+    func addContact(with:AppUser) -> Contact {
         let contact = createContact(generateUDID())
         contact.initiator = currentUser()!.uid
         contact.requester = with.uid!
@@ -391,34 +394,34 @@ class Model: NSObject {
         contact.owner = currentUser()
         currentUser()?.addToContacts(contact)
         
-        let ref = FIRDatabase.database().reference()
+        let ref = Database.database().reference()
         ref.child("contacts").child(contact.uid!).setValue(contact.getData())
         pushContactRequest(to: with)
         return contact
     }
     
     func approveContact(_ contact:Contact) {
-        let ref = FIRDatabase.database().reference()
+        let ref = Database.database().reference()
         contact.status = ContactStatus.approved.rawValue
         ref.child("contacts").child(contact.uid!).setValue(contact.getData())
     }
     
     func rejectContact(_ contact:Contact) {
-        let ref = FIRDatabase.database().reference()
+        let ref = Database.database().reference()
         contact.status = ContactStatus.rejected.rawValue
         ref.child("contacts").child(contact.uid!).setValue(contact.getData())
     }
     
     func deleteContact(_ contact:Contact) {
         currentUser()?.removeFromContacts(contact)
-        let ref = FIRDatabase.database().reference()
+        let ref = Database.database().reference()
         ref.child("contacts").child(contact.uid!).removeValue()
         self.managedObjectContext.delete(contact)
         self.saveContext()
     }
     
     fileprivate func observeContacts() {
-        let ref = FIRDatabase.database().reference()
+        let ref = Database.database().reference()
         let contactQuery = ref.child("contacts").queryLimited(toLast:25)
         
         newContactRefHandle = contactQuery.observe(.childAdded, with: { (snapshot) -> Void in
@@ -489,7 +492,7 @@ class Model: NSObject {
         return manager
     }()
     
-    fileprivate func pushIncommingCall(to:User) {
+    fileprivate func pushIncommingCall(to:AppUser) {
         if to.token != nil {
             let notification:[String:Any] = [
                 "title" : "v-Chanel call",
@@ -508,7 +511,7 @@ class Model: NSObject {
         }
     }
     
-    func pushHangUpCall(to:User) {
+    func pushHangUpCall(to:AppUser) {
         if to.token != nil {
             let data:[String:Int] = ["pushType" : PushType.hangUpCall.rawValue]
             let message:[String:Any] = ["to" : to.token!, "priority" : "high", "data" : data]
@@ -522,7 +525,7 @@ class Model: NSObject {
         }
     }
     
-    fileprivate func pushContactRequest(to:User) {
+    fileprivate func pushContactRequest(to:AppUser) {
         if to.token != nil {
             let notification:[String:Any] = [
                 "title" : "SimpleVOIP request",
@@ -540,7 +543,7 @@ class Model: NSObject {
         }
     }
     
-    fileprivate func messagePush(_ text:String, to:User, from:User) {
+    fileprivate func messagePush(_ text:String, to:AppUser, from:AppUser) {
         if to.token != nil {
             let data:[String:Int] = ["pushType" : PushType.newMessage.rawValue]
             let notification:[String:Any] = ["title" : "New message from \(from.name!):",
@@ -559,8 +562,8 @@ class Model: NSObject {
 
     // MARK: - VOIP calls
     
-    func makeCall(to:User) -> String {
-        let ref = FIRDatabase.database().reference()
+    func makeCall(to:AppUser) -> String {
+        let ref = Database.database().reference()
         let uid = generateUDID()
         let data:[String:Any] = ["from" : currentUser()!.uid!,
                                  "to" : to.uid!]
@@ -570,7 +573,7 @@ class Model: NSObject {
     }
     
     func acceptCall(_ callID:String) {
-        let ref = FIRDatabase.database().reference()
+        let ref = Database.database().reference()
         ref.child("calls").child(callID).setValue(["accept" : true])
         
         Ringtone.shared.stop()
@@ -580,7 +583,7 @@ class Model: NSObject {
     }
 
     func hangUpCall(_ callID:String) {
-        let ref = FIRDatabase.database().reference()
+        let ref = Database.database().reference()
         ref.child("calls").child(callID).removeValue()
         
         Ringtone.shared.stop()
@@ -590,7 +593,7 @@ class Model: NSObject {
     }
     
     fileprivate func observeCalls() {
-        let ref = FIRDatabase.database().reference()
+        let ref = Database.database().reference()
         let callQuery = ref.child("calls").queryLimited(toLast:25)
         
         newCallRefHandle = callQuery.observe(.childAdded, with: { (snapshot) -> Void in
@@ -643,7 +646,7 @@ class Model: NSObject {
         }
     }
     
-    func getMessage(from:User, date:Date) -> Message? {
+    func getMessage(from:AppUser, date:Date) -> Message? {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Message")
         let predicate1 = NSPredicate(format: "from = %@", from.uid!)
         let predicate2 = NSPredicate(format: "date = %@", date as NSDate)
@@ -656,7 +659,7 @@ class Model: NSObject {
     }
     
     func deleteMessage(_ message:Message, completion: @escaping() -> ()) {
-        let ref = FIRDatabase.database().reference()
+        let ref = Database.database().reference()
         if let image = message.imageURL {
             self.storageRef.child(image).delete(completion: { _ in
                 ref.child("messages").child(message.uid!).removeValue(completionBlock:{_, _ in
@@ -744,7 +747,7 @@ class Model: NSObject {
     }
     
     func sendTextMessage(_ text:String, to:String) {
-        let ref = FIRDatabase.database().reference()
+        let ref = Database.database().reference()
         let dateStr = dateFormatter.string(from: Date())
         let messageItem:[String:Any] = ["from" : currentUser()!.uid!,
                                         "to" : to,
@@ -762,13 +765,13 @@ class Model: NSObject {
             return
         }
         if let imageData = UIImageJPEGRepresentation(image, 0.5) {
-            let meta = FIRStorageMetadata()
+            let meta = StorageMetadata()
             meta.contentType = "image/jpeg"
-            self.storageRef.child(generateUDID()).put(imageData, metadata: meta, completion: { metadata, error in
+            self.storageRef.child(generateUDID()).putData(imageData, metadata: meta, completion: { metadata, error in
                 if error != nil {
                     result(error as NSError?)
                 } else {
-                    let ref = FIRDatabase.database().reference()
+                    let ref = Database.database().reference()
                     let dateStr = self.dateFormatter.string(from: Date())
                     let messageItem:[String:Any] = ["from" : currentUser()!.uid!,
                                                     "to" : to,
@@ -783,7 +786,7 @@ class Model: NSObject {
     }
     
     func sendLocationMessage(_ coordinate:CLLocationCoordinate2D, to:String) {
-        let ref = FIRDatabase.database().reference()
+        let ref = Database.database().reference()
         let dateStr = dateFormatter.string(from: Date())
         let messageItem:[String:Any] = ["from" : currentUser()!.uid!,
                                         "to" : to,
@@ -797,7 +800,7 @@ class Model: NSObject {
     }
 
     private func observeMessages() {
-        let ref = FIRDatabase.database().reference()
+        let ref = Database.database().reference()
         let messageQuery = ref.child("messages").queryLimited(toLast:25)
         
         newMessageRefHandle = messageQuery.observe(.childAdded, with: { (snapshot) -> Void in
@@ -828,7 +831,7 @@ class Model: NSObject {
     }
     
     func refreshMessages() {
-        let ref = FIRDatabase.database().reference()
+        let ref = Database.database().reference()
         ref.child("messages").queryOrdered(byChild: "date").observeSingleEvent(of: .value, with: { snapshot in
             if let values = snapshot.value as? [String:Any] {
                 for (key, value) in values {

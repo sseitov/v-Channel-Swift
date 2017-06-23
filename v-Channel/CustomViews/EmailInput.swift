@@ -1,8 +1,8 @@
 //
 //  EmailInput.swift
-//  v-Channel
+//  SimpleVOIP
 //
-//  Created by Сергей Сейтов on 16.02.17.
+//  Created by Сергей Сейтов on 04.02.17.
 //  Copyright © 2017 V-Channel. All rights reserved.
 //
 

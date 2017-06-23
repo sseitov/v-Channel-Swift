@@ -1,8 +1,8 @@
 //
 //  TextFieldContainer.swift
-//  v-Channel
+//  SimpleVOIP
 //
-//  Created by Сергей Сейтов on 16.02.17.
+//  Created by Сергей Сейтов on 03.02.17.
 //  Copyright © 2017 V-Channel. All rights reserved.
 //
 
@@ -17,7 +17,7 @@ class TextFieldContainer: UIView, UITextFieldDelegate {
 
     var delegate:TextFieldContainerDelegate?
     
-    var nonActiveColor:UIColor = UIColor.groupTableViewBackground
+    var nonActiveColor:UIColor = UIColor.white
     var activeColor:UIColor = UIColor.white
     var placeholderColor = UIColor.gray
     
@@ -69,9 +69,9 @@ class TextFieldContainer: UIView, UITextFieldDelegate {
         textField.delegate = self
         
         backgroundColor = nonActiveColor
-        setupBorder(UIColor.mainColor(), radius: 5)
+        setupBorder(MainColor, radius: 5)
         textField.font = textFont
-        textField.textColor = UIColor.mainColor()
+        textField.textColor = MainColor
         
         self.addSubview(textField)
     }

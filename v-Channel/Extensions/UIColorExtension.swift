@@ -1,12 +1,15 @@
 //
-//  UIColorExtensions.swift
-//  v-Channel
+//  UIColorExtension.swift
 //
-//  Created by Сергей Сейтов on 16.02.17.
+//  Created by Сергей Сейтов on 22.05.17.
 //  Copyright © 2017 V-Channel. All rights reserved.
 //
 
 import UIKit
+
+let MainColor = UIColor.color(50, 150, 100, 1)
+let ErrorColor = UIColor.color(240, 90, 80, 1)
+let CancelColor = UIColor.color(128, 128, 128, 1)
 
 extension UIColor {
     class func color(_ r: Float, _ g: Float, _ b: Float, _ a: Float) -> UIColor {
@@ -20,22 +23,6 @@ extension UIColor {
         return UIColor(red: red/255.0, green: green/255.0, blue: blue/255.0, alpha: 1.0)
     }
     
-    class func mainColor() -> UIColor {
-        return color(50, 150, 100, 1)
-    }
-    
-    class func mainColor(_ alpha:Float) -> UIColor {
-        return color(50, 150, 100, alpha)
-    }
-    
-    class func errorColor() -> UIColor {
-        return color(240, 90, 80, 1)
-    }
-    
-    class func traceColor() -> UIColor {
-        return color(72, 160, 205, 1)
-    }
-
     func imageFromColor(_ size:CGSize, cornerRadius:CGFloat) -> UIImage {
         let rect = CGRect(x: 0, y: 0, width: size.width, height: size.height)
         UIGraphicsBeginImageContext(rect.size)

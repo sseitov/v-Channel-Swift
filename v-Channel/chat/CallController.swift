@@ -12,9 +12,9 @@ class CallController: UIViewController {
 
     let SERVER_HOST_URL = "https://appr.tc"
     
-    var user:User?
+    var user:AppUser?
     var incommingCall:String?
-    
+/*
     @IBOutlet weak var callView: UIView!
     @IBOutlet weak var callImage: UIImageView!
     @IBOutlet weak var remoteView: RTCEAGLVideoView!
@@ -164,8 +164,9 @@ class CallController: UIViewController {
             self.localView.frame = CGRect(x: org.x + (120 - w) / 2 , y: org.y, width: w, height: 120)
         }
     }
+     */
 }
-
+/*
 extension CallController : ARDAppClientDelegate {
     
     func appClient(_ client: ARDAppClient!, didChange state: ARDAppClientState) {
@@ -208,3 +209,4 @@ extension CallController : RTCEAGLVideoViewDelegate {
         }
     }
 }
+ */

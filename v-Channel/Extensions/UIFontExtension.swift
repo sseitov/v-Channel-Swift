@@ -1,12 +1,20 @@
 //
-//  UIFontExtensions.swift
-//  v-Channel
+//  UIFontExtension.swift
 //
-//  Created by Сергей Сейтов on 16.02.17.
+//  Created by Сергей Сейтов on 22.05.17.
 //  Copyright © 2017 V-Channel. All rights reserved.
 //
 
 import UIKit
+
+func printFontNames() {
+    for family:String in UIFont.familyNames {
+        print("\(family)")
+        for names:String in UIFont.fontNames(forFamilyName: family) {
+            print("== \(names)")
+        }
+    }
+}
 
 extension UIFont {
     

@@ -16,7 +16,7 @@ class ContactCell: UITableViewCell {
     @IBOutlet weak var contactLabel: UILabel!
     @IBOutlet weak var statusView: UIImageView!
     
-    fileprivate var user:User?
+    fileprivate var user:AppUser?
     var contact:Contact? {
         didSet {
             if currentUser() == nil || contact == nil {

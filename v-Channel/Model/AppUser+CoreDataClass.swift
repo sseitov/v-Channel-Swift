@@ -1,13 +1,14 @@
 //
-//  User+CoreDataClass.swift
+//  AppUser+CoreDataClass.swift
 //  v-Channel
 //
-//  Created by Сергей Сейтов on 16.02.17.
+//  Created by Сергей Сейтов on 23.06.17.
 //  Copyright © 2017 V-Channel. All rights reserved.
 //
 
 import Foundation
 import CoreData
+import SDWebImage
 
 enum SocialType:Int16 {
     case email = 0
@@ -15,7 +16,8 @@ enum SocialType:Int16 {
     case google = 2
 }
 
-public class User: NSManagedObject {
+
+public class AppUser: NSManagedObject {
     
     lazy var socialType: SocialType = {
         if let val = SocialType(rawValue: self.type) {
@@ -74,7 +76,7 @@ public class User: NSManagedObject {
                 })
             } else {
                 let ref = Model.shared.storageRef.child(avatarURL!)
-                ref.data(withMaxSize: INT64_MAX, completion: { data, error in
+                ref.getData(maxSize: INT64_MAX, completion: { data, error in
                     self.avatar = data as NSData?
                     Model.shared.saveContext()
                     completion()

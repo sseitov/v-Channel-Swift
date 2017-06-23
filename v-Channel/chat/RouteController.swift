@@ -8,12 +8,14 @@
 
 import UIKit
 import GoogleMaps
+import SVProgressHUD
+import AFNetworking
 
 class RouteController: UIViewController {
     
     @IBOutlet weak var map: GMSMapView!
     
-    var user:User?
+    var user:AppUser?
     var userLocation:CLLocationCoordinate2D?
     var locationDate:Date?
     

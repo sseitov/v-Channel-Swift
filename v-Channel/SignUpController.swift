@@ -8,8 +8,9 @@
 
 import UIKit
 import Firebase
+import SVProgressHUD
 
-class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate, CameraDelegate {
     
     @IBOutlet weak var imageButton: UIButton!
     @IBOutlet weak var nickField: TextFieldContainer!
@@ -50,7 +51,7 @@ class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigati
             passwordField.setText(userPassword!)
         }
         
-        signUpButton.setupBorder(UIColor.clear, radius: 30)
+        signUpButton.setupBorder(UIColor.clear, radius: 20)
 
         let tap = UITapGestureRecognizer(target: self, action: #selector(self.tap))
         self.view.addGestureRecognizer(tap)
@@ -125,10 +126,10 @@ class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigati
     
     func emailSignUp() {
         SVProgressHUD.show(withStatus: "SignUp...")
-        FIRAuth.auth()?.createUser(withEmail: emailField.text(), password: passwordField.text(), completion: { firUser, error in
+        Auth.auth().createUser(withEmail: emailField.text(), password: passwordField.text(), completion: { firUser, error in
             if error != nil {
                 SVProgressHUD.dismiss()
-                self.showMessage((error as! NSError).localizedDescription, messageType: .error)
+                self.showMessage((error! as NSError).localizedDescription, messageType: .error)
             } else {
                 Model.shared.createEmailUser(firUser!,
                                              email: self.emailField.text(),
@@ -136,7 +137,7 @@ class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigati
                                              image: self.avatar!, result:
                     { setError in
                         if setError == nil {
-                            FIRAuth.auth()?.currentUser?.sendEmailVerification(completion: { error in
+                            Auth.auth().currentUser?.sendEmailVerification(completion: { error in
                                 SVProgressHUD.dismiss()
                                 if error == nil {
                                     self.showMessage("Check your mailbox now. You account will be activated after you confirm registration.", messageType: .information, messageHandler: {
@@ -169,16 +170,17 @@ class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigati
                 imagePicker.delegate = self
                 imagePicker.modalPresentationStyle = .formSheet
                 if let font = UIFont(name: "HelveticaNeue-CondensedBold", size: 15) {
-                    imagePicker.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName : UIColor.mainColor(), NSFontAttributeName : font]
+                    imagePicker.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName : MainColor, NSFontAttributeName : font]
                 }
-                imagePicker.navigationBar.tintColor = UIColor.mainColor()
+                imagePicker.navigationBar.tintColor = MainColor
                 self.present(imagePicker, animated: true, completion: nil)
         }, handler2: {
-            let imagePicker = UIImagePickerController()
-            imagePicker.allowsEditing = false
-            imagePicker.sourceType = .camera
-            imagePicker.delegate = self
-            self.present(imagePicker, animated: true, completion: nil)
+            let camera = UIStoryboard(name: "Camera", bundle: nil)
+            let cameraController = camera.instantiateViewController(withIdentifier: "Camera") as! CameraController
+            cameraController.modalTransitionStyle = .flipHorizontal
+            cameraController.delegate = self
+            cameraController.isFront = true
+            self.present(cameraController, animated: true, completion: nil)
         })
         actionView?.show()
     }
@@ -196,4 +198,11 @@ class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigati
         dismiss(animated: true, completion: nil)
     }
     
+    func didTakePhoto(_ image:UIImage) {
+        dismiss(animated: true, completion: {
+            self.avatar = image.withSize(CGSize(width:256, height:256))
+            self.imageButton.setImage(self.avatar!.inCircle(), for: .normal)
+        })
+    }
+
 }

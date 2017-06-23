@@ -1,14 +1,22 @@
 //
-//  StringExtensions.swift
-//  v-Channel
+//  StringExtension.swift
 //
-//  Created by Сергей Сейтов on 16.02.17.
+//  Created by Сергей Сейтов on 22.05.17.
 //  Copyright © 2017 V-Channel. All rights reserved.
 //
 
-import Foundation
+import UIKit
+
+func LOCALIZE(_ text:String) -> String {
+    return NSLocalizedString(text, comment: "")
+}
 
 extension String {
+    
+    static func generateUDID() -> String {
+        return UUID().uuidString
+    }
+
     func isEmail() -> Bool {
         let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}"
         return NSPredicate(format: "SELF MATCHES %@", emailRegex).evaluate(with: self)
@@ -37,7 +45,7 @@ extension String {
         let endIndex = self.characters.index(self.startIndex, offsetBy: end)
         return self[startIndex..<endIndex]
     }
-    
+
     func length() -> Int {
         return (self as NSString).length
     }
@@ -59,4 +67,5 @@ extension String {
             return false
         }
     }
+
 }

@@ -1,8 +1,8 @@
 //
-//  User+CoreDataProperties.swift
+//  AppUser+CoreDataProperties.swift
 //  v-Channel
 //
-//  Created by Сергей Сейтов on 09.03.17.
+//  Created by Сергей Сейтов on 23.06.17.
 //  Copyright © 2017 V-Channel. All rights reserved.
 //
 
@@ -10,26 +10,26 @@ import Foundation
 import CoreData
 
 
-extension User {
+extension AppUser {
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<User> {
-        return NSFetchRequest<User>(entityName: "User");
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<AppUser> {
+        return NSFetchRequest<AppUser>(entityName: "AppUser")
     }
 
     @NSManaged public var avatar: NSData?
     @NSManaged public var avatarURL: String?
     @NSManaged public var email: String?
+    @NSManaged public var facebookID: String?
     @NSManaged public var name: String?
     @NSManaged public var token: String?
     @NSManaged public var type: Int16
     @NSManaged public var uid: String?
-    @NSManaged public var facebookID: String?
     @NSManaged public var contacts: NSSet?
 
 }
 
 // MARK: Generated accessors for contacts
-extension User {
+extension AppUser {
 
     @objc(addContactsObject:)
     @NSManaged public func addToContacts(_ value: Contact)
