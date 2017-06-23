@@ -21,7 +21,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        
+    
+        // Initialize SSL Peer Connection
+        RTCInitializeSSL()
+
         // Use Firebase library to configure APIs
         FirebaseApp.configure()
 

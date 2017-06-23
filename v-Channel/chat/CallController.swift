@@ -9,12 +9,10 @@
 import UIKit
 
 class CallController: UIViewController {
-
-    let SERVER_HOST_URL = "https://appr.tc"
     
     var user:AppUser?
     var incommingCall:String?
-/*
+
     @IBOutlet weak var callView: UIView!
     @IBOutlet weak var callImage: UIImageView!
     @IBOutlet weak var remoteView: RTCEAGLVideoView!
@@ -30,6 +28,7 @@ class CallController: UIViewController {
     var rtcClient:ARDAppClient?
     var localVideoTrack:RTCVideoTrack?
     var remoteVideoTrack:RTCVideoTrack?
+    var captureController:ARDCaptureController?
     
     var localAspect:CGFloat = 1
     var remoteAspect:CGFloat = 1
@@ -74,8 +73,13 @@ class CallController: UIViewController {
         remoteView.delegate = self
         localView.delegate = self
         rtcClient = ARDAppClient(delegate: self)
-        rtcClient?.serverHostUrl = SERVER_HOST_URL
-        rtcClient?.connectToRoom(withId: incommingCall, options: nil)
+        let settings = ARDSettingsModel()
+        rtcClient?.connectToRoom(withId: incommingCall,
+                                 settings: settings,
+                                 isLoopback: false,
+                                 isAudioOnly: false,
+                                 shouldMakeAecDump: false,
+                                 shouldUseLevelControl: false)
         callView.isHidden = true
     }
     
@@ -84,21 +88,22 @@ class CallController: UIViewController {
         remoteVideoTrack?.remove(remoteView)
         localVideoTrack = nil
         remoteVideoTrack = nil
-        self.rtcClient?.disconnect()
+        captureController?.stopCapture()
+        captureController = nil
+        rtcClient?.disconnect()
+        rtcClient = nil
         callView.isHidden = false
-        self.rtcClient = nil
     }
     
     override func goBack() {
         if incommingCall != nil {
-            let alert = createQuestion("Want you hang up?", acceptTitle: "Yes", cancelTitle: "Cancel", acceptHandler: {
+            yesNoQuestion("Want you hang up?", acceptLabel: "Yes", cancelLabel: "Cancel", acceptHandler: {
                 Model.shared.hangUpCall(self.incommingCall!)
                 if self.rtcClient != nil {
                     self.disconnect()
                     super.goBack()
                 }
             })
-            alert?.show()
         } else {
             if self.busyPlayer != nil {
                 self.busyPlayer?.stop()
@@ -164,11 +169,18 @@ class CallController: UIViewController {
             self.localView.frame = CGRect(x: org.x + (120 - w) / 2 , y: org.y, width: w, height: 120)
         }
     }
-     */
 }
-/*
+
 extension CallController : ARDAppClientDelegate {
     
+    func appClient(_ client: ARDAppClient!, didError error: Error!) {
+        DispatchQueue.main.async {
+            self.showMessage("Error: \(error.localizedDescription)", messageType: .error, messageHandler: {
+                self.goBack()
+            })
+        }
+    }
+
     func appClient(_ client: ARDAppClient!, didChange state: ARDAppClientState) {
         switch state {
         case .connecting:
@@ -180,24 +192,57 @@ extension CallController : ARDAppClientDelegate {
         }
     }
     
+    func appClient(_ client: ARDAppClient!, didChange state: RTCIceConnectionState) {
+        switch state {
+        case .new:
+            print("$$$$$ new")
+        case .checking:
+            print("$$$$$ checking")
+        case .connected:
+            print("$$$$$ connected")
+        case .completed:
+            print("$$$$$ completed")
+        case .failed:
+            print("$$$$$ failed")
+        case .disconnected:
+            print("$$$$$ disconnected")
+        case .closed:
+            print("$$$$$ closed")
+        case .count:
+            print("$$$$$ count")
+        }
+    }
+    
+    func appClient(_ client: ARDAppClient!, didGetStats stats: [Any]!) {
+    }
+
     func appClient(_ client: ARDAppClient!, didReceiveLocalVideoTrack localVideoTrack: RTCVideoTrack!) {
+        print("didReceiveLocalVideoTrack")
         self.localVideoTrack = localVideoTrack
         self.localVideoTrack?.add(self.localView)
     }
     
     func appClient(_ client: ARDAppClient!, didReceiveRemoteVideoTrack remoteVideoTrack: RTCVideoTrack!) {
+        print("didReceiveRemoteVideoTrack")
         self.remoteVideoTrack = remoteVideoTrack
         self.remoteVideoTrack?.add(self.remoteView)
     }
     
-    func appClient(_ client: ARDAppClient!, didError error: Error!) {
-        print("error: \(error)")
+    func appClient(_ client: ARDAppClient!, didCreateLocalCapturer localCapturer: RTCCameraVideoCapturer!) {
+        print("didCreateLocalCapturer")
+        captureController = ARDCaptureController(capturer: localCapturer, settings: ARDSettingsModel())
+        captureController?.startCapture()
     }
+    
+    func appClient(_ client: ARDAppClient!, didReceiveRemoteAudioTracks remoteAudioTrack: RTCAudioTrack!) {
+        print("didReceiveRemoteAudioTracks")
+    }
+
 }
 
 extension CallController : RTCEAGLVideoViewDelegate {
     
-    func videoView(_ videoView: RTCEAGLVideoView!, didChangeVideoSize size: CGSize) {
+    func videoView(_ videoView: RTCEAGLVideoView, didChangeVideoSize size: CGSize) {
         let aspect = size.width / size.height
         if videoView == self.remoteView {
             self.remoteAspect = aspect
@@ -209,4 +254,4 @@ extension CallController : RTCEAGLVideoViewDelegate {
         }
     }
 }
- */
+
