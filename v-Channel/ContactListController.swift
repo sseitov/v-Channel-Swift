@@ -68,7 +68,10 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
     func refresh() {
         if let allContacts = currentUser()!.contacts?.allObjects as? [Contact] {
             contacts.removeAll()
-            contacts = allContacts
+            contacts = allContacts.sorted(by: { contact1, contact2 in
+                let result = contact1.name().caseInsensitiveCompare(contact2.name())
+                return result == .orderedAscending
+            })
         }
         tableView.reloadData()
     }

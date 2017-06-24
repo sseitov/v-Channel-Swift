@@ -48,8 +48,8 @@ class Ringtone {
         } else {
             try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
         }
-        try? AVAudioSession.sharedInstance().setActive(true)
         try? AVAudioSession.sharedInstance().overrideOutputAudioPort(.speaker)
+        try? AVAudioSession.sharedInstance().setActive(true)
 
         if ringPlayer!.prepareToPlay() {
             ringPlayer!.play()

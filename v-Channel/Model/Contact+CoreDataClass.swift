@@ -43,4 +43,11 @@ public class Contact: NSManagedObject {
         Model.shared.saveContext()
     }
     
+    func name() -> String {
+        if let user = initiator! == currentUser()!.uid! ? Model.shared.getUser(requester!) : Model.shared.getUser(initiator!) {
+            return user.name!
+        } else {
+            return ""
+        }
+    }
 }

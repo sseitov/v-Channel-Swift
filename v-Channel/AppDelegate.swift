@@ -138,6 +138,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         center.removeAllDeliveredNotifications()
         UIApplication.shared.applicationIconBadgeNumber = -1
+        Ringtone.shared.stop()
         let nav = window!.rootViewController as! UINavigationController
         nav.popToRootViewController(animated: false)
     }
