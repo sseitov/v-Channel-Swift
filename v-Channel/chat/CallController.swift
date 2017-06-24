@@ -16,29 +16,49 @@ class CallController: UIViewController {
     @IBOutlet weak var callView: UIView!
     @IBOutlet weak var callImage: UIImageView!
     @IBOutlet weak var remoteView: RTCEAGLVideoView!
-    @IBOutlet weak var localView: RTCEAGLVideoView!
+    @IBOutlet weak var localView: RTCCameraPreviewView!
+    @IBOutlet weak var videoButton: UIBarButtonItem!
+    @IBOutlet weak var loudButton: UIBarButtonItem!
     
     private var ringPlayer:AVAudioPlayer?
     private var busyPlayer:AVAudioPlayer?
-    private var loudOn = true
-    private var videoOn = true
     
-    var observerContext = 0
+    var isLoud = false {
+        didSet {
+            if isLoud {
+                loudButton.image = UIImage(named: "loudOn")
+            } else {
+                loudButton.image = UIImage(named: "loudOff")
+            }
+        }
+    }
+    var isVideo = true {
+        didSet {
+            if isVideo {
+                videoButton.image = UIImage(named: "videoOn")
+            } else {
+                videoButton.image = UIImage(named: "videoOff")
+            }
+        }
+    }
     
     var rtcClient:ARDAppClient?
-    var localVideoTrack:RTCVideoTrack?
-    var remoteVideoTrack:RTCVideoTrack?
-    var captureController:ARDCaptureController?
-    
-    var localAspect:CGFloat = 1
-    var remoteAspect:CGFloat = 1
-    var remoteSize:CGSize = CGSize()
+    var videoTrack:RTCVideoTrack?
+    var videoSize:CGSize = CGSize()
+    var cameraController:ARDCaptureController?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupBackButton()
         setupTitle(user!.name!)
+  
+        remoteView.delegate = self
+        ARDAppClient.enableLoudspeaker(false)
         
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(self.hangUpCall(_:)),
+                                               name: hangUpCallNotification,
+                                               object: nil)
         if incommingCall == nil {
             incommingCall = Model.shared.makeCall(to: user!)
             ringPlayer = try? AVAudioPlayer(contentsOf: Bundle.main.url(forResource: "calling", withExtension: "wav")!)
@@ -63,15 +83,19 @@ class CallController: UIViewController {
             connect()
         }
         
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(self.hangUpCall(_:)),
-                                               name: hangUpCallNotification,
-                                               object: nil)
     }
 
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if localView.captureSession != nil {
+            localView.setNeedsLayout()
+        }
+        if videoTrack != nil {
+            updateVideoSize()
+        }
+    }
+    
     func connect() {
-        remoteView.delegate = self
-        localView.delegate = self
         rtcClient = ARDAppClient(delegate: self)
         let settings = ARDSettingsModel()
         rtcClient?.connectToRoom(withId: incommingCall,
@@ -84,13 +108,15 @@ class CallController: UIViewController {
     }
     
     func disconnect() {
-        localVideoTrack?.remove(localView)
-        remoteVideoTrack?.remove(remoteView)
-        localVideoTrack = nil
-        remoteVideoTrack = nil
-        captureController?.stopCapture()
-        captureController = nil
+        videoTrack?.remove(remoteView)
+        videoTrack = nil
+        remoteView.renderFrame(nil)
+        
+        localView.captureSession = nil
+        cameraController?.stopCapture()
+        cameraController = nil
         rtcClient?.disconnect()
+        ARDAppClient.hangUp()
         rtcClient = nil
         callView.isHidden = false
     }
@@ -147,27 +173,37 @@ class CallController: UIViewController {
         }
     }
 
-    func updateRemoteSize() {
-        let aspect = view.frame.size.width / view.frame.size.height
-        let zoom = (aspect > 1) ? remoteSize.height / view.frame.size.height : remoteSize.width / view.frame.size.width
-        if remoteAspect > 1 {
-            let h = (remoteSize.width / remoteAspect) / zoom
-            self.remoteView.frame = CGRect(x: 0, y: (self.view.frame.size.height - h) / 2, width: self.view.frame.size.width, height: h)
-        } else {
-            let w = (remoteSize.height * remoteAspect) / zoom
-            self.remoteView.frame = CGRect(x: (self.view.frame.size.width - w) / 2 , y: 0, width: w, height: self.view.frame.size.height)
+    func updateVideoSize() {
+        if videoSize.width > 0 && videoSize.height > 0 {
+            var remoteVideoFrame = AVMakeRect(aspectRatio: videoSize, insideRect: view.bounds)
+            var scale:CGFloat = 1
+            if (remoteVideoFrame.size.width > remoteVideoFrame.size.height) {
+                // Scale by height.
+                scale = view.bounds.size.height / remoteVideoFrame.size.height;
+            } else {
+                // Scale by width.
+                scale = view.bounds.size.width / remoteVideoFrame.size.width;
+            }
+            remoteVideoFrame.size.height *= scale;
+            remoteVideoFrame.size.width *= scale;
+            remoteView.frame = remoteVideoFrame
+            remoteView.center = CGPoint(x: view.bounds.midX, y: view.bounds.midY)
         }
     }
     
-    func updateLocalSize() {
-        let org = CGPoint(x: self.view.frame.size.width - 140, y: self.view.frame.size.height - 140)
-        if localAspect > 1 {
-            let h = 120 / localAspect
-            self.localView.frame = CGRect(x: org.x, y: org.y + (120 - h) / 2, width: 120, height: h)
+    @IBAction func muteVideo(_ sender: UIBarButtonItem) {
+        if isVideo {
+            cameraController?.stopCapture()
+            isVideo = false
         } else {
-            let w = 120 * localAspect
-            self.localView.frame = CGRect(x: org.x + (120 - w) / 2 , y: org.y, width: w, height: 120)
+            cameraController?.startCapture()
+            isVideo = true
         }
+    }
+    
+    @IBAction func switchSpeaker(_ sender: UIBarButtonItem) {
+        ARDAppClient.enableLoudspeaker(!isLoud)
+        isLoud = ARDAppClient.isLoudSpeaker()
     }
 }
 
@@ -217,25 +253,27 @@ extension CallController : ARDAppClientDelegate {
     }
 
     func appClient(_ client: ARDAppClient!, didReceiveLocalVideoTrack localVideoTrack: RTCVideoTrack!) {
-        print("didReceiveLocalVideoTrack")
-        self.localVideoTrack = localVideoTrack
-        self.localVideoTrack?.add(self.localView)
-    }
-    
-    func appClient(_ client: ARDAppClient!, didReceiveRemoteVideoTrack remoteVideoTrack: RTCVideoTrack!) {
-        print("didReceiveRemoteVideoTrack")
-        self.remoteVideoTrack = remoteVideoTrack
-        self.remoteVideoTrack?.add(self.remoteView)
     }
     
     func appClient(_ client: ARDAppClient!, didCreateLocalCapturer localCapturer: RTCCameraVideoCapturer!) {
-        print("didCreateLocalCapturer")
-        captureController = ARDCaptureController(capturer: localCapturer, settings: ARDSettingsModel())
-        captureController?.startCapture()
+        print("================== didCreateLocalCapturer \(Thread.current)")
+        DispatchQueue.main.async {
+            self.localView.captureSession = localCapturer.captureSession
+            self.localView.setupBorder(UIColor.yellow, radius: 5, width: 2)
+            self.cameraController = ARDCaptureController(capturer: localCapturer, settings: ARDSettingsModel())
+            self.cameraController?.startCapture()
+            self.isVideo = true
+        }
+    }
+    
+    func appClient(_ client: ARDAppClient!, didReceiveRemoteVideoTrack remoteVideoTrack: RTCVideoTrack!) {
+        print("================== didReceiveRemoteVideoTrack \(Thread.current)")
+        videoTrack = remoteVideoTrack
+        videoTrack?.add(self.remoteView)
     }
     
     func appClient(_ client: ARDAppClient!, didReceiveRemoteAudioTracks remoteAudioTrack: RTCAudioTrack!) {
-        print("didReceiveRemoteAudioTracks")
+        isLoud = ARDAppClient.isLoudSpeaker()
     }
 
 }
@@ -243,15 +281,9 @@ extension CallController : ARDAppClientDelegate {
 extension CallController : RTCEAGLVideoViewDelegate {
     
     func videoView(_ videoView: RTCEAGLVideoView, didChangeVideoSize size: CGSize) {
-        let aspect = size.width / size.height
-        if videoView == self.remoteView {
-            self.remoteAspect = aspect
-            self.remoteSize = size
-            self.updateRemoteSize()
-        } else if videoView == self.localView {
-            self.localAspect = aspect
-            self.updateLocalSize()
-        }
+        print("================== didChangeVideoSize \(Thread.current)")
+        videoSize = size
+        updateVideoSize()
     }
 }
 
