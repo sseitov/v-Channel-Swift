@@ -29,4 +29,8 @@ extension UIFont {
     class func condensedFont(_ size:CGFloat = 17) -> UIFont {
         return UIFont(name: "HelveticaNeue-CondensedBold", size: size)!
     }
+    
+    class func commentsFont() -> UIFont {
+        return mainFont(15)
+    }
 }

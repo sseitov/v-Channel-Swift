@@ -16,6 +16,17 @@ func compositeTwoImages(left: UIImage, right: UIImage, newSize: CGSize) -> UIIma
     return newImage
 }
 
+func imageIntoImage(inner: UIImage, outer: UIImage) -> UIImage? {
+    UIGraphicsBeginImageContextWithOptions(outer.size, false, 0.0)
+    outer.draw(in: CGRect(x: 0, y: 0, width: outer.size.width, height: outer.size.height))
+    let offsetX = (outer.size.width - inner.size.width) / 2
+    let offsetY = (outer.size.height - inner.size.height) / 2
+    inner.draw(at: CGPoint(x: offsetX, y: offsetY))
+    let newImage = UIGraphicsGetImageFromCurrentImageContext()
+    UIGraphicsEndImageContext()
+    return newImage
+}
+
 extension UIImage {
     class func imageWithColor(_ color: UIColor, size: CGSize) -> UIImage {
         UIGraphicsBeginImageContext(size)
