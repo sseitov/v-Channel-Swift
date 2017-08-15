@@ -3,18 +3,23 @@ platform :ios, '9.0'
 target 'v-Channel' do
     use_frameworks!
     
-    pod 'Firebase/Core', '~> 4.0.0'
-    pod 'Firebase/Storage', '~> 4.0.0'
-    pod 'Firebase/Auth', '~> 4.0.0'
-    pod 'Firebase/Database', '~> 4.0.0'
-    pod 'Firebase/Messaging', '~> 4.0.0'
-    pod 'Firebase/Invites', '~> 4.0.0'
+    pod 'Firebase/Core'
+    pod 'Firebase/Storage'
+    pod 'Firebase/Auth'
+    pod 'Firebase/Database'
+    pod 'Firebase/Messaging'
+    pod 'Firebase/Invites'
 
     pod 'AFNetworking'
     pod 'JSQMessagesViewController'
+    
     pod 'GoogleMaps'
     pod 'GoogleSignIn'
     
+    pod 'FBSDKCoreKit'
+    pod 'FBSDKLoginKit'
+    pod 'FBSDKShareKit'
+
     pod 'SVProgressHUD'
     pod 'IQKeyboardManager'
     pod 'SDWebImage'

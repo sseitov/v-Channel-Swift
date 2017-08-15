@@ -80,10 +80,6 @@
 		2C5B2AF71E561935006CC809 /* EmailInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5B2AF21E561935006CC809 /* EmailInput.swift */; };
 		2C5B2AF81E561935006CC809 /* EmailInput.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2C5B2AF31E561935006CC809 /* EmailInput.xib */; };
 		2C5B2AF91E561935006CC809 /* TextFieldContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5B2AF41E561935006CC809 /* TextFieldContainer.swift */; };
-		2C7E3F1D1E7123E20019CB7F /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C7E3F1A1E7123E20019CB7F /* FBSDKCoreKit.framework */; };
-		2C7E3F1E1E7123E20019CB7F /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C7E3F1B1E7123E20019CB7F /* FBSDKLoginKit.framework */; };
-		2C7E3F1F1E7123E20019CB7F /* FBSDKShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C7E3F1C1E7123E20019CB7F /* FBSDKShareKit.framework */; };
-		2C7E3F211E7124850019CB7F /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C7E3F201E7124850019CB7F /* Bolts.framework */; };
 		2C7E3F241E71BF1D0019CB7F /* ProfileCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7E3F231E71BF1D0019CB7F /* ProfileCell.swift */; };
 		2C8174491E6D3EFD001E2AF7 /* RingtonePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8174481E6D3EFD001E2AF7 /* RingtonePlayer.swift */; };
 		2CE75BA61E55D40800EEE103 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE75BA51E55D40800EEE103 /* AppDelegate.swift */; };
@@ -223,10 +219,6 @@
 		2C5B2AF21E561935006CC809 /* EmailInput.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EmailInput.swift; path = CustomViews/EmailInput.swift; sourceTree = "<group>"; };
 		2C5B2AF31E561935006CC809 /* EmailInput.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = EmailInput.xib; path = CustomViews/EmailInput.xib; sourceTree = "<group>"; };
 		2C5B2AF41E561935006CC809 /* TextFieldContainer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TextFieldContainer.swift; path = CustomViews/TextFieldContainer.swift; sourceTree = "<group>"; };
-		2C7E3F1A1E7123E20019CB7F /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKCoreKit.framework; sourceTree = "<group>"; };
-		2C7E3F1B1E7123E20019CB7F /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKLoginKit.framework; sourceTree = "<group>"; };
-		2C7E3F1C1E7123E20019CB7F /* FBSDKShareKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKShareKit.framework; sourceTree = "<group>"; };
-		2C7E3F201E7124850019CB7F /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Bolts.framework; sourceTree = "<group>"; };
 		2C7E3F221E712B980019CB7F /* vChannel 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "vChannel 2.xcdatamodel"; sourceTree = "<group>"; };
 		2C7E3F231E71BF1D0019CB7F /* ProfileCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileCell.swift; sourceTree = "<group>"; };
 		2C8174481E6D3EFD001E2AF7 /* RingtonePlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RingtonePlayer.swift; sourceTree = "<group>"; };
@@ -333,10 +325,6 @@
 			files = (
 				2CE96F5B1EFDA12200416404 /* librtc_sdk_objc.a in Frameworks */,
 				2CE96F5D1EFDA39500416404 /* VideoToolbox.framework in Frameworks */,
-				2C7E3F211E7124850019CB7F /* Bolts.framework in Frameworks */,
-				2C7E3F1D1E7123E20019CB7F /* FBSDKCoreKit.framework in Frameworks */,
-				2C7E3F1E1E7123E20019CB7F /* FBSDKLoginKit.framework in Frameworks */,
-				2C7E3F1F1E7123E20019CB7F /* FBSDKShareKit.framework in Frameworks */,
 				C93E45D143D1988363B012E4 /* Pods_v_Channel.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -668,10 +656,6 @@
 			children = (
 				2CE96F5A1EFDA12200416404 /* librtc_sdk_objc.a */,
 				2CE96F5C1EFDA39500416404 /* VideoToolbox.framework */,
-				2C7E3F201E7124850019CB7F /* Bolts.framework */,
-				2C7E3F1A1E7123E20019CB7F /* FBSDKCoreKit.framework */,
-				2C7E3F1B1E7123E20019CB7F /* FBSDKLoginKit.framework */,
-				2C7E3F1C1E7123E20019CB7F /* FBSDKShareKit.framework */,
 				21746C6420EC6E74A8D912F4 /* Pods_v_Channel.framework */,
 			);
 			name = Frameworks;
@@ -825,13 +809,16 @@
 			files = (
 			);
 			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
 			);
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-v-Channel-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		70CF868007FC94E0C1074DEF /* [CP] Copy Pods Resources */ = {
@@ -840,9 +827,15 @@
 			files = (
 			);
 			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-v-Channel/Pods-v-Channel-resources.sh",
+				"${PODS_ROOT}/FirebaseInvites/Resources/GINInviteResources.bundle",
+				"${PODS_ROOT}/FirebaseInvites/Resources/GPPACLPickerResources.bundle",
+				"${PODS_ROOT}/GoogleMaps/Maps/Frameworks/GoogleMaps.framework/Resources/GoogleMaps.bundle",
+				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -855,9 +848,42 @@
 			files = (
 			);
 			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-v-Channel/Pods-v-Channel-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/AFNetworking/AFNetworking.framework",
+				"${BUILT_PRODUCTS_DIR}/Bolts/Bolts.framework",
+				"${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework",
+				"${BUILT_PRODUCTS_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework",
+				"${BUILT_PRODUCTS_DIR}/FBSDKShareKit/FBSDKShareKit.framework",
+				"${BUILT_PRODUCTS_DIR}/GTMOAuth2/GTMOAuth2.framework",
+				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleAPIClientForREST/GoogleAPIClientForREST.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
+				"${BUILT_PRODUCTS_DIR}/IQKeyboardManager/IQKeyboardManager.framework",
+				"${BUILT_PRODUCTS_DIR}/JSQMessagesViewController/JSQMessagesViewController.framework",
+				"${BUILT_PRODUCTS_DIR}/JSQSystemSoundPlayer/JSQSystemSoundPlayer.framework",
+				"${BUILT_PRODUCTS_DIR}/Protobuf/Protobuf.framework",
+				"${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework",
+				"${BUILT_PRODUCTS_DIR}/SVProgressHUD/SVProgressHUD.framework",
+				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AFNetworking.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Bolts.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKShareKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMOAuth2.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleAPIClientForREST.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/IQKeyboardManager.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/JSQMessagesViewController.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/JSQSystemSoundPlayer.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDWebImage.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SVProgressHUD.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1018,7 +1044,7 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VALID_ARCHS = arm64;
+				VALID_ARCHS = "arm64 armv7";
 			};
 			name = Debug;
 		};
@@ -1062,7 +1088,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
-				VALID_ARCHS = arm64;
+				VALID_ARCHS = "arm64 armv7";
 			};
 			name = Release;
 		};
@@ -1111,7 +1137,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "v-Channel-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
-				VALID_ARCHS = arm64;
+				VALID_ARCHS = "arm64 armv7";
 			};
 			name = Debug;
 		};
@@ -1160,7 +1186,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "v-Channel AppStore";
 				SWIFT_OBJC_BRIDGING_HEADER = "v-Channel-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
-				VALID_ARCHS = arm64;
+				VALID_ARCHS = "arm64 armv7";
 			};
 			name = Release;
 		};
