@@ -43,7 +43,7 @@ extension String {
     func partInRange(_ start:Int, end:Int) -> String {
         let startIndex = self.characters.index(self.startIndex, offsetBy: start)
         let endIndex = self.characters.index(self.startIndex, offsetBy: end)
-        return self[startIndex..<endIndex]
+        return String(self[startIndex..<endIndex])
     }
 
     func length() -> Int {
@@ -70,7 +70,7 @@ extension String {
     
     func heightWithConstrainedWidth(width: CGFloat, font: UIFont) -> CGFloat {
         let constraintRect = CGSize(width: width, height: .greatestFiniteMagnitude)
-        let boundingBox = self.boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [NSFontAttributeName: font], context: nil)
+        let boundingBox = self.boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [NSAttributedStringKey.font: font], context: nil)
         
         return boundingBox.height
     }

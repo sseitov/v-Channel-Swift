@@ -58,7 +58,7 @@ class CameraController: UIViewController, AVCaptureVideoDataOutputSampleBufferDe
         self.view.addGestureRecognizer(tap)
     }
     
-    func tapScreen() {
+    @objc func tapScreen() {
         UIApplication.shared.sendAction(#selector(UIApplication.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 
@@ -66,7 +66,7 @@ class CameraController: UIViewController, AVCaptureVideoDataOutputSampleBufferDe
         return true
     }
     
-    func orientationChanged(_ notify:Notification) {
+    @objc func orientationChanged(_ notify:Notification) {
         orientation = UIDevice.current.orientation
     }
     
@@ -110,7 +110,7 @@ class CameraController: UIViewController, AVCaptureVideoDataOutputSampleBufferDe
     
     // MARK: - AVCaptureVideoDataOutput delegate
     
-    func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, from connection: AVCaptureConnection!) {
+    func captureOutput(captureOutput: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         
         pixelBufferLock.lock()
         

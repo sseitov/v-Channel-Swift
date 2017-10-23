@@ -69,7 +69,7 @@ public class AppUser: NSManagedObject {
         
         if avatarURL != nil {
             if type > 0, let url = URL(string: avatarURL!) {
-                SDWebImageDownloader.shared().downloadImage(with: url, options: [], progress: { _ in}, completed: { _, data, error, _ in
+                SDWebImageDownloader.shared().downloadImage(with: url, options: [], progress: nil, completed: { _, data, error, _ in
                     self.avatar = data as NSData?
                     Model.shared.saveContext()
                     completion()

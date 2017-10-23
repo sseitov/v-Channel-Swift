@@ -14,12 +14,12 @@ extension NSString {
         textStyle.alignment = alignment
         
         let textFontAttributes = [
-            NSFontAttributeName: font,
-            NSForegroundColorAttributeName: color,
-            NSParagraphStyleAttributeName: textStyle
+            NSAttributedStringKey.font: font,
+            NSAttributedStringKey.foregroundColor: color,
+            NSAttributedStringKey.paragraphStyle: textStyle
         ]
         
-        let size = self.size(attributes: textFontAttributes)
+        let size = self.size(withAttributes: textFontAttributes)
         let r = CGRect(x: rect.origin.x,
                        y: rect.origin.y + (rect.size.height - size.height)/2.0,
                        width: rect.size.width,

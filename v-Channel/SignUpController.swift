@@ -57,7 +57,7 @@ class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigati
         self.view.addGestureRecognizer(tap)
     }
     
-    func tap() {
+    @objc func tap() {
         UIApplication.shared.sendAction(#selector(UIApplication.resignFirstResponder), to: nil, from: nil, for: nil)
     }
     
@@ -170,7 +170,7 @@ class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigati
                 imagePicker.delegate = self
                 imagePicker.modalPresentationStyle = .formSheet
                 if let font = UIFont(name: "HelveticaNeue-CondensedBold", size: 15) {
-                    imagePicker.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName : MainColor, NSFontAttributeName : font]
+                    imagePicker.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor : MainColor, NSAttributedStringKey.font : font]
                 }
                 imagePicker.navigationBar.tintColor = MainColor
                 self.present(imagePicker, animated: true, completion: nil)

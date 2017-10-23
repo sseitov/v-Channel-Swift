@@ -98,7 +98,7 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
    
     // MARK: - Call management
     
-    func checkIncomming() {
+    @objc func checkIncomming() {
         if UIApplication.shared.applicationState == .active {
             if let call = UserDefaults.standard.object(forKey: "incommingCall") as? [String:Any] {
                 if let callId = call["uid"] as? String, let from = call["from"] as? String, let user = Model.shared.getUser(from) {
@@ -115,7 +115,7 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
 
     // MARK: - Message management
     
-    func newMessage(_ notify:Notification) {
+    @objc func newMessage(_ notify:Notification) {
         if let message = notify.object as? Message {
             if let jsqMessage = addMessage(message) {
                 messages.append(jsqMessage)
@@ -133,7 +133,7 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
         return nil
     }
     
-    func deleteMessage(_ notify:Notification) {
+    @objc func deleteMessage(_ notify:Notification) {
         if let message = notify.object as? Message {
             if let msg = getMsg(sender:message.from!, date:message.date! as Date) {
                 if let index = messages.index(of: msg) {
@@ -193,7 +193,7 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
                 imagePicker.sourceType = .photoLibrary
                 imagePicker.delegate = self
                 imagePicker.modalPresentationStyle = .formSheet
-                imagePicker.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName : MainColor, NSFontAttributeName : UIFont.condensedFont(15)]
+                imagePicker.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor : MainColor, NSAttributedStringKey.font : UIFont.condensedFont(15)]
                 imagePicker.navigationBar.tintColor = MainColor
                 self.present(imagePicker, animated: true, completion: nil)
         }, handler2: {

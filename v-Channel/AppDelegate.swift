@@ -30,21 +30,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
 
         // Register_for_notifications
         if #available(iOS 10.0, *) {
-            let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
-            UNUserNotificationCenter.current().requestAuthorization(
-                options: authOptions,
-                completionHandler: {_, _ in })
-            
             UNUserNotificationCenter.current().delegate = self
-            
+            UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
+                
+                guard error == nil else {
+                    //Display Error.. Handle Error.. etc..
+                    return
+                }
+                
+                if granted {
+                    DispatchQueue.main.async {
+                        //Register for RemoteNotifications. Your Remote Notifications can display alerts now :)
+                        application.registerForRemoteNotifications()
+                    }
+                }
+                else {
+                    //Handle user denying permissions..
+                }
+            }
         } else {
             let settings: UIUserNotificationSettings =
                 UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
             application.registerUserNotificationSettings(settings)
+            application.registerForRemoteNotifications()
         }
-        
-        application.registerForRemoteNotifications()
-        
+
         Messaging.messaging().delegate = self
         
         // Initialize Google Maps
@@ -58,7 +68,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         SVProgressHUD.setForegroundColor(UIColor.white)
         
         if let font = UIFont(name: "HelveticaNeue-CondensedBold", size: 17) {
-            UIBarButtonItem.appearance().setTitleTextAttributes([NSFontAttributeName : font], for: .normal)
+            UIBarButtonItem.appearance().setTitleTextAttributes([NSAttributedStringKey.font : font], for: .normal)
             SVProgressHUD.setFont(font)
         }
         

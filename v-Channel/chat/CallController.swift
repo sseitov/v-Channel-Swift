@@ -142,7 +142,7 @@ class CallController: UIViewController {
         }
     }
     
-    func acceptCall(_ notify:Notification) {
+    @objc func acceptCall(_ notify:Notification) {
         if incommingCall != nil, let call = notify.object as? String, incommingCall! == call {
             self.ringPlayer?.stop()
             self.ringPlayer = nil
@@ -152,7 +152,7 @@ class CallController: UIViewController {
         }
     }
     
-    func hangUpCall(_ notify:Notification) {
+    @objc func hangUpCall(_ notify:Notification) {
         if self.ringPlayer != nil {
             self.ringPlayer?.stop()
             self.ringPlayer = nil

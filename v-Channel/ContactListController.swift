@@ -65,7 +65,7 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
         }
     }
 
-    func refresh() {
+    @objc func refresh() {
         if let allContacts = currentUser()!.contacts?.allObjects as? [Contact] {
             contacts.removeAll()
             contacts = allContacts.sorted(by: { contact1, contact2 in
@@ -76,7 +76,7 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
         tableView.reloadData()
     }
     
-    func refreshStatus() {
+    @objc func refreshStatus() {
         tableView.reloadData()
     }
 
