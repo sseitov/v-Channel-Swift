@@ -110,7 +110,7 @@ class CameraController: UIViewController, AVCaptureVideoDataOutputSampleBufferDe
     
     // MARK: - AVCaptureVideoDataOutput delegate
     
-    func captureOutput(captureOutput: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+    func captureOutput(_ captureOutput: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         
         pixelBufferLock.lock()
         
