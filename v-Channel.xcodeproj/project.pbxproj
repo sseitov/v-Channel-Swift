@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		2C161D1E1E5E23EB002FF97D /* SettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C161D1D1E5E23EB002FF97D /* SettingsController.swift */; };
 		2C161D201E5E260F002FF97D /* SoundSettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C161D1F1E5E260F002FF97D /* SoundSettingsController.swift */; };
+		2C2F1BAA1FBB6A69007BF345 /* ProviderDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C2F1BA71FBB6A69007BF345 /* ProviderDelegate.swift */; };
+		2C2F1BAB1FBB6A69007BF345 /* CallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C2F1BA81FBB6A69007BF345 /* CallManager.swift */; };
+		2C2F1BAC1FBB6A69007BF345 /* Call.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C2F1BA91FBB6A69007BF345 /* Call.swift */; };
 		2C4D32C11E88D1ED0059CAA2 /* Message+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4D32BF1E88D1ED0059CAA2 /* Message+CoreDataClass.swift */; };
 		2C4D32C21E88D1ED0059CAA2 /* Message+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4D32C01E88D1ED0059CAA2 /* Message+CoreDataProperties.swift */; };
 		2C4D32CA1E88DB140059CAA2 /* ChatController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4D32C61E88DB140059CAA2 /* ChatController.swift */; };
@@ -146,6 +149,9 @@
 		2C0DFFCB1FBB45D1003097A4 /* vChannel 5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "vChannel 5.xcdatamodel"; sourceTree = "<group>"; };
 		2C161D1D1E5E23EB002FF97D /* SettingsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsController.swift; sourceTree = "<group>"; };
 		2C161D1F1E5E260F002FF97D /* SoundSettingsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SoundSettingsController.swift; sourceTree = "<group>"; };
+		2C2F1BA71FBB6A69007BF345 /* ProviderDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProviderDelegate.swift; path = CallManager/ProviderDelegate.swift; sourceTree = "<group>"; };
+		2C2F1BA81FBB6A69007BF345 /* CallManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CallManager.swift; path = CallManager/CallManager.swift; sourceTree = "<group>"; };
+		2C2F1BA91FBB6A69007BF345 /* Call.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Call.swift; path = CallManager/Call.swift; sourceTree = "<group>"; };
 		2C4D32BE1E88D00B0059CAA2 /* vChannel 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "vChannel 3.xcdatamodel"; sourceTree = "<group>"; };
 		2C4D32BF1E88D1ED0059CAA2 /* Message+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Message+CoreDataClass.swift"; path = "Model/Message+CoreDataClass.swift"; sourceTree = "<group>"; };
 		2C4D32C01E88D1ED0059CAA2 /* Message+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Message+CoreDataProperties.swift"; path = "Model/Message+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -342,6 +348,16 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		2C2F1BA61FBB6A50007BF345 /* CallManager */ = {
+			isa = PBXGroup;
+			children = (
+				2C2F1BA91FBB6A69007BF345 /* Call.swift */,
+				2C2F1BA81FBB6A69007BF345 /* CallManager.swift */,
+				2C2F1BA71FBB6A69007BF345 /* ProviderDelegate.swift */,
+			);
+			name = CallManager;
+			sourceTree = "<group>";
+		};
 		2C4D32C51E88DAF30059CAA2 /* Chat */ = {
 			isa = PBXGroup;
 			children = (
@@ -530,6 +546,7 @@
 		2CE75BA41E55D40800EEE103 /* v-Channel */ = {
 			isa = PBXGroup;
 			children = (
+				2C2F1BA61FBB6A50007BF345 /* CallManager */,
 				2C5B2AD91E5618B8006CC809 /* CustomViews */,
 				2C5B2AD81E5618AB006CC809 /* Extensions */,
 				2C5B2AC91E560F57006CC809 /* Model */,
@@ -919,6 +936,7 @@
 				2CE96EE41EFD24E800416404 /* LGProgressView.m in Sources */,
 				2C5B2AD21E56110A006CC809 /* Contact+CoreDataProperties.swift in Sources */,
 				2CE96F131EFD613E00416404 /* CameraController.swift in Sources */,
+				2C2F1BAC1FBB6A69007BF345 /* Call.swift in Sources */,
 				2C58977F1E5D7A97004F8B46 /* ContactCell.swift in Sources */,
 				2C5B2ACC1E560FE8006CC809 /* vChannel.xcdatamodeld in Sources */,
 				2CE96F141EFD613E00416404 /* VideoLayerView.m in Sources */,
@@ -939,6 +957,7 @@
 				2C4D32D51E88E4FC0059CAA2 /* RouteController.swift in Sources */,
 				2C4D32D11E88E4E40059CAA2 /* LocationManager.swift in Sources */,
 				2CE96F4D1EFDA08C00416404 /* ARDMessageResponse.m in Sources */,
+				2C2F1BAA1FBB6A69007BF345 /* ProviderDelegate.swift in Sources */,
 				2C4D32D41E88E4FC0059CAA2 /* LocationMediaItem.swift in Sources */,
 				2CE96F041EFD26A400416404 /* UIImageExtension.swift in Sources */,
 				2CE96F531EFDA08C00416404 /* ARDTURNClient.m in Sources */,
@@ -962,6 +981,7 @@
 				2CE96EFA1EFD26A400416404 /* CLLocationExtension.swift in Sources */,
 				2CF8FBD71E5606BF003FC98E /* ContactListController.swift in Sources */,
 				2CE96F561EFDA08C00416404 /* RTCIceCandidate+JSON.m in Sources */,
+				2C2F1BAB1FBB6A69007BF345 /* CallManager.swift in Sources */,
 				2CE96F541EFDA08C00416404 /* ARDUtilities.m in Sources */,
 				2CE96F4A1EFDA08C00416404 /* ARDBitrateTracker.m in Sources */,
 				2CE96F4C1EFDA08C00416404 /* ARDJoinResponse.m in Sources */,
@@ -1052,7 +1072,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -1103,7 +1123,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";

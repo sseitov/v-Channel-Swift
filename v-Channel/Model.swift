@@ -536,12 +536,10 @@ class Model: NSObject {
     fileprivate func pushIncommingCall(to:AppUser, complete:@escaping(Error?) -> ()) {
         Model.shared.userEndpoint(to, endpoint: { point in
             if point != nil {
-                let sns = AWSSNS.default()
                 let message = AWSSNSPublishInput()
-                message?.message = "Test"
+                message?.message = currentUser()!.name!
                 message?.targetArn = point!
-                
-                sns.publish(message!).continueWith(block: { task in
+                AWSSNS.default().publish(message!).continueWith(block: { task in
                     if task.error != nil {
                         print(task.error!.localizedDescription)
                     }
@@ -549,27 +547,24 @@ class Model: NSObject {
                     return nil
                 })
             } else {
-                complete(vchannelError("\(to.name!) didn't configured VOIP push yet."))
+                if to.token != nil {
+                    let notification:[String:Any] = [
+                        "title" : "v-Chanel call",
+                        "body" : "Call from \(currentUser()!.name!)",
+                        "content_available": true]
+                    let data:[String:Int] = ["pushType" : PushType.incommingCall.rawValue]
+                    
+                    let message:[String:Any] = ["to" : to.token!, "priority" : "high", "notification" : notification, "data" : data]
+                    self.httpManager.post("send", parameters: message, progress: nil, success: { task, response in
+                        complete(nil)
+                    }, failure: { task, error in
+                        complete(error)
+                    })
+                } else {
+                    complete(vchannelError("\(to.name!) didn't configured VOIP push yet."))
+                }
             }
         })
-/*
-        if to.token != nil {
-            let notification:[String:Any] = [
-                "title" : "v-Chanel call",
-                "body" : "Call from \(currentUser()!.name!)",
-                "content_available": true]
-            let data:[String:Int] = ["pushType" : PushType.incommingCall.rawValue]
-            
-            let message:[String:Any] = ["to" : to.token!, "priority" : "high", "notification" : notification, "data" : data]
-            httpManager.post("send", parameters: message, progress: nil, success: { task, response in
-                print("SEND PUSH CALL SUCCESS")
-            }, failure: { task, error in
-                print("SEND PUSH CALL ERROR: \(error)")
-            })
-        } else {
-            print("USER HAVE NO TOKEN")
-        }
- */
     }
     
     func pushHangUpCall(to:AppUser) {

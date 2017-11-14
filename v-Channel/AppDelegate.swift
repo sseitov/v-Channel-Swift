@@ -22,6 +22,8 @@ import AWSSNS
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
 
     var window: UIWindow?
+    var providerDelegate: ProviderDelegate!
+    let callManager = CallManager()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
     
@@ -32,30 +34,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         FirebaseApp.configure()
 
         // Register_for_notifications
-        let settings: UIUserNotificationSettings =
-            UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
-        application.registerUserNotificationSettings(settings)
-        if #available(iOS 10.0, *) {
-            UNUserNotificationCenter.current().delegate = self
-            UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
-                
-                guard error == nil else {
-                    //Display Error.. Handle Error.. etc..
-                    return
-                }
-                
-                if granted {
-                    DispatchQueue.main.async {
-                        //Register for RemoteNotifications. Your Remote Notifications can display alerts now :)
-                        application.registerForRemoteNotifications()
-                    }
-                }
-                else {
-                    //Handle user denying permissions..
+        UNUserNotificationCenter.current().delegate = self
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
+            
+            guard error == nil else {
+                //Display Error.. Handle Error.. etc..
+                return
+            }
+            
+            if granted {
+                DispatchQueue.main.async {
+                    //register for voip notifications
+                    let voipRegistry = PKPushRegistry(queue: DispatchQueue.main)
+                    voipRegistry.desiredPushTypes = Set([.voIP])
+                    voipRegistry.delegate = self;
+                    
+                    //Register for RemoteNotifications. Your Remote Notifications can display alerts now :)
+                    application.registerForRemoteNotifications()
                 }
             }
-        } else {
-            application.registerForRemoteNotifications()
+            else {
+                //Handle user denying permissions..
+            }
         }
 
         Messaging.messaging().delegate = self
@@ -84,6 +84,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         let configuration = AWSServiceConfiguration(region:.USEast1, credentialsProvider:credentialsProvider)
         AWSServiceManager.default().defaultServiceConfiguration = configuration
         
+        providerDelegate = ProviderDelegate(callManager: callManager)
+
         return true
     }
     
@@ -97,13 +99,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
                                                      sourceApplication: options[.sourceApplication] as! String!,
                                                      annotation: options[.annotation])
         }
-    }
-
-    func application(_ application: UIApplication, didRegister notificationSettings: UIUserNotificationSettings) {
-        //register for voip notifications
-        let voipRegistry = PKPushRegistry(queue: DispatchQueue.main)
-        voipRegistry.desiredPushTypes = Set([.voIP])
-        voipRegistry.delegate = self;
     }
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
@@ -215,25 +210,12 @@ extension AppDelegate : PKPushRegistryDelegate {
     func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType) {
         let payloadDict = payload.dictionaryPayload["aps"] as? Dictionary<String, String>
         let message = payloadDict?["alert"]
-        
-        //present a local notifcation to visually see when we are recieving a VoIP Notification
         if UIApplication.shared.applicationState == .background {
-            
-            let localNotification = UILocalNotification();
-            localNotification.alertBody = message
-            localNotification.applicationIconBadgeNumber = 1;
-            localNotification.soundName = UILocalNotificationDefaultSoundName;
-            
-            UIApplication.shared.presentLocalNotificationNow(localNotification);
+            providerDelegate.reportIncomingCall(uuid: UUID(), handle: message!, hasVideo: false, completion: { error in
+                if error != nil {
+                    print(error!.localizedDescription)
+                }
+            })
         }
-            
-        else {
-            DispatchQueue.main.async {
-                let alert = UIAlertView(title: "VoIP Notification", message: message, delegate: nil, cancelButtonTitle: "Ok");
-                alert.show()
-            }
-        }
-        
-        print("incoming voip notfication: \(payload.dictionaryPayload)")
     }
 }
