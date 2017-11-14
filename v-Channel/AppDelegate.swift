@@ -14,6 +14,9 @@ import GoogleSignIn
 import FBSDKLoginKit
 import IQKeyboardManager
 import SVProgressHUD
+import PushKit
+import AWSCognito
+import AWSSNS
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
@@ -29,6 +32,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         FirebaseApp.configure()
 
         // Register_for_notifications
+        let settings: UIUserNotificationSettings =
+            UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
+        application.registerUserNotificationSettings(settings)
         if #available(iOS 10.0, *) {
             UNUserNotificationCenter.current().delegate = self
             UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
@@ -49,9 +55,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
                 }
             }
         } else {
-            let settings: UIUserNotificationSettings =
-                UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
-            application.registerUserNotificationSettings(settings)
             application.registerForRemoteNotifications()
         }
 
@@ -74,7 +77,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         
         IQKeyboardManager.shared().isEnableAutoToolbar = false
         Camera.shared().startup()
-
+        
+        // Initialize the Amazon Cognito credentials provider
+        let credentialsProvider = AWSCognitoCredentialsProvider(regionType:.USEast1,
+                                                                identityPoolId:identityPoolID)
+        let configuration = AWSServiceConfiguration(region:.USEast1, credentialsProvider:credentialsProvider)
+        AWSServiceManager.default().defaultServiceConfiguration = configuration
+        
         return true
     }
     
@@ -90,6 +99,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         }
     }
 
+    func application(_ application: UIApplication, didRegister notificationSettings: UIUserNotificationSettings) {
+        //register for voip notifications
+        let voipRegistry = PKPushRegistry(queue: DispatchQueue.main)
+        voipRegistry.desiredPushTypes = Set([.voIP])
+        voipRegistry.delegate = self;
+    }
+    
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
                      fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         if application.applicationState != .active {
@@ -107,6 +123,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         print("Unable to register for remote notifications: \(error.localizedDescription)")
     }
+    
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         #if DEBUG
@@ -164,4 +181,59 @@ extension AppDelegate : MessagingDelegate {
         }
     }
     
+}
+
+extension AppDelegate : PKPushRegistryDelegate {
+    
+    func pushRegistry(_ registry: PKPushRegistry, didUpdate pushCredentials: PKPushCredentials, for type: PKPushType) {
+        let sns = AWSSNS.default()
+        let endpointRequest = AWSSNSCreatePlatformEndpointInput()
+        #if DEBUG
+            endpointRequest?.platformApplicationArn = endpointDev
+        #else
+            endpointRequest?.platformApplicationArn = endpointProd
+        #endif
+
+        endpointRequest?.token = pushCredentials.token.hexadecimalString
+        sns.createPlatformEndpoint(endpointRequest!).continueWith(executor: AWSExecutor.mainThread(), block: { task in
+            if let response = task.result, let endpoint = response.endpointArn {
+                if let currUser = currentUser() {
+                    Model.shared.publishEndpoint(currUser, endpoint: endpoint)
+                } else {
+                    UserDefaults.standard.set(endpoint, forKey: "endpoint")
+                }
+            }
+            return nil
+        })
+
+    }
+
+    func pushRegistry(_ registry: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
+        print("token invalidated")
+    }
+    
+    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType) {
+        let payloadDict = payload.dictionaryPayload["aps"] as? Dictionary<String, String>
+        let message = payloadDict?["alert"]
+        
+        //present a local notifcation to visually see when we are recieving a VoIP Notification
+        if UIApplication.shared.applicationState == .background {
+            
+            let localNotification = UILocalNotification();
+            localNotification.alertBody = message
+            localNotification.applicationIconBadgeNumber = 1;
+            localNotification.soundName = UILocalNotificationDefaultSoundName;
+            
+            UIApplication.shared.presentLocalNotificationNow(localNotification);
+        }
+            
+        else {
+            DispatchQueue.main.async {
+                let alert = UIAlertView(title: "VoIP Notification", message: message, delegate: nil, cancelButtonTitle: "Ok");
+                alert.show()
+            }
+        }
+        
+        print("incoming voip notfication: \(payload.dictionaryPayload)")
+    }
 }

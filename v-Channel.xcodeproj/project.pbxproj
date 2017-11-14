@@ -143,6 +143,7 @@
 
 /* Begin PBXFileReference section */
 		21746C6420EC6E74A8D912F4 /* Pods_v_Channel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_v_Channel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		2C0DFFCB1FBB45D1003097A4 /* vChannel 5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "vChannel 5.xcdatamodel"; sourceTree = "<group>"; };
 		2C161D1D1E5E23EB002FF97D /* SettingsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsController.swift; sourceTree = "<group>"; };
 		2C161D1F1E5E260F002FF97D /* SoundSettingsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SoundSettingsController.swift; sourceTree = "<group>"; };
 		2C4D32BE1E88D00B0059CAA2 /* vChannel 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "vChannel 3.xcdatamodel"; sourceTree = "<group>"; };
@@ -850,6 +851,9 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-v-Channel/Pods-v-Channel-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/AFNetworking/AFNetworking.framework",
+				"${BUILT_PRODUCTS_DIR}/AWSCognito/AWSCognito.framework",
+				"${BUILT_PRODUCTS_DIR}/AWSCore/AWSCore.framework",
+				"${BUILT_PRODUCTS_DIR}/AWSSNS/AWSSNS.framework",
 				"${BUILT_PRODUCTS_DIR}/Bolts/Bolts.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework",
@@ -870,6 +874,9 @@
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AFNetworking.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AWSCognito.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AWSCore.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AWSSNS.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Bolts.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
@@ -1197,8 +1204,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.vchannel.vchannel;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "ccf7b1f9-1ad7-450e-a520-54009c490245";
-				PROVISIONING_PROFILE_SPECIFIER = "v-Channel AppStore";
+				PROVISIONING_PROFILE = "d08408b4-aa34-4956-8897-f6aeafdc2ad2";
+				PROVISIONING_PROFILE_SPECIFIER = "vChannel AdHoc";
 				SWIFT_OBJC_BRIDGING_HEADER = "v-Channel-Bridging-Header.h";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
@@ -1233,12 +1240,13 @@
 		2C5B2ACA1E560FE8006CC809 /* vChannel.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				2C0DFFCB1FBB45D1003097A4 /* vChannel 5.xcdatamodel */,
 				2CE96F071EFD2E7200416404 /* vChannel 4.xcdatamodel */,
 				2C4D32BE1E88D00B0059CAA2 /* vChannel 3.xcdatamodel */,
 				2C7E3F221E712B980019CB7F /* vChannel 2.xcdatamodel */,
 				2C5B2ACB1E560FE8006CC809 /* vChannel.xcdatamodel */,
 			);
-			currentVersion = 2CE96F071EFD2E7200416404 /* vChannel 4.xcdatamodel */;
+			currentVersion = 2C0DFFCB1FBB45D1003097A4 /* vChannel 5.xcdatamodel */;
 			name = vChannel.xcdatamodeld;
 			path = Model/vChannel.xcdatamodeld;
 			sourceTree = "<group>";

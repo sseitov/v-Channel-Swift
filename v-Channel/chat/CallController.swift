@@ -60,25 +60,31 @@ class CallController: UIViewController {
                                                name: hangUpCallNotification,
                                                object: nil)
         if incommingCall == nil {
-            incommingCall = Model.shared.makeCall(to: user!)
-            ringPlayer = try? AVAudioPlayer(contentsOf: Bundle.main.url(forResource: "calling", withExtension: "wav")!)
-            ringPlayer?.numberOfLoops = -1
-            ringPlayer!.prepareToPlay()
-            ringPlayer?.play()
-            
-            var gifs:[UIImage] = []
-            for i in 0..<24 {
-                gifs.append(UIImage(named: "ring_frame_\(i).gif")!)
-            }
-            callImage.animationImages = gifs
-            callImage.animationDuration = 2
-            callImage.animationRepeatCount = 0
-            callImage.startAnimating()
-            
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(self.acceptCall(_:)),
-                                                   name: acceptCallNotification,
-                                                   object: nil)
+            Model.shared.makeCall(to: user!, complete: { uid, error in
+                if error != nil {
+                    self.showMessage(error!.localizedDescription, messageType: .error)
+                } else {
+                    self.incommingCall = uid
+                    self.ringPlayer = try? AVAudioPlayer(contentsOf: Bundle.main.url(forResource: "calling", withExtension: "wav")!)
+                    self.ringPlayer?.numberOfLoops = -1
+                    self.ringPlayer!.prepareToPlay()
+                    self.ringPlayer?.play()
+                    
+                    var gifs:[UIImage] = []
+                    for i in 0..<24 {
+                        gifs.append(UIImage(named: "ring_frame_\(i).gif")!)
+                    }
+                    self.callImage.animationImages = gifs
+                    self.callImage.animationDuration = 2
+                    self.callImage.animationRepeatCount = 0
+                    self.callImage.startAnimating()
+                    
+                    NotificationCenter.default.addObserver(self,
+                                                           selector: #selector(self.acceptCall(_:)),
+                                                           name: acceptCallNotification,
+                                                           object: nil)
+                }
+            })
         } else {
             connect()
         }

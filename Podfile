@@ -9,7 +9,10 @@ target 'v-Channel' do
     pod 'Firebase/Database'
     pod 'Firebase/Messaging'
     pod 'Firebase/Invites'
-
+    
+    pod 'AWSCognito'
+    pod 'AWSSNS'
+    
     pod 'AFNetworking'
     pod 'JSQMessagesViewController'
     

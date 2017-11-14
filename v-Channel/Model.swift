@@ -14,6 +14,11 @@ import SDWebImage
 import GoogleSignIn
 import AFNetworking
 import CoreLocation
+import AWSSNS
+
+func vchannelError(_ text:String) -> Error {
+    return NSError(domain: "com.vchannel.vchannel", code: -1, userInfo: [NSLocalizedDescriptionKey:text])
+}
 
 func currentUser() -> AppUser? {
     if let firUser = Auth.auth().currentUser {
@@ -171,7 +176,7 @@ class Model: NSObject {
 
     private var newTokenRefHandle: DatabaseHandle?
     private var updateTokenRefHandle: DatabaseHandle?
-    
+
     private var newCallRefHandle: DatabaseHandle?
     private var updateCallRefHandle: DatabaseHandle?
     private var deleteCallRefHandle: DatabaseHandle?
@@ -255,6 +260,20 @@ class Model: NSObject {
         ref.child("tokens").child(user.uid!).setValue(token)
     }
     
+    func publishEndpoint(_ user:AppUser,  endpoint:String) {
+        user.endpoint = endpoint
+        saveContext()
+        let ref = Database.database().reference()
+        ref.child("endponts").child(user.uid!).setValue(endpoint)
+    }
+
+    func userEndpoint(_ user:AppUser, endpoint:@escaping(String?) -> ()) {
+        let ref = Database.database().reference()
+        ref.child("endponts").child(user.uid!).observe(.value, with: { snapshot in
+            endpoint(snapshot.value as? String)
+        })
+    }
+    
     fileprivate func observeTokens() {
         let ref = Database.database().reference()
         let coordQuery = ref.child("tokens").queryLimited(toLast:25)
@@ -285,9 +304,11 @@ class Model: NSObject {
         cashedUser.type = Int16(SocialType.email.rawValue)
         cashedUser.avatar = UIImagePNGRepresentation(image) as NSData?
         if let token = Messaging.messaging().fcmToken {
-            Model.shared.publishToken(cashedUser, token: token)
+            publishToken(cashedUser, token: token)
         }
-
+        if let endpoint = UserDefaults.standard.object(forKey: "endpoint") as? String {
+            publishEndpoint(cashedUser, endpoint: endpoint)
+        }
         saveContext()
         let meta = StorageMetadata()
         meta.contentType = "image/png"
@@ -310,6 +331,9 @@ class Model: NSObject {
         cashedUser.name = profile["name"] as? String
         if let token = Messaging.messaging().fcmToken {
             Model.shared.publishToken(cashedUser, token: token)
+        }
+        if let endpoint = UserDefaults.standard.object(forKey: "endpoint") as? String {
+            publishEndpoint(cashedUser, endpoint: endpoint)
         }
 
         if let picture = profile["picture"] as? [String:Any] {
@@ -339,6 +363,9 @@ class Model: NSObject {
         cashedUser.name = googleProfile.name
         if let token = Messaging.messaging().fcmToken {
             Model.shared.publishToken(cashedUser, token: token)
+        }
+        if let endpoint = UserDefaults.standard.object(forKey: "endpoint") as? String {
+            publishEndpoint(cashedUser, endpoint: endpoint)
         }
 
         if googleProfile.hasImage {
@@ -505,8 +532,27 @@ class Model: NSObject {
         manager.responseSerializer = AFHTTPResponseSerializer()
         return manager
     }()
-    
-    fileprivate func pushIncommingCall(to:AppUser) {
+
+    fileprivate func pushIncommingCall(to:AppUser, complete:@escaping(Error?) -> ()) {
+        Model.shared.userEndpoint(to, endpoint: { point in
+            if point != nil {
+                let sns = AWSSNS.default()
+                let message = AWSSNSPublishInput()
+                message?.message = "Test"
+                message?.targetArn = point!
+                
+                sns.publish(message!).continueWith(block: { task in
+                    if task.error != nil {
+                        print(task.error!.localizedDescription)
+                    }
+                    complete(task.error)
+                    return nil
+                })
+            } else {
+                complete(vchannelError("\(to.name!) didn't configured VOIP push yet."))
+            }
+        })
+/*
         if to.token != nil {
             let notification:[String:Any] = [
                 "title" : "v-Chanel call",
@@ -523,6 +569,7 @@ class Model: NSObject {
         } else {
             print("USER HAVE NO TOKEN")
         }
+ */
     }
     
     func pushHangUpCall(to:AppUser) {
@@ -576,14 +623,15 @@ class Model: NSObject {
 
     // MARK: - VOIP calls
 
-    func makeCall(to:AppUser) -> String {
+    func makeCall(to:AppUser, complete:@escaping(String?, Error?) -> ()) {
         let ref = Database.database().reference()
         let uid = generateUDID()
         let data:[String:Any] = ["from" : currentUser()!.uid!,
                                  "to" : to.uid!]
         ref.child("calls").child(uid).setValue(data)
-        pushIncommingCall(to: to)
-        return uid
+        pushIncommingCall(to: to, complete: { error in
+            complete(uid, error)
+        })
     }
     
     func acceptCall(_ callID:String) {
@@ -868,5 +916,4 @@ class Model: NSObject {
             }
         })
     }
-
 }
