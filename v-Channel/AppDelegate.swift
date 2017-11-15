@@ -18,6 +18,18 @@ import PushKit
 import AWSCognito
 import AWSSNS
 
+func MainApp() -> AppDelegate {
+    return UIApplication.shared.delegate as! AppDelegate
+}
+
+func ContactList() -> ContactListController? {
+    if let nav = MainApp().window?.rootViewController as? UINavigationController {
+        return nav.topViewController as? ContactListController
+    } else {
+        return nil
+    }
+}
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
 
@@ -142,6 +154,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
 
     func applicationWillTerminate(_ application: UIApplication) {
     }
+    
+    func closeCall() {
+        providerDelegate.closeIncomingCall()
+    }
 }
 
 // MARK: - NotificationCenter delegate
@@ -211,7 +227,7 @@ extension AppDelegate : PKPushRegistryDelegate {
         let payloadDict = payload.dictionaryPayload["aps"] as? Dictionary<String, String>
         let message = payloadDict?["alert"]
         if UIApplication.shared.applicationState == .background {
-            providerDelegate.reportIncomingCall(uuid: UUID(), handle: message!, hasVideo: false, completion: { error in
+            providerDelegate.reportIncomingCall(uuid: UUID(), handle: message!, completion: { error in
                 if error != nil {
                     print(error!.localizedDescription)
                 }

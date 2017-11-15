@@ -88,7 +88,7 @@ class CallController: UIViewController {
         } else {
             connect()
         }
-        
+        MainApp().closeCall()
     }
 
     override func viewDidLayoutSubviews() {

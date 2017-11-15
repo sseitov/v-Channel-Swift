@@ -539,7 +539,7 @@ class Model: NSObject {
                 let message = AWSSNSPublishInput()
                 message?.message = currentUser()!.name!
                 message?.targetArn = point!
-                AWSSNS.default().publish(message!).continueWith(block: { task in
+                AWSSNS.default().publish(message!).continueOnSuccessWith(executor: AWSExecutor.mainThread(), block: { task in
                     if task.error != nil {
                         print(task.error!.localizedDescription)
                     }
@@ -649,6 +649,17 @@ class Model: NSObject {
         NotificationCenter.default.post(name: contactNotification, object: nil)
     }
     
+    func incommingCall(_ call:@escaping([String:Any]?) -> ()) {
+        let ref = Database.database().reference()
+        ref.child("calls").queryOrdered(byChild: "to").queryEqual(toValue: currentUser()!.uid!).observeSingleEvent(of: .value, with: { snapshot in
+            if let values = snapshot.value as? [String:Any] {
+                call(values)
+            } else {
+                call(nil)
+            }
+        })
+    }
+    
     fileprivate func observeCalls() {
         let ref = Database.database().reference()
         let callQuery = ref.child("calls").queryLimited(toLast:25)
@@ -656,7 +667,6 @@ class Model: NSObject {
         newCallRefHandle = callQuery.observe(.childAdded, with: { (snapshot) -> Void in
             if let data = snapshot.value as? [String:Any], let to = data["to"] as? String, let from = data["from"] as? String {
                 if to == currentUser()!.uid! {
-                    Ringtone.shared.play()
                     let call = ["uid" : snapshot.key, "from" : from]
                     UserDefaults.standard.set(call, forKey: "incommingCall")
                     UserDefaults.standard.synchronize()
@@ -672,7 +682,6 @@ class Model: NSObject {
         deleteCallRefHandle = callQuery.observe(.childRemoved, with: { (snapshot) -> Void in
             NotificationCenter.default.post(name: hangUpCallNotification, object: snapshot.key)
             if (UserDefaults.standard.object(forKey: "incommingCall") as? [String:Any]) != nil {
-                Ringtone.shared.stop()
                 UserDefaults.standard.removeObject(forKey: "incommingCall")
                 UserDefaults.standard.synchronize()
                 NotificationCenter.default.post(name: contactNotification, object: nil)

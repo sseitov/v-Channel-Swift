@@ -43,11 +43,7 @@ class Ringtone {
     }
     
     func play() {
-        if UIApplication.shared.applicationState != .active {
-            try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, with:[.mixWithOthers])
-        } else {
-            try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
-        }
+        try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, with:[.mixWithOthers])
         try? AVAudioSession.sharedInstance().overrideOutputAudioPort(.speaker)
         try? AVAudioSession.sharedInstance().setActive(true)
 

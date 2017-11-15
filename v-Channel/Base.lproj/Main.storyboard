@@ -140,6 +140,7 @@
                     <connections>
                         <segue destination="6rr-xK-nYg" kind="presentation" identifier="login" modalPresentationStyle="formSheet" modalTransitionStyle="flipHorizontal" id="i0T-zV-Ba0"/>
                         <segue destination="F5y-oF-HjK" kind="show" identifier="chat" id="2QR-vz-GHp"/>
+                        <segue destination="WLf-0N-yGm" kind="show" identifier="call" id="beP-u3-gHX"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Rux-fX-hf1" sceneMemberID="firstResponder"/>
@@ -388,7 +389,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8us-8J-N9g" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1419" y="-582"/>
+            <point key="canvasLocation" x="1494" y="-878"/>
         </scene>
         <!--Login Controller-->
         <scene sceneID="w3T-g7-Oxg">
@@ -706,4 +707,7 @@
         <image name="settings" width="22" height="22"/>
         <image name="videoOn" width="24" height="24"/>
     </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="beP-u3-gHX"/>
+    </inferredMetricsTieBreakers>
 </document>

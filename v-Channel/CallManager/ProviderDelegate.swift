@@ -25,9 +25,13 @@ import AVFoundation
 
 class ProviderDelegate: NSObject {
   
-  fileprivate let callManager: CallManager
-  fileprivate let provider: CXProvider
-  
+    fileprivate let callManager: CallManager
+    fileprivate let provider: CXProvider
+    fileprivate var rejected:Bool = true
+    fileprivate var activeCall:Call?
+    fileprivate var incommingCallID:String?
+    fileprivate var incommingCall:[String:Any]?
+    
   init(callManager: CallManager) {
     self.callManager = callManager
     provider = CXProvider(configuration: type(of: self).providerConfiguration)
@@ -42,37 +46,55 @@ class ProviderDelegate: NSObject {
     
     providerConfiguration.supportsVideo = true
     providerConfiguration.maximumCallsPerCallGroup = 1
+    providerConfiguration.maximumCallGroups = 1
     providerConfiguration.supportedHandleTypes = [.generic]
-    
+    if let image = UIImage(named: "stop") {
+        providerConfiguration.iconTemplateImageData = UIImagePNGRepresentation(image)
+    }
     return providerConfiguration
   }
   
-  func reportIncomingCall(uuid: UUID, handle: String, hasVideo: Bool = false, completion: ((NSError?) -> Void)?) {
+  func reportIncomingCall(uuid: UUID, handle: String, completion: ((NSError?) -> Void)?) {
     let update = CXCallUpdate()
     update.remoteHandle = CXHandle(type: .generic, value: handle)
-    update.hasVideo = hasVideo
+    update.hasVideo = true
+    update.supportsHolding = false
+    update.localizedCallerName = handle
     
+    rejected = true
     provider.reportNewIncomingCall(with: uuid, update: update) { error in
       if error == nil {
         let call = Call(uuid: uuid, handle: handle)
         self.callManager.add(call: call)
       }
-      
+        
+        Model.shared.incommingCall({ call in
+            if call != nil {
+                self.incommingCall = call
+                self.incommingCallID = call?.keys.first
+            }
+        })
+
       completion?(error as NSError?)
     }
   }
+
+    func closeIncomingCall() {
+        if activeCall != nil {
+            rejected = false
+            callManager.end(call: activeCall!)
+        }
+    }
 }
 
 // MARK: - CXProviderDelegate
 
 extension ProviderDelegate: CXProviderDelegate {
   func providerDidReset(_ provider: CXProvider) {
-    Ringtone.shared.stop()
 
     for call in callManager.calls {
       call.end()
     }
-    
     callManager.removeAllCalls()
   }
   
@@ -81,9 +103,15 @@ extension ProviderDelegate: CXProviderDelegate {
       action.fail()
       return
     }
-    
+    activeCall = call
     call.answer()
     action.fulfill()
+    let nav = MainApp().window?.rootViewController as? UINavigationController
+    nav?.popToRootViewController(animated: false)
+    if incommingCall != nil {
+        Model.shared.acceptCall(incommingCallID!)
+        ContactList()?.activateCall(incommingCall!)
+    }
   }
   
   func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
@@ -91,12 +119,14 @@ extension ProviderDelegate: CXProviderDelegate {
       action.fail()
       return
     }
-    
-    Ringtone.shared.stop()
 
     call.end()
     action.fulfill()
     callManager.remove(call: call)
+    
+    if rejected && incommingCallID != nil {
+        Model.shared.hangUpCall(incommingCallID!)
+    }
   }
   
   func provider(_ provider: CXProvider, perform action: CXSetHeldCallAction) {
@@ -106,13 +136,6 @@ extension ProviderDelegate: CXProviderDelegate {
     }
     
     call.state = action.isOnHold ? .held : .active
-    
-    if call.state == .held {
-        Ringtone.shared.stop()
-    } else {
-        Ringtone.shared.play()
-    }
-    
     action.fulfill()
   }
   
@@ -142,6 +165,5 @@ extension ProviderDelegate: CXProviderDelegate {
   }
   
   func provider(_ provider: CXProvider, didActivate audioSession: AVAudioSession) {
-    Ringtone.shared.play()
   }
 }

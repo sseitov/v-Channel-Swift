@@ -20,7 +20,7 @@ enum InviteError {
 
 class ContactListController: UITableViewController, LoginControllerDelegate, GIDSignInDelegate {
 
-    fileprivate var contacts:[Contact] = []
+    var contacts:[Contact] = []
     
     var inviteEnabled = false
     
@@ -57,6 +57,10 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
                 GIDSignIn.sharedInstance().signInSilently()
             }
         }
+    }
+    
+    func activateCall(_ call:[String:Any]) {
+        performSegue(withIdentifier: "call", sender: call)
     }
     
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
@@ -274,6 +278,18 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
         } else if segue.identifier == "settings" {
             let controller = segue.destination as! SettingsController
             controller.delegate = self
+        } else if segue.identifier == "call" {
+            let controller = segue.destination as! CallController
+            if let call = sender as? [String:Any] {
+                let uid = call.keys.first
+                controller.incommingCall = uid
+                if let callData = call[uid!] as? [String:Any],
+                    let from = callData["from"] as? String,
+                    let user = Model.shared.getUser(from)
+                {
+                    controller.user = user
+                }
+            }
         }
     }
 }
