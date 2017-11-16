@@ -1224,8 +1224,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.vchannel.vchannel;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "d08408b4-aa34-4956-8897-f6aeafdc2ad2";
-				PROVISIONING_PROFILE_SPECIFIER = "vChannel AdHoc";
+				PROVISIONING_PROFILE = "645c8abe-0f4b-4c36-a5fd-25abb37da685";
+				PROVISIONING_PROFILE_SPECIFIER = "v-Channel AppStore";
 				SWIFT_OBJC_BRIDGING_HEADER = "v-Channel-Bridging-Header.h";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
 				SWIFT_VERSION = 4.0;
