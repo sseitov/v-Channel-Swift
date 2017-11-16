@@ -32,4 +32,3 @@ Podfile.lock
 GoogleService-Info.plist
 Credentials.swift
 librtc_sdk_objc.a
-*.p12
