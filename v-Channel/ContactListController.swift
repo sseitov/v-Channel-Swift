@@ -275,9 +275,6 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
                     }
                 }
             }
-        } else if segue.identifier == "settings" {
-            let controller = segue.destination as! SettingsController
-            controller.delegate = self
         } else if segue.identifier == "call" {
             let controller = segue.destination as! CallController
             if let call = sender as? [String:Any] {
@@ -292,7 +289,16 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
             }
         }
     }
+    
+    @IBAction func signOut(_ sender: Any) {
+        SVProgressHUD.show(withStatus: "SignOut...")
+        Model.shared.signOut {
+            SVProgressHUD.show(withStatus: "SignOut...")
+            self.performSegue(withIdentifier: "login", sender: self)
+        }
+    }
 }
+
 extension ContactListController : InviteDelegate {
     
     func inviteFinished(withInvitations invitationIds: [String], error: Error?) {

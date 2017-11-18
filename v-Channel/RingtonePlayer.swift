@@ -9,9 +9,9 @@
 import Foundation
 import AVFoundation
 
-class Ringtone {
+class RingtonePlayer {
     
-    static let shared = Ringtone()
+    static let shared = RingtonePlayer()
     
     private var ringPlayer:AVAudioPlayer?
   
