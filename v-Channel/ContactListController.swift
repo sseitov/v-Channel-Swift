@@ -59,10 +59,6 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
         }
     }
     
-    func activateCall(_ call:[String:Any]) {
-        performSegue(withIdentifier: "call", sender: call)
-    }
-    
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         if user != nil {
             inviteEnabled = true
@@ -120,12 +116,17 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
             self.findUser(fieldName: "email", fieldValue: email, result: { user, error in
                 switch error {
                 case .none:
-                    let contact = Model.shared.addContact(with: user!)
-                    self.tableView.beginUpdates()
-                    let indexPath = IndexPath(row: self.contacts.count, section: 0)
-                    self.contacts.append(contact)
-                    self.tableView.insertRows(at: [indexPath], with: .bottom)
-                    self.tableView.endUpdates()
+                    Model.shared.addContact(with: user!, contact: { contact in
+                        if contact != nil {
+                            self.tableView.beginUpdates()
+                            let indexPath = IndexPath(row: self.contacts.count, section: 0)
+                            self.contacts.append(contact!)
+                            self.tableView.insertRows(at: [indexPath], with: .bottom)
+                            self.tableView.endUpdates()
+                        } else {
+                            self.showMessage("Can not add contact.", messageType: .error)
+                        }
+                    })
                 case .alreadyInList:
                     self.showMessage("This user is in list already.", messageType: .information)
                 case .notFound:
@@ -244,20 +245,6 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
     }
 
     // MARK: - Navigation
-    
-    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
-        if identifier == "chat" {
-            if let contact = sender as? Contact {
-                if let user = Model.shared.getUser(contact.uid!) {
-                    if user.token == nil {
-                        self.showMessage("\(user.name!) does not available for chat now.", messageType: .information)
-                        return false
-                    }
-                }
-            }
-        }
-        return true
-    }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "login" {
@@ -273,18 +260,6 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
                     } else {
                         controller.user = Model.shared.getUser(contact.initiator!)
                     }
-                }
-            }
-        } else if segue.identifier == "call" {
-            let controller = segue.destination as! CallController
-            if let call = sender as? [String:Any] {
-                let uid = call.keys.first
-                controller.incommingCall = uid
-                if let callData = call[uid!] as? [String:Any],
-                    let from = callData["from"] as? String,
-                    let user = Model.shared.getUser(from)
-                {
-                    controller.user = user
                 }
             }
         }

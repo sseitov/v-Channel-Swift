@@ -14,39 +14,35 @@ class RingtonePlayer {
     static let shared = RingtonePlayer()
     
     private var ringPlayer:AVAudioPlayer?
-  
+    
     private init() {
-        createRingtone()
-    }
-
-    private func createRingtone() {
-        var url = defaultRingtone()
-        if url == nil {
-            url = Bundle.main.url(forResource: "ringtone", withExtension: "wav")
-        }
-        ringPlayer = try? AVAudioPlayer(contentsOf: url!)
-        ringPlayer?.numberOfLoops = -1
     }
     
-    func defaultRingtone() -> URL? {
-        return UserDefaults.standard.url(forKey: "ringtone")
-    }
-    
-    func setDefaultRingtone(_ ringtone:URL?) {
-        if ringtone == nil {
-            UserDefaults.standard.removeObject(forKey: "ringtone")
-        } else {
-            UserDefaults.standard.set(ringtone, forKey: "ringtone")
-        }
-        UserDefaults.standard.synchronize()
-        createRingtone()
-    }
-    
-    func play() {
+    func playCall() {
+        ringPlayer?.stop()
+        
         try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, with:[.mixWithOthers])
         try? AVAudioSession.sharedInstance().overrideOutputAudioPort(.speaker)
         try? AVAudioSession.sharedInstance().setActive(true)
-
+        
+        ringPlayer = try? AVAudioPlayer(contentsOf: Bundle.main.url(forResource: "calling", withExtension: "wav")!)
+        ringPlayer?.numberOfLoops = -1
+        
+        if ringPlayer!.prepareToPlay() {
+            ringPlayer!.play()
+        }
+    }
+    
+    func playBusy() {
+        ringPlayer?.stop()
+        
+        try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, with:[.mixWithOthers])
+        try? AVAudioSession.sharedInstance().overrideOutputAudioPort(.speaker)
+        try? AVAudioSession.sharedInstance().setActive(true)
+        
+        ringPlayer = try? AVAudioPlayer(contentsOf: Bundle.main.url(forResource: "busy", withExtension: "wav")!)
+        ringPlayer?.numberOfLoops = -1
+        
         if ringPlayer!.prepareToPlay() {
             ringPlayer!.play()
         }

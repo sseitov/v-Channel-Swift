@@ -18,7 +18,7 @@ enum SocialType:Int16 {
 
 
 public class AppUser: NSManagedObject {
-    
+  
     lazy var socialType: SocialType = {
         if let val = SocialType(rawValue: self.type) {
             return val

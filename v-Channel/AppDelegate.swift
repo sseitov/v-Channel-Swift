@@ -18,15 +18,27 @@ import PushKit
 import AWSCognito
 import AWSSNS
 
+func IS_PAD() -> Bool {
+    return UIDevice.current.userInterfaceIdiom == .pad
+}
+
 func MainApp() -> AppDelegate {
     return UIApplication.shared.delegate as! AppDelegate
 }
 
-func ContactList() -> ContactListController? {
-    if let nav = MainApp().window?.rootViewController as? UINavigationController {
-        return nav.topViewController as? ContactListController
-    } else {
-        return nil
+func ShowCall(userName:String?, userID:String?, callID:String?) {
+    let call = UIStoryboard(name: "Call", bundle: nil)
+    if let nav = call.instantiateViewController(withIdentifier: "Call") as? UINavigationController {
+        nav.modalTransitionStyle = .flipHorizontal
+        if let top = MainApp().window?.topMostWindowController {
+            if let callController = nav.topViewController as? CallController {
+                callController.userName = userName
+                callController.callID = callID
+                callController.userID = userID
+            }
+            top.present(nav, animated: true, completion: nil)
+            
+        }
     }
 }
 
@@ -69,9 +81,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
                 //Handle user denying permissions..
             }
         }
-
-        Messaging.messaging().delegate = self
         
+        Messaging.messaging().delegate = self
+
         // Initialize Google Maps
         GMSServices.provideAPIKey(GoolgleMapAPIKey)
 
@@ -111,20 +123,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
                                                      sourceApplication: options[.sourceApplication] as! String!,
                                                      annotation: options[.annotation])
         }
-    }
-    
-    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
-                     fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        if application.applicationState != .active {
-            if let pushTypeStr = userInfo["pushType"] as? String, let pushType = Int(pushTypeStr) {
-                if pushType == PushType.incommingCall.rawValue {
-                    Ringtone.shared.play()
-                } else if pushType == PushType.hangUpCall.rawValue {
-                    Ringtone.shared.stop()
-                }
-            }
-        }
-        completionHandler(.newData)
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
@@ -176,7 +174,6 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         center.removeAllDeliveredNotifications()
         UIApplication.shared.applicationIconBadgeNumber = -1
-        Ringtone.shared.stop()
         let nav = window!.rootViewController as! UINavigationController
         nav.popToRootViewController(animated: false)
     }
@@ -187,12 +184,15 @@ extension AppDelegate : MessagingDelegate {
     func messaging(_ messaging: Messaging, didRefreshRegistrationToken fcmToken: String) {
         Messaging.messaging().shouldEstablishDirectChannel = true
         if let currUser = currentUser() {
-            currUser.token = fcmToken
             Model.shared.publishToken(currUser, token: fcmToken)
+        } else {
+            UserDefaults.standard.set(fcmToken, forKey: "fcmToken")
         }
     }
     
 }
+
+// MARK: - PKPushRegistry delegate
 
 extension AppDelegate : PKPushRegistryDelegate {
     
@@ -223,15 +223,67 @@ extension AppDelegate : PKPushRegistryDelegate {
         print("token invalidated")
     }
     
-    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType) {
-        let payloadDict = payload.dictionaryPayload["aps"] as? Dictionary<String, String>
-        let message = payloadDict?["alert"]
-        if UIApplication.shared.applicationState == .background {
-            providerDelegate.reportIncomingCall(uuid: UUID(), handle: message!, completion: { error in
-                if error != nil {
-                    print(error!.localizedDescription)
+    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void)
+    {
+        if let payloadDict = payload.dictionaryPayload["aps"] as? Dictionary<String, String>,
+            let message = payloadDict["alert"]
+        {
+            if message == "hangup" {
+                if UIApplication.shared.applicationState == .active {
+                    NotificationCenter.default.post(name: hangUpCallNotification, object: nil)
+                } else {
+                    providerDelegate.closeIncomingCall()
                 }
-            })
+                completion()
+            } else if message == "accept" {
+                if UIApplication.shared.applicationState == .active {
+                    NotificationCenter.default.post(name: acceptCallNotification, object: nil)
+                }
+                completion()
+            } else {
+                if let data = message.data(using: .utf8), let request = try? JSONSerialization.jsonObject(with: data, options: []), let requestData = request as? [String:Any]
+                {
+                    if let userName = requestData["userName"] as? String,
+                        let userID = requestData["userID"] as? String,
+                        let callID = requestData["callID"] as? String
+                    {
+                        if UIApplication.shared.applicationState == .active {
+                            MainApp().window?.topMostWindowController?.yesNoQuestion("\(userName) call you.", acceptLabel: "Accept", cancelLabel: "Reject", acceptHandler:
+                                {
+                                    SVProgressHUD.show()
+                                    PushManager.shared.pushCommand(to: userID, command:"accept", success: { result in
+                                        SVProgressHUD.dismiss()
+                                        if !result {
+                                            MainApp().window?.topMostWindowController?.showMessage(LOCALIZE("requestError"), messageType: .error)
+                                        } else {
+                                            ShowCall(userName: userName, userID: userID, callID: callID)
+                                        }
+                                        completion()
+                                    })
+                            }, cancelHandler: {
+                                PushManager.shared.pushCommand(to: userID, command: "hangup", success: { _ in
+                                    completion()
+                                })
+                            })
+                            
+                        } else {
+                            providerDelegate.reportIncomingCall(callID: callID,
+                                                                userName: userName,
+                                                                userID: userID, completion:
+                                { error in
+                                    if error != nil {
+                                        print(error!.localizedDescription)
+                                    }
+                                    completion()
+                            })
+                        }
+                    }
+                } else {
+                    completion()
+                }
+            }
+        } else {
+            completion()
         }
     }
 }

@@ -55,9 +55,6 @@ let newMessageNotification = Notification.Name("NEW_MESSAGE")
 let deleteMessageNotification = Notification.Name("DELETE_MESSAGE")
 let readMessageNotification = Notification.Name("READ_MESSAGE")
 
-let acceptCallNotification = Notification.Name("ACCEPT_CALL")
-let hangUpCallNotification = Notification.Name("HANGUP_CALL")
-
 let contactNotification = Notification.Name("CONTACT")
 
 class Model: NSObject {
@@ -140,11 +137,6 @@ class Model: NSObject {
             try? Auth.auth().signOut()
             self.newMessageRefHandle = nil
             self.deleteMessageRefHandle = nil
-            self.newTokenRefHandle = nil
-            self.updateTokenRefHandle = nil
-            self.newCallRefHandle = nil
-            self.updateCallRefHandle = nil
-            self.deleteCallRefHandle = nil
             self.newContactRefHandle = nil
             self.updateContactRefHandle = nil
             self.deleteContactRefHandle = nil
@@ -158,14 +150,8 @@ class Model: NSObject {
         if newMessageRefHandle == nil {
             observeMessages()
         }
-        if newTokenRefHandle == nil {
-            observeTokens()
-        }
         if newContactRefHandle == nil {
             observeContacts()
-        }
-        if newCallRefHandle == nil {
-            observeCalls()
         }
     }
     
@@ -173,13 +159,6 @@ class Model: NSObject {
     
     private var newMessageRefHandle: DatabaseHandle?
     private var deleteMessageRefHandle: DatabaseHandle?
-
-    private var newTokenRefHandle: DatabaseHandle?
-    private var updateTokenRefHandle: DatabaseHandle?
-
-    private var newCallRefHandle: DatabaseHandle?
-    private var updateCallRefHandle: DatabaseHandle?
-    private var deleteCallRefHandle: DatabaseHandle?
     
     private var newContactRefHandle: DatabaseHandle?
     private var updateContactRefHandle: DatabaseHandle?
@@ -223,11 +202,8 @@ class Model: NSObject {
                 if let userData = snapshot.value as? [String:Any] {
                     let user = self.createUser(uid)
                     user.setData(userData, completion: {
-                        self.getUserToken(uid, token: { token in
-                            user.token = token
-                            self.saveContext()
-                            result(user)
-                        })
+                        self.saveContext()
+                        result(user)
                     })
                 } else {
                     result(nil)
@@ -241,59 +217,28 @@ class Model: NSObject {
         let ref = Database.database().reference()
         ref.child("users").child(user.uid!).setValue(user.getData())
     }
-
-    fileprivate func getUserToken(_ uid:String, token: @escaping(String?) -> ()) {
-        let ref = Database.database().reference()
-        ref.child("tokens").child(uid).observeSingleEvent(of: .value, with: { snapshot in
-            if let result = snapshot.value as? String {
-                token(result)
-            } else {
-                token(nil)
-            }
-        })
-    }
     
-    func publishToken(_ user:AppUser,  token:String) {
-        user.token = token
-        saveContext()
+    func publishToken(_ user:AppUser, token:String) {
         let ref = Database.database().reference()
         ref.child("tokens").child(user.uid!).setValue(token)
     }
     
+    func userToken(_ user:AppUser, token:@escaping(String?) -> ()) {
+        let ref = Database.database().reference()
+        ref.child("tokens").child(user.uid!).observeSingleEvent(of: .value, with: { snapshot in
+            token(snapshot.value as? String)
+        })
+    }
+
     func publishEndpoint(_ user:AppUser,  endpoint:String) {
-        user.endpoint = endpoint
-        saveContext()
         let ref = Database.database().reference()
         ref.child("endponts").child(user.uid!).setValue(endpoint)
     }
 
-    func userEndpoint(_ user:AppUser, endpoint:@escaping(String?) -> ()) {
+    func userEndpoint(_ userID:String, endpoint:@escaping(String?) -> ()) {
         let ref = Database.database().reference()
-        ref.child("endponts").child(user.uid!).observe(.value, with: { snapshot in
+        ref.child("endponts").child(userID).observeSingleEvent(of: .value, with: { snapshot in
             endpoint(snapshot.value as? String)
-        })
-    }
-    
-    fileprivate func observeTokens() {
-        let ref = Database.database().reference()
-        let coordQuery = ref.child("tokens").queryLimited(toLast:25)
-        
-        newTokenRefHandle = coordQuery.observe(.childAdded, with: { (snapshot) -> Void in
-            if let user = self.getUser(snapshot.key) {
-                if let token = snapshot.value as? String {
-                    user.token = token
-                    self.saveContext()
-                }
-            }
-        })
-        
-        updateTokenRefHandle = coordQuery.observe(.childChanged, with: { (snapshot) -> Void in
-            if let user = self.getUser(snapshot.key) {
-                if let token = snapshot.value as? String {
-                    user.token = token
-                    self.saveContext()
-                }
-            }
         })
     }
 
@@ -303,7 +248,7 @@ class Model: NSObject {
         cashedUser.name = nick
         cashedUser.type = Int16(SocialType.email.rawValue)
         cashedUser.avatar = UIImagePNGRepresentation(image) as NSData?
-        if let token = Messaging.messaging().fcmToken {
+        if let token = UserDefaults.standard.object(forKey: "fcmToken") as? String {
             publishToken(cashedUser, token: token)
         }
         if let endpoint = UserDefaults.standard.object(forKey: "endpoint") as? String {
@@ -329,8 +274,8 @@ class Model: NSObject {
         cashedUser.facebookID = profile["id"] as? String
         cashedUser.email = profile["email"] as? String
         cashedUser.name = profile["name"] as? String
-        if let token = Messaging.messaging().fcmToken {
-            Model.shared.publishToken(cashedUser, token: token)
+        if let token = UserDefaults.standard.object(forKey: "fcmToken") as? String {
+            publishToken(cashedUser, token: token)
         }
         if let endpoint = UserDefaults.standard.object(forKey: "endpoint") as? String {
             publishEndpoint(cashedUser, endpoint: endpoint)
@@ -361,8 +306,8 @@ class Model: NSObject {
         cashedUser.type = Int16(SocialType.google.rawValue)
         cashedUser.email = googleProfile.email
         cashedUser.name = googleProfile.name
-        if let token = Messaging.messaging().fcmToken {
-            Model.shared.publishToken(cashedUser, token: token)
+        if let token = UserDefaults.standard.object(forKey: "fcmToken") as? String {
+            publishToken(cashedUser, token: token)
         }
         if let endpoint = UserDefaults.standard.object(forKey: "endpoint") as? String {
             publishEndpoint(cashedUser, endpoint: endpoint)
@@ -427,18 +372,23 @@ class Model: NSObject {
         }
     }
     
-    func addContact(with:AppUser) -> Contact {
-        let contact = createContact(generateUDID())
-        contact.initiator = currentUser()!.uid
-        contact.requester = with.uid!
-        contact.status = ContactStatus.requested.rawValue
-        contact.owner = currentUser()
-        currentUser()?.addToContacts(contact)
-        
-        let ref = Database.database().reference()
-        ref.child("contacts").child(contact.uid!).setValue(contact.getData())
-        pushContactRequest(to: with)
-        return contact
+    func addContact(with:AppUser, contact:@escaping(Contact?) -> ()) {
+        PushManager.shared.contactRequest(to: with, success: { isSuccess in
+            if isSuccess {
+                let newContact = self.createContact(generateUDID())
+                newContact.initiator = currentUser()!.uid
+                newContact.requester = with.uid!
+                newContact.status = ContactStatus.requested.rawValue
+                newContact.owner = currentUser()
+                currentUser()?.addToContacts(newContact)
+                
+                let ref = Database.database().reference()
+                ref.child("contacts").child(newContact.uid!).setValue(newContact.getData())
+                contact(newContact)
+            } else {
+                contact(nil)
+            }
+        })
     }
     
     func approveContact(_ contact:Contact) {
@@ -520,174 +470,6 @@ class Model: NSObject {
         } else {
             return nil
         }
-    }
-    
-    // MARK: - Push notifications
-    
-    fileprivate lazy var httpManager:AFHTTPSessionManager = {
-        let manager = AFHTTPSessionManager(baseURL: URL(string: "https://fcm.googleapis.com/fcm/"))
-        manager.requestSerializer = AFJSONRequestSerializer()
-        manager.requestSerializer.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        manager.requestSerializer.setValue("key=\(pushServerKey)", forHTTPHeaderField: "Authorization")
-        manager.responseSerializer = AFHTTPResponseSerializer()
-        return manager
-    }()
-
-    fileprivate func pushIncommingCall(to:AppUser, complete:@escaping(Error?) -> ()) {
-        Model.shared.userEndpoint(to, endpoint: { point in
-            if point != nil {
-                let message = AWSSNSPublishInput()
-                message?.message = currentUser()!.name!
-                message?.targetArn = point!
-                AWSSNS.default().publish(message!).continueOnSuccessWith(executor: AWSExecutor.mainThread(), block: { task in
-                    if task.error != nil {
-                        print(task.error!.localizedDescription)
-                    }
-                    complete(task.error)
-                    return nil
-                })
-            } else {
-                if to.token != nil {
-                    let notification:[String:Any] = [
-                        "title" : "v-Chanel call",
-                        "body" : "Call from \(currentUser()!.name!)",
-                        "content_available": true]
-                    let data:[String:Int] = ["pushType" : PushType.incommingCall.rawValue]
-                    
-                    let message:[String:Any] = ["to" : to.token!, "priority" : "high", "notification" : notification, "data" : data]
-                    self.httpManager.post("send", parameters: message, progress: nil, success: { task, response in
-                        complete(nil)
-                    }, failure: { task, error in
-                        complete(error)
-                    })
-                } else {
-                    complete(vchannelError("\(to.name!) didn't configured VOIP push yet."))
-                }
-            }
-        })
-    }
-    
-    func pushHangUpCall(to:AppUser) {
-        if to.token != nil {
-            let data:[String:Int] = ["pushType" : PushType.hangUpCall.rawValue]
-            let message:[String:Any] = ["to" : to.token!, "priority" : "high", "data" : data]
-            httpManager.post("send", parameters: message, progress: nil, success: { task, response in
-                print("SEND PUSH CALL SUCCESS")
-            }, failure: { task, error in
-                print("SEND PUSH CALL ERROR: \(error)")
-            })
-        } else {
-            print("USER HAVE NO TOKEN")
-        }
-    }
-    
-    fileprivate func pushContactRequest(to:AppUser) {
-        if to.token != nil {
-            let notification:[String:Any] = [
-                "title" : "SimpleVOIP request",
-                "body" :"\(currentUser()!.name!) ask you to add him into contact list",
-                "sound":"default",
-                "content_available": true]
-            let message:[String:Any] = ["to": to.token!, "priority": "high", "notification": notification]
-            httpManager.post("send", parameters: message, progress: nil, success: { task, response in
-                print("SEND PUSH CONTACT REQUEST SUCCESS")
-            }, failure: { task, error in
-                print("SEND PUSH ERROR: \(error)")
-            })
-        } else {
-            print("USER HAVE NO TOKEN")
-        }
-    }
-    
-    fileprivate func messagePush(_ text:String, to:AppUser, from:AppUser) {
-        if to.token != nil {
-            let data:[String:Int] = ["pushType" : PushType.newMessage.rawValue]
-            let notification:[String:Any] = ["title" : "New message from \(from.name!):",
-                "body": text,
-                "sound":"default",
-                "content_available": true]
-            let message:[String:Any] = ["to" : to.token!, "priority" : "high", "notification" : notification, "data" : data]
-            httpManager.post("send", parameters: message, progress: nil, success: { task, response in
-            }, failure: { task, error in
-                print("SEND PUSH ERROR: \(error)")
-            })
-        } else {
-            print("USER HAVE NO TOKEN")
-        }
-    }
-
-    // MARK: - VOIP calls
-
-    func makeCall(to:AppUser, complete:@escaping(String?, Error?) -> ()) {
-        let ref = Database.database().reference()
-        let uid = generateUDID()
-        let data:[String:Any] = ["from" : currentUser()!.uid!,
-                                 "to" : to.uid!]
-        ref.child("calls").child(uid).setValue(data)
-        pushIncommingCall(to: to, complete: { error in
-            complete(uid, error)
-        })
-    }
-    
-    func acceptCall(_ callID:String) {
-        let ref = Database.database().reference()
-        ref.child("calls").child(callID).setValue(["accept" : true])
-        
-        Ringtone.shared.stop()
-        UserDefaults.standard.removeObject(forKey: "incommingCall")
-        UserDefaults.standard.synchronize()
-        NotificationCenter.default.post(name: contactNotification, object: nil)
-    }
-
-    func hangUpCall(_ callID:String) {
-        let ref = Database.database().reference()
-        ref.child("calls").child(callID).removeValue()
-        
-        Ringtone.shared.stop()
-        UserDefaults.standard.removeObject(forKey: "incommingCall")
-        UserDefaults.standard.synchronize()
-        NotificationCenter.default.post(name: contactNotification, object: nil)
-    }
-    
-    func incommingCall(_ call:@escaping([String:Any]?) -> ()) {
-        let ref = Database.database().reference()
-        ref.child("calls").queryOrdered(byChild: "to").queryEqual(toValue: currentUser()!.uid!).observeSingleEvent(of: .value, with: { snapshot in
-            if let values = snapshot.value as? [String:Any] {
-                call(values)
-            } else {
-                call(nil)
-            }
-        })
-    }
-    
-    fileprivate func observeCalls() {
-        let ref = Database.database().reference()
-        let callQuery = ref.child("calls").queryLimited(toLast:25)
-        
-        newCallRefHandle = callQuery.observe(.childAdded, with: { (snapshot) -> Void in
-            if let data = snapshot.value as? [String:Any], let to = data["to"] as? String, let from = data["from"] as? String {
-                if to == currentUser()!.uid! {
-                    let call = ["uid" : snapshot.key, "from" : from]
-                    UserDefaults.standard.set(call, forKey: "incommingCall")
-                    UserDefaults.standard.synchronize()
-                    NotificationCenter.default.post(name: contactNotification, object: nil)
-                }
-            }
-        })
-        
-        updateCallRefHandle = callQuery.observe(.childChanged, with: { (snapshot) -> Void in
-            NotificationCenter.default.post(name: acceptCallNotification, object: snapshot.key)
-        })
-        
-        deleteCallRefHandle = callQuery.observe(.childRemoved, with: { (snapshot) -> Void in
-            NotificationCenter.default.post(name: hangUpCallNotification, object: snapshot.key)
-            if (UserDefaults.standard.object(forKey: "incommingCall") as? [String:Any]) != nil {
-                UserDefaults.standard.removeObject(forKey: "incommingCall")
-                UserDefaults.standard.synchronize()
-                NotificationCenter.default.post(name: contactNotification, object: nil)
-            }
-        })
-        
     }
     
     // MARK: - Message table
@@ -821,11 +603,11 @@ class Model: NSObject {
                                         "date" : dateStr]
         ref.child("messages").childByAutoId().setValue(messageItem)
         if let toUser = getUser(to) {
-            self.messagePush(text, to: toUser, from: currentUser()!)
+            PushManager.shared.messagePush(text, to: toUser, from: currentUser()!)
         }
     }
     
-    func sendImageMessage(_ image:UIImage, to:String, result:@escaping (NSError?) -> ()) {
+    func sendImageMessage(_ image:UIImage, to:String, result:@escaping (Error?) -> ()) {
         let toUser = getUser(to)
         if toUser == nil || currentUser() == nil {
             return
@@ -835,7 +617,7 @@ class Model: NSObject {
             meta.contentType = "image/jpeg"
             self.storageRef.child(generateUDID()).putData(imageData, metadata: meta, completion: { metadata, error in
                 if error != nil {
-                    result(error as NSError?)
+                    result(error)
                 } else {
                     let ref = Database.database().reference()
                     let dateStr = self.dateFormatter.string(from: Date())
@@ -844,7 +626,7 @@ class Model: NSObject {
                                                     "image" : metadata!.path!,
                                                     "date" : dateStr]
                     ref.child("messages").childByAutoId().setValue(messageItem)
-                    self.messagePush("\(currentUser()!.name!) sent photo.", to: toUser!, from: currentUser()!)
+                    PushManager.shared.messagePush("\(currentUser()!.name!) sent photo.", to: toUser!, from: currentUser()!)
                     result(nil)
                 }
             })
@@ -861,7 +643,7 @@ class Model: NSObject {
                                         "longitude" : coordinate.longitude]
         ref.child("messages").childByAutoId().setValue(messageItem)
         if let toUser = getUser(to) {
-            self.messagePush("\(currentUser()!.name!) sent location.", to: toUser, from: currentUser()!)
+            PushManager.shared.messagePush("\(currentUser()!.name!) sent location.", to: toUser, from: currentUser()!)
         }
     }
 

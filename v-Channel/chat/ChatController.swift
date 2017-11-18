@@ -73,11 +73,6 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
                                                    selector: #selector(ChatController.deleteMessage(_:)),
                                                    name: deleteMessageNotification,
                                                    object: nil)
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(self.checkIncomming),
-                                                   name: contactNotification,
-                                                   object: nil)
-            checkIncomming()
         } else {
             self.senderId = ""
             self.senderDisplayName = ""
@@ -94,23 +89,6 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         scrollToBottom(animated: true)
-    }
-   
-    // MARK: - Call management
-    
-    @objc func checkIncomming() {
-        if UIApplication.shared.applicationState == .active {
-            if let call = UserDefaults.standard.object(forKey: "incommingCall") as? [String:Any] {
-                if let callId = call["uid"] as? String, let from = call["from"] as? String, let user = Model.shared.getUser(from) {
-                    yesNoQuestion("\(user.name!) call you.", acceptLabel: "Accept", cancelLabel: "Reject", acceptHandler: {
-                        Model.shared.acceptCall(callId)
-                        self.performSegue(withIdentifier: "call", sender: callId)
-                    }, cancelHandler: {
-                        Model.shared.hangUpCall(callId)
-                    })
-                }
-            }
-        }
     }
 
     // MARK: - Message management
@@ -388,7 +366,10 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
             })
         })
     }
-
+    
+    @IBAction func makeCall(_ sender: Any) {
+    }
+    
     // MARK: - Navigation
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -409,12 +390,6 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
             let point = message.media as! LocationMediaItem
             controller.userLocation = point.messageLocation
             controller.locationDate = message.date
-        } else if segue.identifier == "call" {
-            let controller = segue.destination as! CallController
-            if let call = sender as? String {
-                controller.incommingCall = call
-            }
-            controller.user = self.user
         }
     }
 }
