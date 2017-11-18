@@ -82,8 +82,8 @@
 		2C5B2AF81E561935006CC809 /* EmailInput.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2C5B2AF31E561935006CC809 /* EmailInput.xib */; };
 		2C5B2AF91E561935006CC809 /* TextFieldContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5B2AF41E561935006CC809 /* TextFieldContainer.swift */; };
 		2C8174491E6D3EFD001E2AF7 /* RingtonePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8174481E6D3EFD001E2AF7 /* RingtonePlayer.swift */; };
-		2C8985261FC00C140023683D /* Call.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C8985251FC00C140023683D /* Call.storyboard */; };
 		2C8985291FC01A950023683D /* PushManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8985281FC01A950023683D /* PushManager.swift */; };
+		2C89852C1FC0313F0023683D /* Call.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C89852A1FC0313F0023683D /* Call.storyboard */; };
 		2CE75BA61E55D40800EEE103 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE75BA51E55D40800EEE103 /* AppDelegate.swift */; };
 		2CE75BAD1E55D40800EEE103 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2CE75BAB1E55D40800EEE103 /* Main.storyboard */; };
 		2CE75BAF1E55D40800EEE103 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2CE75BAE1E55D40800EEE103 /* Assets.xcassets */; };
@@ -225,9 +225,9 @@
 		2C5B2AF41E561935006CC809 /* TextFieldContainer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TextFieldContainer.swift; path = CustomViews/TextFieldContainer.swift; sourceTree = "<group>"; };
 		2C7E3F221E712B980019CB7F /* vChannel 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "vChannel 2.xcdatamodel"; sourceTree = "<group>"; };
 		2C8174481E6D3EFD001E2AF7 /* RingtonePlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RingtonePlayer.swift; sourceTree = "<group>"; };
-		2C8985251FC00C140023683D /* Call.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Call.storyboard; sourceTree = "<group>"; };
 		2C8985271FC0104A0023683D /* vChannel 6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "vChannel 6.xcdatamodel"; sourceTree = "<group>"; };
 		2C8985281FC01A950023683D /* PushManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PushManager.swift; sourceTree = "<group>"; };
+		2C89852B1FC0313F0023683D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = "v-Channel/Base.lproj/Call.storyboard"; sourceTree = "<group>"; };
 		2CE75BA21E55D40800EEE103 /* v-Channel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "v-Channel.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CE75BA51E55D40800EEE103 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2CE75BAC1E55D40800EEE103 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -568,8 +568,8 @@
 				2C5B2AD71E5615EF006CC809 /* v-Channel.entitlements */,
 				2CF8FBDA1E560AE4003FC98E /* GoogleService-Info.plist */,
 				2CE75BBF1E55FA9F00EEE103 /* logo.png */,
-				2C8985251FC00C140023683D /* Call.storyboard */,
 				2CE75BAB1E55D40800EEE103 /* Main.storyboard */,
+				2C89852A1FC0313F0023683D /* Call.storyboard */,
 				2CE75BAE1E55D40800EEE103 /* Assets.xcassets */,
 				2CE75BB01E55D40800EEE103 /* LaunchScreen.storyboard */,
 				2CE75BB31E55D40800EEE103 /* Info.plist */,
@@ -776,7 +776,7 @@
 				2C5897A81E5D7C55004F8B46 /* frame_13.gif in Resources */,
 				2C5897D31E5D7C64004F8B46 /* ring_frame_8.gif in Resources */,
 				2C5897D21E5D7C64004F8B46 /* ring_frame_7.gif in Resources */,
-				2C8985261FC00C140023683D /* Call.storyboard in Resources */,
+				2C89852C1FC0313F0023683D /* Call.storyboard in Resources */,
 				2C5897A71E5D7C55004F8B46 /* frame_12.gif in Resources */,
 				2C5897E11E5D7C64004F8B46 /* ring_frame_22.gif in Resources */,
 				2C5897D11E5D7C64004F8B46 /* ring_frame_6.gif in Resources */,
@@ -994,6 +994,14 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
+		2C89852A1FC0313F0023683D /* Call.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				2C89852B1FC0313F0023683D /* Base */,
+			);
+			name = Call.storyboard;
+			sourceTree = "<group>";
+		};
 		2CE75BAB1E55D40800EEE103 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (

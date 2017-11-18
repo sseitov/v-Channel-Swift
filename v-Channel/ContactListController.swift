@@ -32,7 +32,9 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupTitle("My Contacts")
+        
+        let versionNumber: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
+        setupTitle("v-Channel ( \(versionNumber) )")
         
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(self.refresh),
@@ -188,8 +190,12 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
         return contacts.count
     }
     
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return "my contacts"
+    }
+    
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 5
+        return 40
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -266,11 +272,13 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
     }
     
     @IBAction func signOut(_ sender: Any) {
-        SVProgressHUD.show(withStatus: "SignOut...")
-        Model.shared.signOut {
+        yesNoQuestion("Do you really want to sign out?", acceptLabel: "Sure", cancelLabel: "Cancel", acceptHandler: {
             SVProgressHUD.show(withStatus: "SignOut...")
-            self.performSegue(withIdentifier: "login", sender: self)
-        }
+            Model.shared.signOut {
+                SVProgressHUD.show(withStatus: "SignOut...")
+                self.performSegue(withIdentifier: "login", sender: self)
+            }
+        })
     }
 }
 

@@ -368,6 +368,7 @@ class ChatController: JSQMessagesViewController, UINavigationControllerDelegate,
     }
     
     @IBAction func makeCall(_ sender: Any) {
+        ShowCall(userName: user?.name, userID: user?.uid, callID: nil)
     }
     
     // MARK: - Navigation

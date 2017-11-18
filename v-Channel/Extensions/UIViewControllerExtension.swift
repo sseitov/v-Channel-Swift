@@ -28,7 +28,7 @@ extension UIViewController {
         let label = TitleView(frame: CGRect(x: 0, y: 0, width: 200, height: 44))
         label.textAlignment = .center
         label.font = UIFont.condensedFont(17)
-        label.text = text.uppercased()
+        label.text = text
         label.textColor = UIColor.white
         label.numberOfLines = 0
         label.lineBreakMode = .byWordWrapping
