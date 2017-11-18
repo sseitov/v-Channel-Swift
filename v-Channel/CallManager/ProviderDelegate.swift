@@ -44,7 +44,10 @@ class ProviderDelegate: NSObject {
         providerConfiguration.maximumCallsPerCallGroup = 1
         providerConfiguration.maximumCallGroups = 1
         providerConfiguration.supportedHandleTypes = [.generic]
-        
+        if let iconMaskImage = UIImage(named: "provider") {
+            providerConfiguration.iconTemplateImageData = UIImagePNGRepresentation(iconMaskImage)
+        }
+
         return providerConfiguration
     }
     
