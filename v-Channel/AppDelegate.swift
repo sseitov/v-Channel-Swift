@@ -223,8 +223,7 @@ extension AppDelegate : PKPushRegistryDelegate {
         print("token invalidated")
     }
     
-    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void)
-    {
+    private func processPayload(_ payload: PKPushPayload, complete: @escaping () -> Void) {
         if let payloadDict = payload.dictionaryPayload["aps"] as? Dictionary<String, String>,
             let message = payloadDict["alert"]
         {
@@ -234,12 +233,12 @@ extension AppDelegate : PKPushRegistryDelegate {
                 } else {
                     providerDelegate.closeIncomingCall()
                 }
-                completion()
+                complete()
             } else if message == "accept" {
                 if UIApplication.shared.applicationState == .active {
                     NotificationCenter.default.post(name: acceptCallNotification, object: nil)
                 }
-                completion()
+                complete()
             } else {
                 if let data = message.data(using: .utf8), let request = try? JSONSerialization.jsonObject(with: data, options: []), let requestData = request as? [String:Any]
                 {
@@ -258,11 +257,11 @@ extension AppDelegate : PKPushRegistryDelegate {
                                         } else {
                                             ShowCall(userName: userName, userID: userID, callID: callID)
                                         }
-                                        completion()
+                                        complete()
                                     })
                             }, cancelHandler: {
                                 PushManager.shared.pushCommand(to: userID, command: "hangup", success: { _ in
-                                    completion()
+                                    complete()
                                 })
                             })
                             
@@ -274,16 +273,31 @@ extension AppDelegate : PKPushRegistryDelegate {
                                     if error != nil {
                                         print(error!.localizedDescription)
                                     }
-                                    completion()
+                                    complete()
                             })
                         }
+                    } else {
+                        complete()
                     }
                 } else {
-                    completion()
+                    complete()
                 }
             }
         } else {
-            completion()
+            complete()
         }
     }
+    
+    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType) {
+        processPayload(payload, complete: {
+        })
+    }
+    
+    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void)
+    {
+        processPayload(payload, complete: {
+            completion()
+        })
+    }
+
 }
