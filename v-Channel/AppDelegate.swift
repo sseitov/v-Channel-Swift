@@ -30,7 +30,7 @@ func ShowCall(userName:String?, userID:String?, callID:String?) {
     let call = UIStoryboard(name: "Call", bundle: nil)
     if let nav = call.instantiateViewController(withIdentifier: "Call") as? UINavigationController {
         nav.modalTransitionStyle = .flipHorizontal
-        if let top = MainApp().window?.topMostWindowController {
+        if let top = MainApp().window?.rootViewController {
             if let callController = nav.topViewController as? CallController {
                 callController.userName = userName
                 callController.callID = callID
@@ -120,7 +120,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
             return FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
         } else {
             return GIDSignIn.sharedInstance().handle(url,
-                                                     sourceApplication: options[.sourceApplication] as! String!,
+                                                     sourceApplication: options[.sourceApplication] as! String?,
                                                      annotation: options[.annotation])
         }
     }
@@ -247,13 +247,13 @@ extension AppDelegate : PKPushRegistryDelegate {
                         let callID = requestData["callID"] as? String
                     {
                         if UIApplication.shared.applicationState == .active {
-                            MainApp().window?.topMostWindowController?.yesNoQuestion("\(userName) call you.", acceptLabel: "Accept", cancelLabel: "Reject", acceptHandler:
+                            MainApp().window?.topMostController?.yesNoQuestion("\(userName) call you.", acceptLabel: "Accept", cancelLabel: "Reject", acceptHandler:
                                 {
                                     SVProgressHUD.show()
                                     PushManager.shared.pushCommand(to: userID, command:"accept", success: { result in
                                         SVProgressHUD.dismiss()
                                         if !result {
-                                            MainApp().window?.topMostWindowController?.showMessage(LOCALIZE("requestError"), messageType: .error)
+                                            MainApp().window?.topMostController?.showMessage(LOCALIZE("requestError"), messageType: .error)
                                         } else {
                                             ShowCall(userName: userName, userID: userID, callID: callID)
                                         }
