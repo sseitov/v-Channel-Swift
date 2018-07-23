@@ -61,13 +61,11 @@ extension LocationManager : CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
-            if location.horizontalAccuracy <= 10.0 && currentLocation == nil {
-                locationManager.stopUpdatingLocation()
-                self.locationCondition.lock()
-                self.currentLocation = location
-                self.locationCondition.signal()
-                self.locationCondition.unlock()
-            }
+            locationManager.stopUpdatingLocation()
+            self.locationCondition.lock()
+            self.currentLocation = location
+            self.locationCondition.signal()
+            self.locationCondition.unlock()
         }
     }
 }
