@@ -14,7 +14,6 @@ import SDWebImage
 import GoogleSignIn
 import AFNetworking
 import CoreLocation
-import AWSSNS
 
 func vchannelError(_ text:String) -> Error {
     return NSError(domain: "com.vchannel.vchannel", code: -1, userInfo: [NSLocalizedDescriptionKey:text])

@@ -165,8 +165,8 @@ class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate,
                     self.showMessage(error!.localizedDescription, messageType: .error)
                 }
             } else {
-                if firUser!.isEmailVerified || testUser(user) {
-                    Model.shared.uploadUser(firUser!.uid, result: { user in
+                if firUser!.user.isEmailVerified || testUser(user) {
+                    Model.shared.uploadUser(firUser!.user.uid, result: { user in
                         SVProgressHUD.dismiss()
                         if user != nil {
                             self.delegate?.didLogin()

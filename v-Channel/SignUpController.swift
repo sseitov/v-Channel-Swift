@@ -131,7 +131,7 @@ class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigati
                 SVProgressHUD.dismiss()
                 self.showMessage((error! as NSError).localizedDescription, messageType: .error)
             } else {
-                Model.shared.createEmailUser(firUser!,
+                Model.shared.createEmailUser(firUser!.user,
                                              email: self.emailField.text(),
                                              nick: self.nickField.text(),
                                              image: self.avatar!, result:

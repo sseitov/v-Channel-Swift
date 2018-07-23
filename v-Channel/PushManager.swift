@@ -9,7 +9,6 @@
 import UIKit
 import AFNetworking
 import Firebase
-import AWSSNS
 
 class PushManager: NSObject {
     static let shared = PushManager()
@@ -68,6 +67,7 @@ class PushManager: NSObject {
     }
 
     func pushCommand(to:String, command:String, success: @escaping(Bool) -> ()) {
+/*
         Model.shared.userEndpoint(to, endpoint: { point in
             if point != nil {
                 let message = AWSSNSPublishInput()
@@ -84,9 +84,11 @@ class PushManager: NSObject {
                 success(false)
             }
         })
+ */
     }
     
     func callRequest(_ callID:String, to:String, success: @escaping(Bool) -> ()) {
+/*
         Model.shared.userEndpoint(to, endpoint: { point in
             if point != nil {
                 let message = AWSSNSPublishInput()
@@ -113,5 +115,6 @@ class PushManager: NSObject {
                 success(false)
             }
         })
+ */
     }
 }

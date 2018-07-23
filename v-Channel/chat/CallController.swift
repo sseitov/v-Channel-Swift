@@ -104,7 +104,6 @@ class CallController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        MainApp().closeCall()
     }
     
     override func viewDidLayoutSubviews() {

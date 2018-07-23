@@ -14,9 +14,6 @@ import GoogleSignIn
 import FBSDKLoginKit
 import IQKeyboardManager
 import SVProgressHUD
-import PushKit
-import AWSCognito
-import AWSSNS
 
 func IS_PAD() -> Bool {
     return UIDevice.current.userInterfaceIdiom == .pad
@@ -25,6 +22,8 @@ func IS_PAD() -> Bool {
 func MainApp() -> AppDelegate {
     return UIApplication.shared.delegate as! AppDelegate
 }
+
+var bgTask:UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
 
 func ShowCall(userName:String?, userID:String?, callID:String?) {
     let call = UIStoryboard(name: "Call", bundle: nil)
@@ -46,8 +45,6 @@ func ShowCall(userName:String?, userID:String?, callID:String?) {
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
 
     var window: UIWindow?
-    var providerDelegate: ProviderDelegate!
-    let callManager = CallManager()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
     
@@ -68,11 +65,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
             
             if granted {
                 DispatchQueue.main.async {
-                    //register for voip notifications
-                    let voipRegistry = PKPushRegistry(queue: DispatchQueue.main)
-                    voipRegistry.desiredPushTypes = Set([.voIP])
-                    voipRegistry.delegate = self;
-                    
                     //Register for RemoteNotifications. Your Remote Notifications can display alerts now :)
                     application.registerForRemoteNotifications()
                 }
@@ -101,14 +93,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         
         IQKeyboardManager.shared().isEnableAutoToolbar = false
         Camera.shared().startup()
-        
-        // Initialize the Amazon Cognito credentials provider
-        let credentialsProvider = AWSCognitoCredentialsProvider(regionType:.USEast1,
-                                                                identityPoolId:identityPoolID)
-        let configuration = AWSServiceConfiguration(region:.USEast1, credentialsProvider:credentialsProvider)
-        AWSServiceManager.default().defaultServiceConfiguration = configuration
-        
-        providerDelegate = ProviderDelegate(callManager: callManager)
 
         return true
     }
@@ -125,12 +109,44 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         }
     }
     
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
+                     fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+/*
+        if let command = userInfo["command"] as? String, command == "askLocaton" {
+            if application.applicationState == .active {
+                sendCurrentLocation {
+                    completionHandler(.newData)
+                }
+            } else {
+                bgTask = UIApplication.shared.beginBackgroundTask(expirationHandler: {
+                    UIApplication.shared.endBackgroundTask(bgTask)
+                    bgTask = UIBackgroundTaskInvalid
+                })
+                sendCurrentLocation {
+                    UIApplication.shared.endBackgroundTask(bgTask)
+                    bgTask = UIBackgroundTaskInvalid
+                    completionHandler(.newData)
+                }
+            }
+        } else {
+            completionHandler(.newData)
+        }
+ */
+    }
+
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         print("Unable to register for remote notifications: \(error.localizedDescription)")
     }
     
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        let tokenParts = deviceToken.map { data -> String in
+            return String(format: "%02.2hhx", data)
+        }
+        
+        let token = tokenParts.joined()
+        print("=========== Device Token: \(token)")
+
         #if DEBUG
             Messaging.messaging().setAPNSToken(deviceToken, type: .sandbox)
         #else
@@ -152,10 +168,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
 
     func applicationWillTerminate(_ application: UIApplication) {
     }
-    
-    func closeCall() {
-        providerDelegate.closeIncomingCall()
-    }
 }
 
 // MARK: - NotificationCenter delegate
@@ -167,21 +179,34 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+/*
+        if let command = notification.request.content.userInfo["command"] as? String, command == "invite" {
+            acceptInvite(notification.request.content.userInfo)
+        }
+ */
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
+/*
+        if let command = response.notification.request.content.userInfo["command"] as? String, command == "invite" {
+            acceptInvite(response.notification.request.content.userInfo)
+        }
+        completionHandler()
+*/
+/*
         center.removeAllDeliveredNotifications()
         UIApplication.shared.applicationIconBadgeNumber = -1
         let nav = window!.rootViewController as! UINavigationController
         nav.popToRootViewController(animated: false)
+ */
     }
 }
 
 extension AppDelegate : MessagingDelegate {
     
-    func messaging(_ messaging: Messaging, didRefreshRegistrationToken fcmToken: String) {
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
         Messaging.messaging().shouldEstablishDirectChannel = true
         if let currUser = currentUser() {
             Model.shared.publishToken(currUser, token: fcmToken)
@@ -190,114 +215,4 @@ extension AppDelegate : MessagingDelegate {
         }
     }
     
-}
-
-// MARK: - PKPushRegistry delegate
-
-extension AppDelegate : PKPushRegistryDelegate {
-    
-    func pushRegistry(_ registry: PKPushRegistry, didUpdate pushCredentials: PKPushCredentials, for type: PKPushType) {
-        let sns = AWSSNS.default()
-        let endpointRequest = AWSSNSCreatePlatformEndpointInput()
-        #if DEBUG
-            endpointRequest?.platformApplicationArn = endpointDev
-        #else
-            endpointRequest?.platformApplicationArn = endpointProd
-        #endif
-
-        endpointRequest?.token = pushCredentials.token.hexadecimalString
-        sns.createPlatformEndpoint(endpointRequest!).continueWith(executor: AWSExecutor.mainThread(), block: { task in
-            if let response = task.result, let endpoint = response.endpointArn {
-                if let currUser = currentUser() {
-                    Model.shared.publishEndpoint(currUser, endpoint: endpoint)
-                } else {
-                    UserDefaults.standard.set(endpoint, forKey: "endpoint")
-                }
-            }
-            return nil
-        })
-
-    }
-
-    func pushRegistry(_ registry: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
-        print("token invalidated")
-    }
-    
-    private func processPayload(_ payload: PKPushPayload, complete: @escaping () -> Void) {
-        if let payloadDict = payload.dictionaryPayload["aps"] as? Dictionary<String, String>,
-            let message = payloadDict["alert"]
-        {
-            if message == "hangup" {
-                if UIApplication.shared.applicationState == .active {
-                    NotificationCenter.default.post(name: hangUpCallNotification, object: nil)
-                } else {
-                    providerDelegate.closeIncomingCall()
-                }
-                complete()
-            } else if message == "accept" {
-                if UIApplication.shared.applicationState == .active {
-                    NotificationCenter.default.post(name: acceptCallNotification, object: nil)
-                }
-                complete()
-            } else {
-                if let data = message.data(using: .utf8), let request = try? JSONSerialization.jsonObject(with: data, options: []), let requestData = request as? [String:Any]
-                {
-                    if let userName = requestData["userName"] as? String,
-                        let userID = requestData["userID"] as? String,
-                        let callID = requestData["callID"] as? String
-                    {
-                        if UIApplication.shared.applicationState == .active {
-                            MainApp().window?.topMostController?.yesNoQuestion("\(userName) call you.", acceptLabel: "Accept", cancelLabel: "Reject", acceptHandler:
-                                {
-                                    SVProgressHUD.show()
-                                    PushManager.shared.pushCommand(to: userID, command:"accept", success: { result in
-                                        SVProgressHUD.dismiss()
-                                        if !result {
-                                            MainApp().window?.topMostController?.showMessage(LOCALIZE("requestError"), messageType: .error)
-                                        } else {
-                                            ShowCall(userName: userName, userID: userID, callID: callID)
-                                        }
-                                        complete()
-                                    })
-                            }, cancelHandler: {
-                                PushManager.shared.pushCommand(to: userID, command: "hangup", success: { _ in
-                                    complete()
-                                })
-                            })
-                            
-                        } else {
-                            providerDelegate.reportIncomingCall(callID: callID,
-                                                                userName: userName,
-                                                                userID: userID, completion:
-                                { error in
-                                    if error != nil {
-                                        print(error!.localizedDescription)
-                                    }
-                                    complete()
-                            })
-                        }
-                    } else {
-                        complete()
-                    }
-                } else {
-                    complete()
-                }
-            }
-        } else {
-            complete()
-        }
-    }
-    
-    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType) {
-        processPayload(payload, complete: {
-        })
-    }
-    
-    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void)
-    {
-        processPayload(payload, complete: {
-            completion()
-        })
-    }
-
 }

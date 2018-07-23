@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2C2F1BAA1FBB6A69007BF345 /* ProviderDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C2F1BA71FBB6A69007BF345 /* ProviderDelegate.swift */; };
-		2C2F1BAB1FBB6A69007BF345 /* CallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C2F1BA81FBB6A69007BF345 /* CallManager.swift */; };
-		2C2F1BAC1FBB6A69007BF345 /* Call.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C2F1BA91FBB6A69007BF345 /* Call.swift */; };
 		2C4D32C11E88D1ED0059CAA2 /* Message+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4D32BF1E88D1ED0059CAA2 /* Message+CoreDataClass.swift */; };
 		2C4D32C21E88D1ED0059CAA2 /* Message+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4D32C01E88D1ED0059CAA2 /* Message+CoreDataProperties.swift */; };
 		2C4D32CA1E88DB140059CAA2 /* ChatController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4D32C61E88DB140059CAA2 /* ChatController.swift */; };
@@ -81,8 +78,8 @@
 		2C5B2AF71E561935006CC809 /* EmailInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5B2AF21E561935006CC809 /* EmailInput.swift */; };
 		2C5B2AF81E561935006CC809 /* EmailInput.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2C5B2AF31E561935006CC809 /* EmailInput.xib */; };
 		2C5B2AF91E561935006CC809 /* TextFieldContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5B2AF41E561935006CC809 /* TextFieldContainer.swift */; };
+		2C756A8F210665DC00F5729B /* PushManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C756A8E210665DC00F5729B /* PushManager.swift */; };
 		2C8174491E6D3EFD001E2AF7 /* RingtonePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8174481E6D3EFD001E2AF7 /* RingtonePlayer.swift */; };
-		2C8985291FC01A950023683D /* PushManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8985281FC01A950023683D /* PushManager.swift */; };
 		2C89852C1FC0313F0023683D /* Call.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C89852A1FC0313F0023683D /* Call.storyboard */; };
 		2CE75BA61E55D40800EEE103 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE75BA51E55D40800EEE103 /* AppDelegate.swift */; };
 		2CE75BAD1E55D40800EEE103 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2CE75BAB1E55D40800EEE103 /* Main.storyboard */; };
@@ -146,9 +143,6 @@
 /* Begin PBXFileReference section */
 		21746C6420EC6E74A8D912F4 /* Pods_v_Channel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_v_Channel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C0DFFCB1FBB45D1003097A4 /* vChannel 5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "vChannel 5.xcdatamodel"; sourceTree = "<group>"; };
-		2C2F1BA71FBB6A69007BF345 /* ProviderDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ProviderDelegate.swift; path = CallManager/ProviderDelegate.swift; sourceTree = "<group>"; };
-		2C2F1BA81FBB6A69007BF345 /* CallManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CallManager.swift; path = CallManager/CallManager.swift; sourceTree = "<group>"; };
-		2C2F1BA91FBB6A69007BF345 /* Call.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Call.swift; path = CallManager/Call.swift; sourceTree = "<group>"; };
 		2C4D32BE1E88D00B0059CAA2 /* vChannel 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "vChannel 3.xcdatamodel"; sourceTree = "<group>"; };
 		2C4D32BF1E88D1ED0059CAA2 /* Message+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Message+CoreDataClass.swift"; path = "Model/Message+CoreDataClass.swift"; sourceTree = "<group>"; };
 		2C4D32C01E88D1ED0059CAA2 /* Message+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Message+CoreDataProperties.swift"; path = "Model/Message+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -223,10 +217,10 @@
 		2C5B2AF21E561935006CC809 /* EmailInput.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EmailInput.swift; path = CustomViews/EmailInput.swift; sourceTree = "<group>"; };
 		2C5B2AF31E561935006CC809 /* EmailInput.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = EmailInput.xib; path = CustomViews/EmailInput.xib; sourceTree = "<group>"; };
 		2C5B2AF41E561935006CC809 /* TextFieldContainer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TextFieldContainer.swift; path = CustomViews/TextFieldContainer.swift; sourceTree = "<group>"; };
+		2C756A8E210665DC00F5729B /* PushManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PushManager.swift; sourceTree = "<group>"; };
 		2C7E3F221E712B980019CB7F /* vChannel 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "vChannel 2.xcdatamodel"; sourceTree = "<group>"; };
 		2C8174481E6D3EFD001E2AF7 /* RingtonePlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RingtonePlayer.swift; sourceTree = "<group>"; };
 		2C8985271FC0104A0023683D /* vChannel 6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "vChannel 6.xcdatamodel"; sourceTree = "<group>"; };
-		2C8985281FC01A950023683D /* PushManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PushManager.swift; sourceTree = "<group>"; };
 		2C89852B1FC0313F0023683D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = "v-Channel/Base.lproj/Call.storyboard"; sourceTree = "<group>"; };
 		2CE75BA21E55D40800EEE103 /* v-Channel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "v-Channel.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CE75BA51E55D40800EEE103 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -345,16 +339,6 @@
 				C55A54370BD411B724397158 /* Pods-v-Channel.release.xcconfig */,
 			);
 			name = Pods;
-			sourceTree = "<group>";
-		};
-		2C2F1BA61FBB6A50007BF345 /* CallManager */ = {
-			isa = PBXGroup;
-			children = (
-				2C2F1BA91FBB6A69007BF345 /* Call.swift */,
-				2C2F1BA81FBB6A69007BF345 /* CallManager.swift */,
-				2C2F1BA71FBB6A69007BF345 /* ProviderDelegate.swift */,
-			);
-			name = CallManager;
 			sourceTree = "<group>";
 		};
 		2C4D32C51E88DAF30059CAA2 /* Chat */ = {
@@ -541,7 +525,6 @@
 		2CE75BA41E55D40800EEE103 /* v-Channel */ = {
 			isa = PBXGroup;
 			children = (
-				2C2F1BA61FBB6A50007BF345 /* CallManager */,
 				2C5B2AD91E5618B8006CC809 /* CustomViews */,
 				2C5B2AD81E5618AB006CC809 /* Extensions */,
 				2C5B2AC91E560F57006CC809 /* Model */,
@@ -553,8 +536,8 @@
 				2CE75BA51E55D40800EEE103 /* AppDelegate.swift */,
 				2C8174481E6D3EFD001E2AF7 /* RingtonePlayer.swift */,
 				2C4D32D01E88E4E40059CAA2 /* LocationManager.swift */,
+				2C756A8E210665DC00F5729B /* PushManager.swift */,
 				2C5B2AD51E561190006CC809 /* Model.swift */,
-				2C8985281FC01A950023683D /* PushManager.swift */,
 				2CFC4F801E6ECFFE00DF34EA /* Credentials.swift */,
 			);
 			path = "v-Channel";
@@ -870,9 +853,6 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-v-Channel/Pods-v-Channel-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/AFNetworking/AFNetworking.framework",
-				"${BUILT_PRODUCTS_DIR}/AWSCognito/AWSCognito.framework",
-				"${BUILT_PRODUCTS_DIR}/AWSCore/AWSCore.framework",
-				"${BUILT_PRODUCTS_DIR}/AWSSNS/AWSSNS.framework",
 				"${BUILT_PRODUCTS_DIR}/Bolts/Bolts.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework",
@@ -893,9 +873,6 @@
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AFNetworking.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AWSCognito.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AWSCore.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AWSSNS.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Bolts.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
@@ -938,7 +915,6 @@
 				2CE96EE41EFD24E800416404 /* LGProgressView.m in Sources */,
 				2C5B2AD21E56110A006CC809 /* Contact+CoreDataProperties.swift in Sources */,
 				2CE96F131EFD613E00416404 /* CameraController.swift in Sources */,
-				2C2F1BAC1FBB6A69007BF345 /* Call.swift in Sources */,
 				2C58977F1E5D7A97004F8B46 /* ContactCell.swift in Sources */,
 				2C5B2ACC1E560FE8006CC809 /* vChannel.xcdatamodeld in Sources */,
 				2CE96F141EFD613E00416404 /* VideoLayerView.m in Sources */,
@@ -958,9 +934,7 @@
 				2C4D32CB1E88DB140059CAA2 /* PhotoController.swift in Sources */,
 				2C4D32D51E88E4FC0059CAA2 /* RouteController.swift in Sources */,
 				2C4D32D11E88E4E40059CAA2 /* LocationManager.swift in Sources */,
-				2C8985291FC01A950023683D /* PushManager.swift in Sources */,
 				2CE96F4D1EFDA08C00416404 /* ARDMessageResponse.m in Sources */,
-				2C2F1BAA1FBB6A69007BF345 /* ProviderDelegate.swift in Sources */,
 				2C4D32D41E88E4FC0059CAA2 /* LocationMediaItem.swift in Sources */,
 				2CE96F041EFD26A400416404 /* UIImageExtension.swift in Sources */,
 				2CE96F531EFDA08C00416404 /* ARDTURNClient.m in Sources */,
@@ -970,6 +944,7 @@
 				2CE96F121EFD613E00416404 /* Camera.m in Sources */,
 				2C4D32E21E8967D90059CAA2 /* CallController.swift in Sources */,
 				2CE96F051EFD26A400416404 /* UIViewControllerExtension.swift in Sources */,
+				2C756A8F210665DC00F5729B /* PushManager.swift in Sources */,
 				2CE96EE01EFD24E800416404 /* LGAlertView.m in Sources */,
 				2CE96F021EFD26A400416404 /* UIColorExtension.swift in Sources */,
 				2CE96F591EFDA08C00416404 /* RTCSessionDescription+JSON.m in Sources */,
@@ -982,7 +957,6 @@
 				2CE96EFA1EFD26A400416404 /* CLLocationExtension.swift in Sources */,
 				2CF8FBD71E5606BF003FC98E /* ContactListController.swift in Sources */,
 				2CE96F561EFDA08C00416404 /* RTCIceCandidate+JSON.m in Sources */,
-				2C2F1BAB1FBB6A69007BF345 /* CallManager.swift in Sources */,
 				2CE96F541EFDA08C00416404 /* ARDUtilities.m in Sources */,
 				2CE96F4A1EFDA08C00416404 /* ARDBitrateTracker.m in Sources */,
 				2CE96F4C1EFDA08C00416404 /* ARDJoinResponse.m in Sources */,
