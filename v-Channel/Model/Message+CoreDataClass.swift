@@ -9,6 +9,7 @@
 import Foundation
 import CoreData
 import CoreLocation
+import MessageKit
 
 public class Message: NSManagedObject {
     
@@ -49,6 +50,64 @@ public class Message: NSManagedObject {
             return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
         } else {
             return nil
+        }
+    }
+}
+
+private struct ImageMediaItem: MediaItem {
+    
+    var url: URL?
+    var image: UIImage?
+    var placeholderImage: UIImage
+    var size: CGSize
+    
+    init(image: UIImage) {
+        self.image = image
+        self.size = CGSize(width: 240, height: 240)
+        self.placeholderImage = UIImage()
+    }
+    
+}
+
+private struct ChatLocationItem: LocationItem {
+    
+    var location: CLLocation
+    var size: CGSize
+    
+    init(location: CLLocation) {
+        self.location = location
+        self.size = CGSize(width: 240, height: 240)
+    }
+    
+}
+
+struct ChatMessage: MessageType {
+    
+    var messageId: String
+    var sender: Sender
+    var sentDate: Date
+    var kind: MessageKind
+
+    init(_ message:Message) {
+        messageId = message.uid!
+        if message.from! == currentUser()!.uid! {
+            sender = Sender(id: message.from!, displayName: currentUser()!.name!)
+        } else {
+            if let user = Model.shared.getUser(message.from!) {
+                sender = Sender(id: message.from!, displayName: user.name!)
+            } else {
+                sender = Sender(id: message.from!, displayName: "unknown")
+            }
+        }
+        sentDate = (message.date as Date?)!
+        if let data = message.imageData as Data?, let image = UIImage(data: data) {
+            let mediaItem = ImageMediaItem(image: image)
+            kind = .photo(mediaItem)
+        } else if let location = message.location() {
+            let locationItem = ChatLocationItem(location: CLLocation(latitude: location.latitude, longitude: location.longitude))
+            kind = .location(locationItem)
+        } else {
+            kind = .text(message.text!)
         }
     }
 }

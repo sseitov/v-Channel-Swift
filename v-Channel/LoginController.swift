@@ -55,13 +55,13 @@ class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate,
             if userField.text().isEmail() {
                 passwordField.activate(true)
             } else {
-                showMessage("Email should have xxxx@domain.prefix format.", messageType: .error, messageHandler: {
+                showMessage("Email should have xxxx@domain.prefix format.", messageHandler: {
                     self.userField.activate(true)
                 })
             }
         } else {
             if passwordField.text().isEmpty {
-                showMessage("Password field required.", messageType: .error, messageHandler: {
+                showMessage("Password field required.", messageHandler: {
                     self.passwordField.activate(true)
                 })
             } else if userField.text().isEmpty {
@@ -81,7 +81,7 @@ class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate,
     @IBAction func facebookSignIn(_ sender: Any) { // read_custom_friendlists
         FBSDKLoginManager().logIn(withReadPermissions: ["public_profile","email","user_friends","user_photos"], from: self, handler: { result, error in
             if error != nil {
-                self.showMessage("Facebook authorization error.", messageType: .error)
+                self.showMessage("Facebook authorization error.")
                 return
             }
             
@@ -91,21 +91,21 @@ class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate,
             request!.start(completionHandler: { _, result, fbError in
                 if fbError != nil {
                     SVProgressHUD.dismiss()
-                    self.showMessage(fbError!.localizedDescription, messageType: .error)
+                    self.showMessage(fbError!.localizedDescription)
                 } else {
                     let credential = FacebookAuthProvider.credential(withAccessToken: FBSDKAccessToken.current().tokenString)
-                    Auth.auth().signIn(with: credential, completion: { firUser, error in
+                    Auth.auth().signInAndRetrieveData(with: credential, completion: { firUser, error in
                         if error != nil {
                             SVProgressHUD.dismiss()
-                            self.showMessage((error as NSError?)!.localizedDescription, messageType: .error)
+                            self.showMessage((error as NSError?)!.localizedDescription)
                         } else {
                             if let profile = result as? [String:Any] {
-                                Model.shared.createFacebookUser(firUser!, profile: profile, completion: {
+                                Model.shared.createFacebookUser(firUser!.user, profile: profile, completion: {
                                     SVProgressHUD.dismiss()
                                     self.delegate?.didLogin()
                                 })
                             } else {
-                                self.showMessage("Can not read user profile.", messageType: .error)
+                                self.showMessage("Can not read user profile.")
                                 try? Auth.auth().signOut()
                             }
                         }
@@ -123,19 +123,19 @@ class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate,
     
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         if error != nil {
-            showMessage(error.localizedDescription, messageType: .error)
+            showMessage(error.localizedDescription)
             return
         }
         let authentication = user.authentication
         let credential = GoogleAuthProvider.credential(withIDToken: (authentication?.idToken)!,
                                                           accessToken: (authentication?.accessToken)!)
         SVProgressHUD.show(withStatus: "Login...")
-        Auth.auth().signIn(with: credential, completion: { firUser, error in
+        Auth.auth().signInAndRetrieveData(with: credential, completion: { firUser, error in
             if error != nil {
                 SVProgressHUD.dismiss()
-                self.showMessage((error as NSError?)!.localizedDescription, messageType: .error)
+                self.showMessage((error as NSError?)!.localizedDescription)
             } else {
-                Model.shared.createGoogleUser(firUser!, googleProfile: user.profile, completion: {
+                Model.shared.createGoogleUser(firUser!.user, googleProfile: user.profile, completion: {
                     SVProgressHUD.dismiss()
                     self.delegate?.didLogin()
                 })
@@ -159,10 +159,10 @@ class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate,
                     if reason == "ERROR_USER_NOT_FOUND" {
                         self.performSegue(withIdentifier: "signUp", sender: nil)
                     } else {
-                        self.showMessage(error!.localizedDescription, messageType: .error)
+                        self.showMessage(error!.localizedDescription)
                     }
                 } else {
-                    self.showMessage(error!.localizedDescription, messageType: .error)
+                    self.showMessage(error!.localizedDescription)
                 }
             } else {
                 if firUser!.user.isEmailVerified || testUser(user) {
@@ -171,12 +171,12 @@ class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate,
                         if user != nil {
                             self.delegate?.didLogin()
                         } else {
-                            self.showMessage("Can not download profile data.", messageType: .error)
+                            self.showMessage("Can not download profile data.")
                         }
                     })
                 } else {
                     SVProgressHUD.dismiss()
-                    self.showMessage("You must confirm your registeration. Check your mailbox and try again.", messageType: .information)
+                    self.showMessage("You must confirm your registeration. Check your mailbox and try again.")
                 }
             }
         })

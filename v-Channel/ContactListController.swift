@@ -126,21 +126,21 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
                             self.tableView.insertRows(at: [indexPath], with: .bottom)
                             self.tableView.endUpdates()
                         } else {
-                            self.showMessage("Can not add contact.", messageType: .error)
+                            self.showMessage("Can not add contact.")
                         }
                     })
                 case .alreadyInList:
-                    self.showMessage("This user is in list already.", messageType: .information)
+                    self.showMessage("This user is in list already.")
                 case .notFound:
                     if self.inviteEnabled {
                         self.yesNoQuestion("User not found. Do you want to invite him into v-Channel?", acceptLabel: "Yes", cancelLabel: "No", acceptHandler: {
                             self.sendInvite()
                         })
                     } else {
-                        self.showMessage("User not found.", messageType: .error)
+                        self.showMessage("User not found.")
                     }
                 case .errorLoadProfile:
-                    self.showMessage("Can not load user profile.", messageType: .error)
+                    self.showMessage("Can not load user profile.")
                 }
             })
         })
@@ -288,11 +288,11 @@ extension ContactListController : InviteDelegate {
         if let error = error {
             if error.localizedDescription != "Canceled by User" {
                 let message = "Can not send invite. Error: \(error.localizedDescription)"
-                showMessage(message, messageType: .error)
+                showMessage(message)
             }
         } else {
             let message = "\(invitationIds.count) invites was sent."
-            showMessage(message, messageType: .information)
+            showMessage(message)
         }
     }
 }

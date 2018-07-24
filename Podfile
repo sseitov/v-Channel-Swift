@@ -11,7 +11,7 @@ target 'v-Channel' do
     pod 'Firebase/Invites'
     
     pod 'AFNetworking'
-    pod 'JSQMessagesViewController'
+    pod 'MessageKit'
     
     pod 'GoogleMaps'
     pod 'GoogleSignIn'

@@ -76,7 +76,7 @@ class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigati
                 if avatar != nil {
                     emailSignUp()
                 } else {
-                    showMessage("Avatar image required.", messageType: .error)
+                    showMessage("Avatar image required.")
                 }
             }
         }
@@ -89,7 +89,7 @@ class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigati
     func checkFields(_ sender:TextFieldContainer?) -> Bool {
         if sender == nil || sender == nickField {
             if nickField.text().isEmpty {
-                showMessage("Nickname field required.", messageType: .error, messageHandler: {
+                showMessage("Nickname field required.", messageHandler: {
                     self.nickField.activate(true)
                 })
                 return false
@@ -97,7 +97,7 @@ class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigati
         }
         if sender == nil || sender == emailField {
             if !emailField.text().isEmail() {
-                showMessage("Email should have xxxx@domain.prefix format.", messageType: .error, messageHandler: {
+                showMessage("Email should have xxxx@domain.prefix format.", messageHandler: {
                     self.emailField.activate(true)
                 })
                 return false
@@ -105,7 +105,7 @@ class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigati
         }
         if sender == nil || sender == passwordField {
             if passwordField.text().isEmpty {
-                showMessage("Password field required.", messageType: .error, messageHandler: {
+                showMessage("Password field required.", messageHandler: {
                     self.passwordField.activate(true)
                 })
                 return false
@@ -119,7 +119,7 @@ class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigati
             if avatar != nil {
                 emailSignUp()
             } else {
-                showMessage("Avatar image required.", messageType: .error)
+                showMessage("Avatar image required.")
             }
         }
     }
@@ -129,7 +129,7 @@ class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigati
         Auth.auth().createUser(withEmail: emailField.text(), password: passwordField.text(), completion: { firUser, error in
             if error != nil {
                 SVProgressHUD.dismiss()
-                self.showMessage((error! as NSError).localizedDescription, messageType: .error)
+                self.showMessage((error! as NSError).localizedDescription)
             } else {
                 Model.shared.createEmailUser(firUser!.user,
                                              email: self.emailField.text(),
@@ -140,16 +140,16 @@ class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigati
                             Auth.auth().currentUser?.sendEmailVerification(completion: { error in
                                 SVProgressHUD.dismiss()
                                 if error == nil {
-                                    self.showMessage("Check your mailbox now. You account will be activated after you confirm registration.", messageType: .information, messageHandler: {
+                                    self.showMessage("Check your mailbox now. You account will be activated after you confirm registration.", messageHandler: {
                                         self.goBack()
                                     })
                                 } else {
-                                    self.showMessage(setError!.localizedDescription, messageType: .error)
+                                    self.showMessage(setError!.localizedDescription)
                                 }
                             })
                         } else {
                             SVProgressHUD.dismiss()
-                            self.showMessage(setError!.localizedDescription, messageType: .error)
+                            self.showMessage(setError!.localizedDescription)
                         }
                 })
             }

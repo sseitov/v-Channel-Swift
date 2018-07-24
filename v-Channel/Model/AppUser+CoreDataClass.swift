@@ -96,13 +96,16 @@ public class AppUser: NSManagedObject {
         }
     }
     
-    func getImage() -> UIImage {
+    func getImage() -> UIImage? {
         if avatar != nil {
-            return UIImage(data: avatar! as Data)!
+            return UIImage(data: avatar! as Data)
         } else {
+            return nil
+/*
             return UIImage.imageWithColor(
                 ColorUtility.md5color(email!),
                 size: CGSize(width: 100, height: 100)).addImage(UIImage(named: "question")!)
+ */
         }
     }
 

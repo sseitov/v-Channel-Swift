@@ -78,7 +78,7 @@ class CallController: UIViewController {
             PushManager.shared.callRequest(callID!, to: userID!, success: { isSuccess in
                 SVProgressHUD.dismiss()
                 if !isSuccess {
-                    self.showMessage(LOCALIZE("requestError"), messageType: .error, messageHandler: {
+                    self.showMessage(LOCALIZE("requestError"), messageHandler: {
                         self.callID = nil
                         self.goBack()
                     })
@@ -278,7 +278,7 @@ extension CallController : ARDAppClientDelegate {
     
     func appClient(_ client: ARDAppClient!, didError error: Error!) {
         DispatchQueue.main.async {
-            self.showMessage("Error: \(error.localizedDescription)", messageType: .error, messageHandler: {
+            self.showMessage("Error: \(error.localizedDescription)", messageHandler: {
                 self.goBack()
             })
         }

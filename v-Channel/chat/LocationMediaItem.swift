@@ -5,7 +5,7 @@
 //  Created by Сергей Сейтов on 04.03.17.
 //  Copyright © 2017 Сергей Сейтов. All rights reserved.
 //
-
+/*
 import UIKit
 import JSQMessagesViewController
 
@@ -71,3 +71,4 @@ class LocationMediaItem : JSQLocationMediaItem {
     }
 
 }
+*/

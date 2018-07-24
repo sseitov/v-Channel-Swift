@@ -7,10 +7,6 @@
 
 import UIKit
 
-enum MessageType {
-    case error, success, information
-}
-
 class TitleView : UILabel {
     var prompt:UILabel?
     
@@ -56,7 +52,7 @@ extension UIViewController {
     
     // MARK: - alerts
     
-    func showMessage(_ message:String, messageType:MessageType, messageHandler: (() -> ())? = nil) {
+    func showMessage(_ message:String, messageHandler: (() -> ())? = nil) {
         
         let alert = LGAlertView.decoratedAlert(
             withTitle: Bundle.main.infoDictionary?["CFBundleName"] as? String,
@@ -67,13 +63,8 @@ extension UIViewController {
                     messageHandler!()
                 }
         })
-        if messageType == .error {
-            alert!.titleLabel.textColor = ErrorColor
-            alert!.okButton.backgroundColor = ErrorColor
-        } else {
-            alert!.titleLabel.textColor = MainColor
-            alert!.okButton.backgroundColor = MainColor
-        }
+        alert!.titleLabel.textColor = MainColor
+        alert!.okButton.backgroundColor = MainColor
         alert?.show()
     }
     

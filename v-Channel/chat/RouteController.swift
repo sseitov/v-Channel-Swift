@@ -35,7 +35,11 @@ class RouteController: UIViewController {
         map.camera = GMSCameraPosition.camera(withTarget: userLocation!, zoom: 6)
         map.isMyLocationEnabled = true
         userMarker = GMSMarker(position: userLocation!)
-        userMarker!.icon = user!.getImage().withSize(CGSize(width: 60, height: 60)).inCircle()
+        if let image = user?.getImage() {
+            userMarker!.icon = image.withSize(CGSize(width: 60, height: 60)).inCircle()
+        } else {
+            userMarker!.icon = UIImage.imageWithColor(UIColor.green, size: CGSize(width: 100, height: 100)).inCircle()
+        }
         userMarker!.title = user!.name!
         userMarker!.snippet = Model.shared.textDateFormatter.string(from: locationDate!)
         userMarker!.map = map
@@ -81,9 +85,9 @@ class RouteController: UIViewController {
                 self.createDirection(from: myLocation!.coordinate, to: self.userMarker!.position, completion: { result in
                     SVProgressHUD.dismiss()
                     if result == -1 {
-                        self.showMessage("Can not create route to \(self.user!.name!)", messageType: .error)
+                        self.showMessage("Can not create route to \(self.user!.name!)")
                     } else if result == 0 {
-                        self.showMessage("You are in the same place.", messageType: .information)
+                        self.showMessage("You are in the same place.")
                     }
                 })
             })
