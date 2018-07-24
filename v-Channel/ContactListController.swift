@@ -262,9 +262,9 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
             if let contact = sender as? Contact {
                 if contact.getContactStatus() == .approved {
                     if contact.initiator! == currentUser()!.uid! {
-                        controller.user = Model.shared.getUser(contact.requester!)
+                        controller.opponent = Model.shared.getUser(contact.requester!)
                     } else {
-                        controller.user = Model.shared.getUser(contact.initiator!)
+                        controller.opponent = Model.shared.getUser(contact.initiator!)
                     }
                 }
             }

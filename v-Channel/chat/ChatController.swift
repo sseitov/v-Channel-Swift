@@ -12,9 +12,9 @@ import SVProgressHUD
 import MessageKit
 import MapKit
 
-class ChatController: MessagesViewController {
+class ChatController: MessagesViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
     
-    var user:AppUser?
+    var opponent:AppUser?
     var messageList: [ChatMessage] = []
     
     lazy var formatter: DateFormatter = {
@@ -23,23 +23,172 @@ class ChatController: MessagesViewController {
         return formatter
     }()
 
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupTitle(user!.name!)
+        setupTitle(opponent!.name!)
         setupBackButton()
         
-        messageList = Model.shared.chatMessages(with: user!.uid!)
+        messageList = Model.shared.chatMessages(with: opponent!.uid!)
         
         messagesCollectionView.messagesDataSource = self
         messagesCollectionView.messagesLayoutDelegate = self
         messagesCollectionView.messagesDisplayDelegate = self
         messagesCollectionView.messageCellDelegate = self
-        messageInputBar.delegate = self
         
-        messageInputBar.sendButton.tintColor = UIColor(red: 69/255, green: 193/255, blue: 89/255, alpha: 1)
-        scrollsToBottomOnKeybordBeginsEditing = true // default false
-        maintainPositionOnKeyboardFrameChanged = true // default false
+        let newMessageInputBar = MessageInputBar()
+        newMessageInputBar.sendButton.tintColor = UIColor.black
+        newMessageInputBar.delegate = self
+        messageInputBar = newMessageInputBar
+        reloadInputViews()
+        let item = InputBarButtonItem()
+            .configure {
+                $0.spacing = .fixed(10)
+                $0.image = UIImage(named: "attachment")?.withRenderingMode(.alwaysTemplate)
+                $0.setSize(CGSize(width: 30, height: 30), animated: true)
+            }.onTouchUpInside { _ in
+                self.pressAccessoryButton()
+        }
+        item.tintColor = UIColor.black
+        
+        messageInputBar.setLeftStackViewWidthConstant(to: 40, animated: false)
+        messageInputBar.setStackViewItems([item], forStack: .left, animated: false)
+
+        scrollsToBottomOnKeybordBeginsEditing = true
+        maintainPositionOnKeyboardFrameChanged = true
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(self.newMessage(_:)),
+                                               name: newMessageNotification,
+                                               object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(ChatController.deleteMessage(_:)),
+                                               name: deleteMessageNotification,
+                                               object: nil)
+
+        messagesCollectionView.scrollToBottom()
+    }
+    
+    @objc
+    func deleteMessage(_ notify:Notification) {
+        if let message = notify.object as? Message {
+            let chatMessage = ChatMessage(message)
+            if let index = messageList.index(where: { msg in
+                return msg.messageId == chatMessage.messageId
+            }) {
+                messageList.remove(at: index)
+                let set = IndexSet(integer: index)
+                messagesCollectionView.deleteSections(set)
+            }
+        }
+    }
+
+    @objc
+    func newMessage(_ notify:Notification) {
+        if let message = notify.object as? Message {
+            let chatMessage = ChatMessage(message)
+            messageList.append(chatMessage)
+            messagesCollectionView.insertSections([messageList.count - 1])
+            messagesCollectionView.scrollToBottom()
+        }
+    }
+
+    private func pressAccessoryButton() {
+        UIApplication.shared.sendAction(#selector(UIApplication.resignFirstResponder), to: nil, from: nil, for: nil)
+        
+        let actionView = ActionSheet.create(
+            title: "Choose Data",
+            actions: ["Photo from Camera Roll", "Create photo use Camera", "My current location"],
+            handler1: {
+                let imagePicker = UIImagePickerController()
+                imagePicker.allowsEditing = false
+                imagePicker.sourceType = .photoLibrary
+                imagePicker.delegate = self
+                imagePicker.modalPresentationStyle = .formSheet
+                imagePicker.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor : MainColor, NSAttributedStringKey.font : UIFont.condensedFont(15)]
+                imagePicker.navigationBar.tintColor = MainColor
+                self.present(imagePicker, animated: true, completion: nil)
+        }, handler2: {
+            let imagePicker = UIImagePickerController()
+            imagePicker.allowsEditing = false
+            imagePicker.sourceType = .camera
+            imagePicker.delegate = self
+            imagePicker.modalPresentationStyle = .formSheet
+            imagePicker.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor : MainColor, NSAttributedStringKey.font : UIFont.condensedFont(15)]
+            imagePicker.navigationBar.tintColor = MainColor
+            self.present(imagePicker, animated: true, completion: nil)
+        }, handler3: {
+            SVProgressHUD.show(withStatus: "Get Location...")
+            LocationManager.shared.updateLocation({ location in
+                SVProgressHUD.dismiss()
+                if location != nil {
+                    Model.shared.sendLocationMessage(location!.coordinate, to: self.opponent!.uid!)
+                } else {
+                    self.showMessage("Can not get your location.")
+                }
+            })
+        })
+        
+        actionView?.show()
+    }
+    
+    // MARK: - UIImagePickerController delegate
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        picker.dismiss(animated: true, completion: {
+            if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
+                SVProgressHUD.show(withStatus: "Send...")
+                Model.shared.sendImageMessage(pickedImage, to: self.opponent!.uid!, result: { error in
+                    SVProgressHUD.dismiss()
+                    if error != nil {
+                        self.showMessage(error!.localizedDescription)
+                    }
+                })
+            }
+        })
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        dismiss(animated: true, completion: nil)
+    }
+
+    @IBAction func makeCall(_ sender: Any) {
+        ShowCall(userName: opponent?.name, userID: opponent?.uid, callID: nil)
+    }
+    
+    // MARK: - Navigation
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "showPhoto" {
+            let controller = segue.destination as! PhotoController
+            let message = sender as! ChatMessage
+            controller.date = message.sentDate
+            switch message.kind {
+            case .photo(let mediaItem):
+                controller.image = mediaItem.image
+            default:
+                break
+            }
+        } else if segue.identifier == "showMap" {
+            let controller = segue.destination as! RouteController
+            let message = sender as! ChatMessage
+            if message.sender.id != currentUser()!.uid! {
+                controller.user = self.opponent
+            } else {
+                controller.user = currentUser()
+            }
+            switch message.kind {
+            case .location(let locationItem):
+                controller.userLocation = locationItem.location.coordinate
+                controller.locationDate = message.sentDate
+            default:
+                break
+            }
+        }
     }
 }
 
@@ -152,9 +301,13 @@ extension ChatController: MessagesDisplayDelegate {
     
     func annotationViewForLocation(message: MessageType, at indexPath: IndexPath, in messageCollectionView: MessagesCollectionView) -> MKAnnotationView? {
         let annotationView = MKAnnotationView(annotation: nil, reuseIdentifier: nil)
-        let pinImage = #imageLiteral(resourceName: "pin")
-        annotationView.image = pinImage
-        annotationView.centerOffset = CGPoint(x: 0, y: -pinImage.size.height / 2)
+        if let user = Model.shared.getUser(message.sender.id) {
+            annotationView.image = user.getImage()?.withSize(CGSize(width: 30, height: 30)).inCircle()
+        } else {
+            let pinImage = #imageLiteral(resourceName: "pin")
+            annotationView.image = pinImage
+            annotationView.centerOffset = CGPoint(x: 0, y: -pinImage.size.height / 2)
+        }
         return annotationView
     }
     
@@ -180,25 +333,75 @@ extension ChatController: MessagesDisplayDelegate {
 extension ChatController: MessageCellDelegate {
     
     func didTapAvatar(in cell: MessageCollectionViewCell) {
-        print("Avatar tapped")
+        
     }
     
     func didTapMessage(in cell: MessageCollectionViewCell) {
-        print("Message tapped")
+        if let indexPath = messagesCollectionView.indexPath(for: cell) {
+            tapOnMessage(messageList[indexPath.section])
+        }
     }
     
     func didTapCellTopLabel(in cell: MessageCollectionViewCell) {
-        print("Top cell label tapped")
     }
     
     func didTapMessageTopLabel(in cell: MessageCollectionViewCell) {
-        print("Top message label tapped")
     }
     
     func didTapMessageBottomLabel(in cell: MessageCollectionViewCell) {
-        print("Bottom label tapped")
     }
     
+    private func tapOnMessage(_ message:ChatMessage) {
+        if message.sender.id == currentUser()!.uid! {
+            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            if messageIsPhoto(message) {
+                alert.addAction(UIAlertAction(title: "show photo", style: .default, handler: { _ in
+                    self.performSegue(withIdentifier: "showPhoto", sender: message)
+                }))
+            }
+            if messageIsLocation(message) {
+                alert.addAction(UIAlertAction(title: "show map", style: .default, handler: { _ in
+                    self.performSegue(withIdentifier: "showMap", sender: message)
+                }))
+            }
+            
+            alert.addAction(UIAlertAction(title: "delete message", style: .destructive, handler: { _ in
+                if let msg = Model.shared.getMessage(from: currentUser()!, date: message.sentDate) {
+                    SVProgressHUD.show(withStatus: "Delete...")
+                    Model.shared.deleteMessage(msg, completion: {
+                        SVProgressHUD.dismiss()
+                    })
+                }
+            }))
+            alert.addAction(UIAlertAction(title: "cancel", style: .cancel, handler: nil))
+            present(alert, animated: true, completion: nil)
+        } else {
+            if messageIsPhoto(message) {
+                self.performSegue(withIdentifier: "showPhoto", sender: message)
+            }
+            if messageIsLocation(message) {
+                self.performSegue(withIdentifier: "showMap", sender: message)
+            }
+        }
+    }
+    
+    private func messageIsPhoto(_ message:ChatMessage) -> Bool {
+        switch message.kind {
+        case .photo(_):
+            return true
+        default:
+            return false
+        }
+    }
+    
+    private func messageIsLocation(_ message:ChatMessage) -> Bool {
+        switch message.kind {
+        case .location(_):
+            return true
+        default:
+            return false
+        }
+    }
 }
 
 // MARK: - MessageInputBarDelegate
@@ -206,418 +409,14 @@ extension ChatController: MessageCellDelegate {
 extension ChatController: MessageInputBarDelegate {
     
     func messageInputBar(_ inputBar: MessageInputBar, didPressSendButtonWith text: String) {
-/*
+
         // Each NSTextAttachment that contains an image will count as one empty character in the text: String
         
         for component in inputBar.inputTextView.components {
-            
-            if let image = component as? UIImage {
-                
-                let imageMessage = MockMessage(image: image, sender: currentSender(), messageId: UUID().uuidString, date: Date())
-                messageList.append(imageMessage)
-                messagesCollectionView.insertSections([messageList.count - 1])
-                
-            } else if let text = component as? String {
-                
-                let attributedText = NSAttributedString(string: text, attributes: [.font: UIFont.systemFont(ofSize: 15), .foregroundColor: UIColor.blue])
-                
-                let message = MockMessage(attributedText: attributedText, sender: currentSender(), messageId: UUID().uuidString, date: Date())
-                messageList.append(message)
-                messagesCollectionView.insertSections([messageList.count - 1])
+            if let text = component as? String {
+                Model.shared.sendTextMessage(text, to: opponent!.uid!)
             }
-            
         }
-        
         inputBar.inputTextView.text = String()
-        messagesCollectionView.scrollToBottom()
- */
     }
 }
-
-/*
-import JSQMessagesViewController
-
-class Avatar : NSObject, JSQMessageAvatarImageDataSource {
-    
-    var userImage:UIImage?
-    
-    init(_ user:AppUser) {
-        super.init()
-        self.userImage = user.getImage().inCircle()
-    }
-    
-    func avatarImage() -> UIImage! {
-        return userImage
-    }
-    
-    func avatarHighlightedImage() -> UIImage! {
-        return userImage
-    }
-    
-    func avatarPlaceholderImage() -> UIImage! {
-        return UIImage(named: "logo")?.inCircle()
-    }
-}
-
-class ChatController: JSQMessagesViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate, CameraDelegate {
-    
-    var user:AppUser?
-    var messages:[JSQMessage] = []
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        if user != nil {
-            self.senderId = currentUser()!.uid!
-            self.senderDisplayName = currentUser()!.name!
-            
-            setupTitle(user!.name!)
-            setupBackButton()
-         
-            collectionView!.collectionViewLayout.incomingAvatarViewSize = CGSize(width: 36, height: 36)
-            collectionView!.collectionViewLayout.outgoingAvatarViewSize = CGSize(width: 36, height: 36)
-            let cashedMessages = Model.shared.chatMessages(with: user!.uid!)
-            for message in cashedMessages {
-                if let jsqMessage = addMessage(message) {
-                    if message.isNew {
-                        Model.shared.readMessage(message)
-                    }
-                    messages.append(jsqMessage)
-                }
-                self.finishReceivingMessage()
-            }
-            
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(ChatController.newMessage(_:)),
-                                                   name: newMessageNotification,
-                                                   object: nil)
-            NotificationCenter.default.addObserver(self,
-                                                   selector: #selector(ChatController.deleteMessage(_:)),
-                                                   name: deleteMessageNotification,
-                                                   object: nil)
-        } else {
-            self.senderId = ""
-            self.senderDisplayName = ""
-            inputToolbar.isHidden = true
-            navigationItem.rightBarButtonItem = nil
-            setupTitle("Contact list is empty")
-        }
-    }
-    
-    override func goBack() {
-        _ = navigationController?.popViewController(animated: true)
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        scrollToBottom(animated: true)
-    }
-
-    // MARK: - Message management
-    
-    @objc func newMessage(_ notify:Notification) {
-        if let message = notify.object as? Message {
-            if let jsqMessage = addMessage(message) {
-                messages.append(jsqMessage)
-                self.finishReceivingMessage()
-            }
-        }
-    }
-
-    private func getMsg(sender:String, date:Date) -> JSQMessage? {
-        for msg in messages {
-            if msg.senderId == sender && msg.date.timeIntervalSince1970 == date.timeIntervalSince1970 {
-                return msg
-            }
-        }
-        return nil
-    }
-    
-    @objc func deleteMessage(_ notify:Notification) {
-        if let message = notify.object as? Message {
-            if let msg = getMsg(sender:message.from!, date:message.date! as Date) {
-                if let index = messages.index(of: msg) {
-                    self.collectionView.performBatchUpdates({
-                        self.messages.remove(at: index)
-                        self.collectionView.deleteItems(at: [IndexPath(row:index, section:0)])
-                    }, completion: { _ in
-                    })
-                }
-            }
-        }
-    }
-    
-    // MARK: - Send / receive messages
-    
-    private func addMessage(_ message:Message) -> JSQMessage? {
-        if let user = Model.shared.getUser(message.from!) {
-            Model.shared.readMessage(message)
-            let name = user.name!
-            if message.imageData != nil {
-                let photo = JSQPhotoMediaItem(image: UIImage(data: message.imageData! as Data))
-                photo!.appliesMediaViewMaskAsOutgoing = (message.from! == currentUser()!.uid!)
-                return JSQMessage(senderId: message.from!, senderDisplayName: name, date: message.date! as Date, media: photo)
-            } else if message.location() != nil {
-                let point = LocationMediaItem(location: nil)
-                point?.messageLocation = message.location()
-                point!.appliesMediaViewMaskAsOutgoing = (message.from! == currentUser()!.uid!)
-                point!.setLocation(CLLocation(latitude: message.latitude, longitude: message.longitude), withCompletionHandler: {
-                    self.collectionView.reloadData()
-                })
-                return JSQMessage(senderId: message.from!, senderDisplayName: name, date: message.date! as Date, media: point)
-            } else if message.text != nil {
-                return JSQMessage(senderId: message.from!, senderDisplayName: name, date: message.date! as Date, text: message.text!)
-            } else {
-                return nil
-            }
-        } else {
-            return nil
-        }
-    }
-    
-    override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
-        Model.shared.sendTextMessage(text, to: user!.uid!)
-        JSQSystemSoundPlayer.jsq_playMessageSentSound()
-        finishSendingMessage()
-    }
-    
-    override func didPressAccessoryButton(_ sender: UIButton!) {
-        UIApplication.shared.sendAction(#selector(UIApplication.resignFirstResponder), to: nil, from: nil, for: nil)
-        
-        let actionView = ActionSheet.create(
-            title: "Choose Data",
-            actions: ["Photo from Camera Roll", "Create photo use Camera", "My current location"],
-            handler1: {
-                let imagePicker = UIImagePickerController()
-                imagePicker.allowsEditing = false
-                imagePicker.sourceType = .photoLibrary
-                imagePicker.delegate = self
-                imagePicker.modalPresentationStyle = .formSheet
-                imagePicker.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor : MainColor, NSAttributedStringKey.font : UIFont.condensedFont(15)]
-                imagePicker.navigationBar.tintColor = MainColor
-                self.present(imagePicker, animated: true, completion: nil)
-        }, handler2: {
-            let camera = UIStoryboard(name: "Camera", bundle: nil)
-            let cameraController = camera.instantiateViewController(withIdentifier: "Camera") as! CameraController
-            cameraController.modalTransitionStyle = .flipHorizontal
-            cameraController.delegate = self
-            cameraController.isFront = false
-            self.present(cameraController, animated: true, completion: nil)
-        }, handler3: {
-            SVProgressHUD.show(withStatus: "Get Location...")
-            LocationManager.shared.updateLocation({ location in
-                SVProgressHUD.dismiss()
-                if location != nil {
-                    Model.shared.sendLocationMessage(location!.coordinate, to: self.user!.uid!)
-                } else {
-                    self.showMessage("Can not get your location.", messageType: .error)
-                }
-            })
-        })
-        
-        actionView?.show()
-    }
-    
-    // MARK: - JSQMessagesCollectionView delegate
-    
-    lazy var outgoingBubbleImageView: JSQMessagesBubbleImage = self.setupOutgoingBubble()
-    lazy var incomingBubbleImageView: JSQMessagesBubbleImage = self.setupIncomingBubble()
-    
-    private func setupOutgoingBubble() -> JSQMessagesBubbleImage {
-        let bubbleImageFactory = JSQMessagesBubbleImageFactory()
-        return bubbleImageFactory!.outgoingMessagesBubbleImage(with: MainColor)
-    }
-    
-    private func setupIncomingBubble() -> JSQMessagesBubbleImage {
-        let bubbleImageFactory = JSQMessagesBubbleImageFactory()
-        return bubbleImageFactory!.incomingMessagesBubbleImage(with: UIColor.jsq_messageBubbleLightGray())
-    }
-    
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForCellBottomLabelAt indexPath: IndexPath!) -> NSAttributedString! {
-        let message = messages[indexPath.item]
-        return NSAttributedString(string: Model.shared.textDateFormatter.string(from: message.date))
-    }
-    
-    override func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, heightForCellBottomLabelAt indexPath:IndexPath) -> CGFloat {
-        return 20
-    }
-    
-    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return messages.count
-    }
-    
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageDataForItemAt indexPath: IndexPath!) -> JSQMessageData! {
-        return messages[indexPath.item]
-    }
-    
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
-        let message = messages[indexPath.item]
-        if message.senderId == senderId {
-            return Avatar(currentUser()!)
-        } else {
-            return Avatar(self.user!)
-        }
-    }
-    
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAt indexPath: IndexPath!) -> JSQMessageBubbleImageDataSource! {
-        let message = messages[indexPath.item]
-        if message.senderId == senderId {
-            return outgoingBubbleImageView
-        } else {
-            return incomingBubbleImageView
-        }
-    }
-    
-    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = super.collectionView(collectionView, cellForItemAt: indexPath) as! JSQMessagesCollectionViewCell
-        let message = messages[indexPath.item]
-        
-        if message.senderId == senderId {
-            cell.textView?.textColor = UIColor.white
-        } else {
-            cell.textView?.textColor = UIColor.black
-        }
-        return cell
-    }
-    
-    private func IS_PAD() -> Bool {
-        return UIDevice.current.userInterfaceIdiom == .pad
-    }
-
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, didTapMessageBubbleAt indexPath: IndexPath!) {
-        let message = messages[indexPath.item]
-        if message.isMediaMessage || message.senderId == currentUser()!.uid! {
-            if IS_PAD() {
-                if message.senderId == currentUser()!.uid! {
-                    var handler:CompletionBlock?
-                    var titles = ["Delete message"]
-                    if (message.media as? JSQPhotoMediaItem) != nil {
-                        handler = {
-                            self.performSegue(withIdentifier: "showPhoto", sender: message)
-                        }
-                        titles.insert("Show photo", at: 0)
-                    } else if (message.media as? LocationMediaItem) != nil {
-                        handler = {
-                            self.performSegue(withIdentifier: "showMap", sender: message)
-                        }
-                        titles.insert("Show map", at: 0)
-                    }
-                    let alert = ActionSheet.create(title: "Action", actions: titles, handler1: handler, handler2: {
-                        if let msg = Model.shared.getMessage(from: currentUser()!, date: message.date) {
-                            SVProgressHUD.show(withStatus: "Delete...")
-                            Model.shared.deleteMessage(msg, completion: {
-                                SVProgressHUD.dismiss()
-                            })
-                        }
-                    })
-                    alert?.show()
-                } else {
-                    if (message.media as? JSQPhotoMediaItem) != nil {
-                        yesNoQuestion("Show photo?", acceptLabel: "Show", cancelLabel: "Cancel", acceptHandler: {
-                            self.performSegue(withIdentifier: "showPhoto", sender: message)
-                        })
-                    } else if (message.media as? LocationMediaItem) != nil {
-                        yesNoQuestion("Show map?", acceptLabel: "Show", cancelLabel: "Cancel", acceptHandler: {
-                            self.performSegue(withIdentifier: "showMap", sender: message)
-                        })
-                    }
-                }
-            } else {
-                let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-                if (message.media as? JSQPhotoMediaItem) != nil {
-                    alert.addAction(UIAlertAction(title: "show photo", style: .default, handler: { _ in
-                        self.performSegue(withIdentifier: "showPhoto", sender: message)
-                    }))
-                }
-                if (message.media as? LocationMediaItem) != nil {
-                    alert.addAction(UIAlertAction(title: "show map", style: .default, handler: { _ in
-                        self.performSegue(withIdentifier: "showMap", sender: message)
-                    }))
-                }
-                
-                if message.senderId == currentUser()!.uid! {
-                    alert.addAction(UIAlertAction(title: "delete message", style: .destructive, handler: { _ in
-                        if let msg = Model.shared.getMessage(from: currentUser()!, date: message.date) {
-                            SVProgressHUD.show(withStatus: "Delete...")
-                            Model.shared.deleteMessage(msg, completion: {
-                                SVProgressHUD.dismiss()
-                            })
-                        }
-                    }))
-                }
-                alert.addAction(UIAlertAction(title: "cancel", style: .cancel, handler: nil))
-                present(alert, animated: true, completion: nil)
-            }
-        }
-    }
-    
-    // MARK: - UIImagePickerController delegate
-    
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        picker.dismiss(animated: true, completion: {
-            if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
-                SVProgressHUD.show(withStatus: "Send...")
-                Model.shared.sendImageMessage(pickedImage, to: self.user!.uid!, result: { error in
-                    SVProgressHUD.dismiss()
-                    if error != nil {
-                        self.showMessage(error!.localizedDescription, messageType: .error)
-                    } else {
-                        JSQSystemSoundPlayer.jsq_playMessageSentSound()
-                        self.finishSendingMessage()
-                    }
-                })
-            }
-        })
-    }
-    
-    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        dismiss(animated: true, completion: nil)
-    }
-    
-    func didTakePhoto(_ image:UIImage) {
-        dismiss(animated: true, completion: {
-            SVProgressHUD.show(withStatus: "Send...")
-            Model.shared.sendImageMessage(image, to: self.user!.uid!, result: { error in
-                SVProgressHUD.dismiss()
-                if error != nil {
-                    self.showMessage(error!.localizedDescription, messageType: .error)
-                } else {
-                    JSQSystemSoundPlayer.jsq_playMessageSentSound()
-                    self.finishSendingMessage()
-                }
-            })
-        })
-    }
-    
-    @IBAction func makeCall(_ sender: Any) {
-        ShowCall(userName: user?.name, userID: user?.uid, callID: nil)
-    }
-    
-    // MARK: - Navigation
-
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "showPhoto" {
-            let message = sender as! JSQMessage
-            let controller = segue.destination as! PhotoController
-            controller.date = message.date
-            let photo = message.media as! JSQPhotoMediaItem
-            controller.image = photo.image
-        } else if segue.identifier == "showMap" {
-            let controller = segue.destination as! RouteController
-            let message = sender as! JSQMessage
-            if message.senderId != currentUser()!.uid! {
-                controller.user = self.user
-            } else {
-                controller.user = currentUser()
-            }
-            let point = message.media as! LocationMediaItem
-            controller.userLocation = point.messageLocation
-            controller.locationDate = message.date
-        }
-    }
-}
-*/

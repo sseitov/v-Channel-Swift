@@ -54,7 +54,7 @@ public class Message: NSManagedObject {
     }
 }
 
-private struct ImageMediaItem: MediaItem {
+struct ChatImageItem: MediaItem {
     
     var url: URL?
     var image: UIImage?
@@ -69,7 +69,7 @@ private struct ImageMediaItem: MediaItem {
     
 }
 
-private struct ChatLocationItem: LocationItem {
+struct ChatLocationItem: LocationItem {
     
     var location: CLLocation
     var size: CGSize
@@ -101,7 +101,7 @@ struct ChatMessage: MessageType {
         }
         sentDate = (message.date as Date?)!
         if let data = message.imageData as Data?, let image = UIImage(data: data) {
-            let mediaItem = ImageMediaItem(image: image)
+            let mediaItem = ChatImageItem(image: image)
             kind = .photo(mediaItem)
         } else if let location = message.location() {
             let locationItem = ChatLocationItem(location: CLLocation(latitude: location.latitude, longitude: location.longitude))
