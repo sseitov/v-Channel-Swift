@@ -92,6 +92,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         }
         
         IQKeyboardManager.shared().isEnableAutoToolbar = false
+        IQKeyboardManager.shared().disabledDistanceHandlingClasses.add(ChatController.self)
+        
         Camera.shared().startup()
 
         return true
