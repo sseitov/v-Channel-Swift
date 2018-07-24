@@ -61,6 +61,11 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
         }
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tableView.reloadData()
+    }
+    
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         if user != nil {
             inviteEnabled = true

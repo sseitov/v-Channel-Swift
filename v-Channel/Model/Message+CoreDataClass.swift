@@ -107,7 +107,11 @@ struct ChatMessage: MessageType {
             let locationItem = ChatLocationItem(location: CLLocation(latitude: location.latitude, longitude: location.longitude))
             kind = .location(locationItem)
         } else {
-            kind = .text(message.text!)
+            if message.text != nil {
+                kind = .text(message.text!)
+            } else {
+                kind = .text("")
+            }
         }
     }
 }

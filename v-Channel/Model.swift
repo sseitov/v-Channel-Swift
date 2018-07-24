@@ -542,8 +542,10 @@ class Model: NSObject {
         if let all = try? managedObjectContext.fetch(fetchRequest) as! [Message] {
             var result:[ChatMessage] = []
             for item in all {
+                item.isNew = false
                 result.append(ChatMessage(item))
             }
+            saveContext()
             return result
         } else {
             return []

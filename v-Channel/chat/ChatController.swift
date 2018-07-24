@@ -39,12 +39,13 @@ class ChatController: MessagesViewController, UINavigationControllerDelegate, UI
         messagesCollectionView.messagesLayoutDelegate = self
         messagesCollectionView.messagesDisplayDelegate = self
         messagesCollectionView.messageCellDelegate = self
-        
+
         let newMessageInputBar = MessageInputBar()
         newMessageInputBar.sendButton.tintColor = UIColor.black
         newMessageInputBar.delegate = self
         messageInputBar = newMessageInputBar
         reloadInputViews()
+
         let item = InputBarButtonItem()
             .configure {
                 $0.spacing = .fixed(10)
@@ -54,7 +55,7 @@ class ChatController: MessagesViewController, UINavigationControllerDelegate, UI
                 self.pressAccessoryButton()
         }
         item.tintColor = UIColor.black
-        
+
         messageInputBar.setLeftStackViewWidthConstant(to: 40, animated: false)
         messageInputBar.setStackViewItems([item], forStack: .left, animated: false)
 
@@ -90,6 +91,8 @@ class ChatController: MessagesViewController, UINavigationControllerDelegate, UI
     @objc
     func newMessage(_ notify:Notification) {
         if let message = notify.object as? Message {
+            message.isNew = false
+            Model.shared.saveContext()
             let chatMessage = ChatMessage(message)
             messageList.append(chatMessage)
             messagesCollectionView.insertSections([messageList.count - 1])
@@ -209,11 +212,6 @@ extension ChatController: MessagesDataSource {
     }
     
     func cellTopLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
-/*
-        if indexPath.section % 3 == 0 {
-            return NSAttributedString(string: MessageKitDateFormatter.shared.string(from: message.sentDate), attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 10), NSAttributedStringKey.foregroundColor: UIColor.darkGray])
-        }
- */
         return nil
     }
     
@@ -235,9 +233,6 @@ extension ChatController: MessagesDataSource {
 extension ChatController: MessagesLayoutDelegate {
     
     func cellTopLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
-        if indexPath.section % 3 == 0 {
-            return 10
-        }
         return 0
     }
     
@@ -353,6 +348,7 @@ extension ChatController: MessageCellDelegate {
     
     private func tapOnMessage(_ message:ChatMessage) {
         if message.sender.id == currentUser()!.uid! {
+            TextFieldContainer.deactivateAll()
             let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
             if messageIsPhoto(message) {
                 alert.addAction(UIAlertAction(title: "show photo", style: .default, handler: { _ in
@@ -377,9 +373,11 @@ extension ChatController: MessageCellDelegate {
             present(alert, animated: true, completion: nil)
         } else {
             if messageIsPhoto(message) {
+                TextFieldContainer.deactivateAll()
                 self.performSegue(withIdentifier: "showPhoto", sender: message)
             }
             if messageIsLocation(message) {
+                TextFieldContainer.deactivateAll()
                 self.performSegue(withIdentifier: "showMap", sender: message)
             }
         }
