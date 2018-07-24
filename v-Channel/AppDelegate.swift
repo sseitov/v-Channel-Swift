@@ -14,33 +14,7 @@ import GoogleSignIn
 import FBSDKLoginKit
 import IQKeyboardManager
 import SVProgressHUD
-/*
-func IS_PAD() -> Bool {
-    return UIDevice.current.userInterfaceIdiom == .pad
-}
 
-func MainApp() -> AppDelegate {
-    return UIApplication.shared.delegate as! AppDelegate
-}
-
-var bgTask:UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
-
-func ShowCall(userName:String?, userID:String?, callID:String?) {
-    let call = UIStoryboard(name: "Call", bundle: nil)
-    if let nav = call.instantiateViewController(withIdentifier: "Call") as? UINavigationController {
-        nav.modalTransitionStyle = .flipHorizontal
-        if let top = MainApp().window?.rootViewController {
-            if let callController = nav.topViewController as? CallController {
-                callController.userName = userName
-                callController.callID = callID
-                callController.userID = userID
-            }
-            top.present(nav, animated: true, completion: nil)
-            
-        }
-    }
-}
-*/
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
 
