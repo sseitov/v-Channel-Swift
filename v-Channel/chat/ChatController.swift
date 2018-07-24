@@ -70,10 +70,33 @@ class ChatController: MessagesViewController, UINavigationControllerDelegate, UI
                                                selector: #selector(ChatController.deleteMessage(_:)),
                                                name: deleteMessageNotification,
                                                object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(self.checkIncomming),
+                                               name: contactNotification,
+                                               object: nil)
+        checkIncomming()
 
         messagesCollectionView.scrollToBottom()
     }
     
+    // MARK: - Message management
+
+    @objc
+    func checkIncomming() {
+        if UIApplication.shared.applicationState == .active {
+            if let call = UserDefaults.standard.object(forKey: "incommingCall") as? [String:Any] {
+                if let callId = call["uid"] as? String, let from = call["from"] as? String, let user = Model.shared.getUser(from) {
+                    yesNoQuestion("\(user.name!) call you.", acceptLabel: "Accept", cancelLabel: "Reject", acceptHandler: {
+                        Model.shared.acceptCall(callId)
+                        self.performSegue(withIdentifier: "call", sender: callId)
+                    }, cancelHandler: {
+                        Model.shared.hangUpCall(callId)
+                    })
+                }
+            }
+        }
+    }
+
     @objc
     func deleteMessage(_ notify:Notification) {
         if let message = notify.object as? Message {
@@ -158,10 +181,6 @@ class ChatController: MessagesViewController, UINavigationControllerDelegate, UI
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         dismiss(animated: true, completion: nil)
     }
-
-    @IBAction func makeCall(_ sender: Any) {
-        ShowCall(userName: opponent?.name, userID: opponent?.uid, callID: nil)
-    }
     
     // MARK: - Navigation
     
@@ -191,6 +210,12 @@ class ChatController: MessagesViewController, UINavigationControllerDelegate, UI
             default:
                 break
             }
+        } else if segue.identifier == "call" {
+            let controller = segue.destination as! CallController
+            if let call = sender as? String {
+                controller.incommingCall = call
+            }
+            controller.user = self.opponent
         }
     }
 }

@@ -9,40 +9,48 @@
 import Foundation
 import AVFoundation
 
-class RingtonePlayer {
+class Ringtone {
     
-    static let shared = RingtonePlayer()
+    static let shared = Ringtone()
     
     private var ringPlayer:AVAudioPlayer?
-    
+  
     private init() {
+        createRingtone()
     }
-    
-    func playCall() {
-        ringPlayer?.stop()
-        
-        try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, with:[.mixWithOthers])
-        try? AVAudioSession.sharedInstance().overrideOutputAudioPort(.speaker)
-        try? AVAudioSession.sharedInstance().setActive(true)
-        
-        ringPlayer = try? AVAudioPlayer(contentsOf: Bundle.main.url(forResource: "calling", withExtension: "wav")!)
-        ringPlayer?.numberOfLoops = -1
-        
-        if ringPlayer!.prepareToPlay() {
-            ringPlayer!.play()
+
+    private func createRingtone() {
+        var url = defaultRingtone()
+        if url == nil {
+            url = Bundle.main.url(forResource: "ringtone", withExtension: "wav")
         }
+        ringPlayer = try? AVAudioPlayer(contentsOf: url!)
+        ringPlayer?.numberOfLoops = -1
     }
     
-    func playBusy() {
-        ringPlayer?.stop()
-        
-        try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, with:[.mixWithOthers])
+    func defaultRingtone() -> URL? {
+        return UserDefaults.standard.url(forKey: "ringtone")
+    }
+    
+    func setDefaultRingtone(_ ringtone:URL?) {
+        if ringtone == nil {
+            UserDefaults.standard.removeObject(forKey: "ringtone")
+        } else {
+            UserDefaults.standard.set(ringtone, forKey: "ringtone")
+        }
+        UserDefaults.standard.synchronize()
+        createRingtone()
+    }
+    
+    func play() {
+        if UIApplication.shared.applicationState != .active {
+            try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, with:[.mixWithOthers])
+        } else {
+            try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+        }
         try? AVAudioSession.sharedInstance().overrideOutputAudioPort(.speaker)
         try? AVAudioSession.sharedInstance().setActive(true)
-        
-        ringPlayer = try? AVAudioPlayer(contentsOf: Bundle.main.url(forResource: "busy", withExtension: "wav")!)
-        ringPlayer?.numberOfLoops = -1
-        
+
         if ringPlayer!.prepareToPlay() {
             ringPlayer!.play()
         }

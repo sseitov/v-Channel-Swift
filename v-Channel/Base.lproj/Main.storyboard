@@ -7,6 +7,7 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="Navigation items with more than one left or right bar item" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -172,6 +173,7 @@
                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <connections>
                                 <action selector="makeCall:" destination="F5y-oF-HjK" id="gA4-16-jnP"/>
+                                <segue destination="YY9-pf-31I" kind="show" identifier="call" id="C7O-xA-uif"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -455,6 +457,91 @@
             </objects>
             <point key="canvasLocation" x="1418" y="255"/>
         </scene>
+        <!--Call Controller-->
+        <scene sceneID="TvE-Kd-Fqo">
+            <objects>
+                <viewController id="YY9-pf-31I" customClass="CallController" customModule="v_Channel" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="7Lb-9W-Qyj"/>
+                        <viewControllerLayoutGuide type="bottom" id="hAx-dQ-vVE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="FcH-yV-2dT">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CPv-qp-kvl" customClass="RTCEAGLVideoView">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="504"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Dnx-dk-Vhm" customClass="RTCCameraPreviewView">
+                                <rect key="frame" x="241" y="556" width="120" height="120"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="120" id="fWx-rg-TQf"/>
+                                    <constraint firstAttribute="width" constant="120" id="rXe-wl-6FJ"/>
+                                </constraints>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vW0-du-Nxs">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="690"/>
+                                <subviews>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo.png" translatesAutoresizingMaskIntoConstraints="NO" id="je2-Nd-Tmu">
+                                        <rect key="frame" x="97.666666666666686" y="255" width="180" height="180"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="180" id="My2-U4-iCl"/>
+                                            <constraint firstAttribute="width" constant="180" id="P8f-Zg-nC9"/>
+                                        </constraints>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstItem="je2-Nd-Tmu" firstAttribute="centerX" secondItem="vW0-du-Nxs" secondAttribute="centerX" id="AsO-2c-gRG"/>
+                                    <constraint firstItem="je2-Nd-Tmu" firstAttribute="centerY" secondItem="vW0-du-Nxs" secondAttribute="centerY" id="Kb2-2C-wTb"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="Dnx-dk-Vhm" secondAttribute="trailing" constant="14" id="T4K-e2-POV"/>
+                            <constraint firstAttribute="trailing" secondItem="vW0-du-Nxs" secondAttribute="trailing" id="TU3-op-Ec9"/>
+                            <constraint firstItem="hAx-dQ-vVE" firstAttribute="top" secondItem="vW0-du-Nxs" secondAttribute="bottom" id="Zdc-5V-8Ow"/>
+                            <constraint firstItem="hAx-dQ-vVE" firstAttribute="top" secondItem="Dnx-dk-Vhm" secondAttribute="bottom" constant="14" id="gyp-p1-B8E"/>
+                            <constraint firstItem="vW0-du-Nxs" firstAttribute="leading" secondItem="FcH-yV-2dT" secondAttribute="leading" id="vsJ-HK-5NQ"/>
+                            <constraint firstItem="vW0-du-Nxs" firstAttribute="top" secondItem="7Lb-9W-Qyj" secondAttribute="bottom" id="zrh-ex-7Nd"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="WJH-AT-KSB">
+                        <barButtonItem key="leftBarButtonItem" image="hangUp" id="aSx-iG-7F0">
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        </barButtonItem>
+                        <rightBarButtonItems>
+                            <barButtonItem image="videoOn" id="MCQ-P6-1Aq">
+                                <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <action selector="muteVideo:" destination="YY9-pf-31I" id="YZN-UL-m2F"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem image="loudOff" id="nMH-FD-8gg">
+                                <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <action selector="switchSpeaker:" destination="YY9-pf-31I" id="TfI-up-M1X"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="callImage" destination="je2-Nd-Tmu" id="YJF-UW-2vG"/>
+                        <outlet property="callView" destination="vW0-du-Nxs" id="31p-gG-J4o"/>
+                        <outlet property="localView" destination="Dnx-dk-Vhm" id="LxX-tt-MUt"/>
+                        <outlet property="loudButton" destination="nMH-FD-8gg" id="f1G-5x-ccD"/>
+                        <outlet property="remoteView" destination="CPv-qp-kvl" id="PtG-er-WkQ"/>
+                        <outlet property="videoButton" destination="MCQ-P6-1Aq" id="Pds-fX-7kf"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="CJ8-XI-fWI" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1417" y="-582"/>
+        </scene>
     </scenes>
     <resources>
         <image name="add_contact" width="27" height="27"/>
@@ -462,8 +549,11 @@
         <image name="back" width="22" height="22"/>
         <image name="button-Facebook" width="260" height="40"/>
         <image name="button-Google" width="260" height="40"/>
+        <image name="hangUp" width="24" height="24"/>
         <image name="logo.png" width="1024" height="1024"/>
+        <image name="loudOff" width="28" height="28"/>
         <image name="phone" width="24" height="24"/>
         <image name="signOut" width="24" height="24"/>
+        <image name="videoOn" width="24" height="24"/>
     </resources>
 </document>

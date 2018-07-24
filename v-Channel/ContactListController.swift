@@ -20,7 +20,7 @@ enum InviteError {
 
 class ContactListController: UITableViewController, LoginControllerDelegate, GIDSignInDelegate {
 
-    var contacts:[Contact] = []
+    fileprivate var contacts:[Contact] = []
     
     var inviteEnabled = false
     
@@ -32,9 +32,7 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let versionNumber: String = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
-        setupTitle("v-Channel ( \(versionNumber) )")
+        setupTitle("My Contacts")
         
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(self.refresh),
@@ -59,11 +57,6 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
                 GIDSignIn.sharedInstance().signInSilently()
             }
         }
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        tableView.reloadData()
     }
     
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
@@ -123,17 +116,12 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
             self.findUser(fieldName: "email", fieldValue: email, result: { user, error in
                 switch error {
                 case .none:
-                    Model.shared.addContact(with: user!, contact: { contact in
-                        if contact != nil {
-                            self.tableView.beginUpdates()
-                            let indexPath = IndexPath(row: self.contacts.count, section: 0)
-                            self.contacts.append(contact!)
-                            self.tableView.insertRows(at: [indexPath], with: .bottom)
-                            self.tableView.endUpdates()
-                        } else {
-                            self.showMessage("Can not add contact.")
-                        }
-                    })
+                    let contact = Model.shared.addContact(with: user!)
+                    self.tableView.beginUpdates()
+                    let indexPath = IndexPath(row: self.contacts.count, section: 0)
+                    self.contacts.append(contact)
+                    self.tableView.insertRows(at: [indexPath], with: .bottom)
+                    self.tableView.endUpdates()
                 case .alreadyInList:
                     self.showMessage("This user is in list already.")
                 case .notFound:
@@ -195,12 +183,8 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
         return contacts.count
     }
     
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "my contacts"
-    }
-    
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 40
+        return 5
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -256,6 +240,20 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
     }
 
     // MARK: - Navigation
+    
+    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
+        if identifier == "chat" {
+            if let contact = sender as? Contact {
+                if let user = Model.shared.getUser(contact.uid!) {
+                    if user.token == nil {
+                        self.showMessage("\(user.name!) does not available for chat now.")
+                        return false
+                    }
+                }
+            }
+        }
+        return true
+    }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "login" {
@@ -275,18 +273,7 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
             }
         }
     }
-    
-    @IBAction func signOut(_ sender: Any) {
-        yesNoQuestion("Do you really want to sign out?", acceptLabel: "Sure", cancelLabel: "Cancel", acceptHandler: {
-            SVProgressHUD.show(withStatus: "SignOut...")
-            Model.shared.signOut {
-                SVProgressHUD.show(withStatus: "SignOut...")
-                self.performSegue(withIdentifier: "login", sender: self)
-            }
-        })
-    }
 }
-
 extension ContactListController : InviteDelegate {
     
     func inviteFinished(withInvitations invitationIds: [String], error: Error?) {

@@ -14,7 +14,7 @@ import GoogleSignIn
 import FBSDKLoginKit
 import IQKeyboardManager
 import SVProgressHUD
-
+/*
 func IS_PAD() -> Bool {
     return UIDevice.current.userInterfaceIdiom == .pad
 }
@@ -40,7 +40,7 @@ func ShowCall(userName:String?, userID:String?, callID:String?) {
         }
     }
 }
-
+*/
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
 
@@ -113,27 +113,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
                      fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-/*
-        if let command = userInfo["command"] as? String, command == "askLocaton" {
-            if application.applicationState == .active {
-                sendCurrentLocation {
-                    completionHandler(.newData)
-                }
-            } else {
-                bgTask = UIApplication.shared.beginBackgroundTask(expirationHandler: {
-                    UIApplication.shared.endBackgroundTask(bgTask)
-                    bgTask = UIBackgroundTaskInvalid
-                })
-                sendCurrentLocation {
-                    UIApplication.shared.endBackgroundTask(bgTask)
-                    bgTask = UIBackgroundTaskInvalid
-                    completionHandler(.newData)
+        if application.applicationState != .active {
+            if let pushTypeStr = userInfo["pushType"] as? String, let pushType = Int(pushTypeStr) {
+                if pushType == PushType.incommingCall.rawValue {
+                    Ringtone.shared.play()
+                } else if pushType == PushType.hangUpCall.rawValue {
+                    Ringtone.shared.stop()
                 }
             }
-        } else {
-            completionHandler(.newData)
         }
- */
+        completionHandler(.newData)
     }
 
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
@@ -181,28 +170,16 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-/*
-        if let command = notification.request.content.userInfo["command"] as? String, command == "invite" {
-            acceptInvite(notification.request.content.userInfo)
-        }
- */
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
-/*
-        if let command = response.notification.request.content.userInfo["command"] as? String, command == "invite" {
-            acceptInvite(response.notification.request.content.userInfo)
-        }
-        completionHandler()
-*/
-/*
         center.removeAllDeliveredNotifications()
         UIApplication.shared.applicationIconBadgeNumber = -1
+        Ringtone.shared.stop()
         let nav = window!.rootViewController as! UINavigationController
         nav.popToRootViewController(animated: false)
- */
     }
 }
 
@@ -211,6 +188,7 @@ extension AppDelegate : MessagingDelegate {
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
         Messaging.messaging().shouldEstablishDirectChannel = true
         if let currUser = currentUser() {
+            currUser.token = fcmToken
             Model.shared.publishToken(currUser, token: fcmToken)
         } else {
             UserDefaults.standard.set(fcmToken, forKey: "fcmToken")

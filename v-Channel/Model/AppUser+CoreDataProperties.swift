@@ -2,8 +2,8 @@
 //  AppUser+CoreDataProperties.swift
 //  v-Channel
 //
-//  Created by Сергей Сейтов on 18.11.2017.
-//  Copyright © 2017 V-Channel. All rights reserved.
+//  Created by Сергей Сейтов on 24.07.2018.
+//  Copyright © 2018 V-Channel. All rights reserved.
 //
 //
 
@@ -24,6 +24,7 @@ extension AppUser {
     @NSManaged public var name: String?
     @NSManaged public var type: Int16
     @NSManaged public var uid: String?
+    @NSManaged public var token: String?
     @NSManaged public var contacts: NSSet?
 
 }
