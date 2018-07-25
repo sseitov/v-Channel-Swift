@@ -141,6 +141,7 @@ class ChatController: MessagesViewController, UINavigationControllerDelegate, UI
         
         var selections:[AlertSelection] = [
             AlertSelection(name: "Photo from Camera Roll", handler: {
+                self.becomeFirstResponder()
                 let imagePicker = UIImagePickerController()
                 imagePicker.allowsEditing = false
                 imagePicker.sourceType = .photoLibrary
@@ -151,6 +152,7 @@ class ChatController: MessagesViewController, UINavigationControllerDelegate, UI
                 self.present(imagePicker, animated: true, completion: nil)
             }),
             AlertSelection(name: "Create photo use Camera", handler: {
+                self.becomeFirstResponder()
                 let imagePicker = UIImagePickerController()
                 imagePicker.allowsEditing = false
                 imagePicker.sourceType = .camera
@@ -161,6 +163,7 @@ class ChatController: MessagesViewController, UINavigationControllerDelegate, UI
                 self.present(imagePicker, animated: true, completion: nil)
             }),
             AlertSelection(name: "My current location", handler: {
+                self.becomeFirstResponder()
                 SVProgressHUD.show(withStatus: "Get Location...")
                 LocationManager.shared.updateLocation({ location in
                     SVProgressHUD.dismiss()
@@ -171,7 +174,9 @@ class ChatController: MessagesViewController, UINavigationControllerDelegate, UI
                     }
                 })
             })]
-        Alert.select(title: "Choose Data".uppercased(), handlers: selections)
+        Alert.select(title: "Choose Data".uppercased(), handlers: selections, cancelHandler: {
+            self.becomeFirstResponder()
+        })
     }
     
     // MARK: - UIImagePickerController delegate
@@ -389,16 +394,19 @@ extension ChatController: MessageCellDelegate {
             if messageIsPhoto(message) || messageIsLocation(message) {
                 var selections:[AlertSelection] = []
                 if messageIsPhoto(message) {
+                    self.becomeFirstResponder()
                     selections.append(AlertSelection(name: "Show photo", handler: {
                         self.performSegue(withIdentifier: "showPhoto", sender: message)
                     }))
                 }
                 if messageIsLocation(message) {
+                    self.becomeFirstResponder()
                     selections.append(AlertSelection(name: "Show map", handler: {
                         self.performSegue(withIdentifier: "showMap", sender: message)
                     }))
                 }
                 selections.append(AlertSelection(name: "Delete message", handler: {
+                    self.becomeFirstResponder()
                     if let msg = Model.shared.getMessage(from: currentUser()!, date: message.sentDate) {
                         SVProgressHUD.show(withStatus: "Delete...")
                         Model.shared.deleteMessage(msg, completion: {
@@ -406,15 +414,18 @@ extension ChatController: MessageCellDelegate {
                         })
                     }
                 }))
-                Alert.select(title: "Choose action".uppercased(), handlers: selections)
+                Alert.select(title: "Choose action".uppercased(), handlers: selections, cancelHandler:{ self.becomeFirstResponder() })
             } else {
                 Alert.question(title: "Attention!", message: "Do you want to delete this message?", okHandler: {
+                    self.becomeFirstResponder()
                     if let msg = Model.shared.getMessage(from: currentUser()!, date: message.sentDate) {
                         SVProgressHUD.show(withStatus: "Delete...")
                         Model.shared.deleteMessage(msg, completion: {
                             SVProgressHUD.dismiss()
                         })
                     }
+                }, cancelHandler: {
+                    self.becomeFirstResponder()
                 })
             }
         } else {
