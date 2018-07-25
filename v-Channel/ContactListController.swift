@@ -59,6 +59,11 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
         }
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tableView.reloadData()
+    }
+    
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         if user != nil {
             inviteEnabled = true
@@ -111,33 +116,33 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
     }
 
     @IBAction func addContact(_ sender: Any) {
-        let alert = EmailInput.getEmail(cancelHandler: {
-        }, acceptHandler: { email in
-            self.findUser(fieldName: "email", fieldValue: email, result: { user, error in
-                switch error {
-                case .none:
-                    let contact = Model.shared.addContact(with: user!)
-                    self.tableView.beginUpdates()
-                    let indexPath = IndexPath(row: self.contacts.count, section: 0)
-                    self.contacts.append(contact)
-                    self.tableView.insertRows(at: [indexPath], with: .bottom)
-                    self.tableView.endUpdates()
-                case .alreadyInList:
-                    self.showMessage("This user is in list already.")
-                case .notFound:
-                    if self.inviteEnabled {
-                        self.yesNoQuestion("User not found. Do you want to invite him into v-Channel?", acceptLabel: "Yes", cancelLabel: "No", acceptHandler: {
-                            self.sendInvite()
-                        })
-                    } else {
-                        self.showMessage("User not found.")
+        TextAlert.getEmail({ email in
+            if email != nil {
+                self.findUser(fieldName: "email", fieldValue: email!, result: { user, error in
+                    switch error {
+                    case .none:
+                        let contact = Model.shared.addContact(with: user!)
+                        self.tableView.beginUpdates()
+                        let indexPath = IndexPath(row: self.contacts.count, section: 0)
+                        self.contacts.append(contact)
+                        self.tableView.insertRows(at: [indexPath], with: .bottom)
+                        self.tableView.endUpdates()
+                    case .alreadyInList:
+                        self.showMessage("This user is in list already.")
+                    case .notFound:
+                        if self.inviteEnabled {
+                            self.yesNoQuestion("User not found. Do you want to invite him into v-Channel?", acceptLabel: "Yes", cancelLabel: "No", acceptHandler: {
+                                self.sendInvite()
+                            })
+                        } else {
+                            self.showMessage("User not found.")
+                        }
+                    case .errorLoadProfile:
+                        self.showMessage("Can not load user profile.")
                     }
-                case .errorLoadProfile:
-                    self.showMessage("Can not load user profile.")
-                }
-            })
+                })
+            }
         })
-        alert?.show()
     }
     
     func findUser(fieldName:String, fieldValue:String, result: @escaping(AppUser?, InviteError) -> ()) {

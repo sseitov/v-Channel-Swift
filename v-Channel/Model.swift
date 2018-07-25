@@ -697,7 +697,7 @@ class Model: NSObject {
         return NSCompoundPredicate(orPredicateWithSubpredicates: [toPredicate, fromPredicate])
     }
     
-    func chatMessages(with:String) -> [ChatMessage] {
+    func chatMessages(with:String) -> [Message] {
         if currentUser() == nil {
             return []
         }
@@ -707,13 +707,7 @@ class Model: NSObject {
         fetchRequest.sortDescriptors = [sortDescriptor]
         
         if let all = try? managedObjectContext.fetch(fetchRequest) as! [Message] {
-            var result:[ChatMessage] = []
-            for item in all {
-                item.isNew = false
-                result.append(ChatMessage(item))
-            }
-            saveContext()
-            return result
+            return all
         } else {
             return []
         }

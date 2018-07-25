@@ -72,12 +72,10 @@
 		2C5B2AD11E56110A006CC809 /* Contact+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5B2ACD1E56110A006CC809 /* Contact+CoreDataClass.swift */; };
 		2C5B2AD21E56110A006CC809 /* Contact+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5B2ACE1E56110A006CC809 /* Contact+CoreDataProperties.swift */; };
 		2C5B2AD61E561190006CC809 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5B2AD51E561190006CC809 /* Model.swift */; };
-		2C5B2AF51E561935006CC809 /* ActionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5B2AF01E561935006CC809 /* ActionSheet.swift */; };
-		2C5B2AF61E561935006CC809 /* ActionSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2C5B2AF11E561935006CC809 /* ActionSheet.xib */; };
-		2C5B2AF71E561935006CC809 /* EmailInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5B2AF21E561935006CC809 /* EmailInput.swift */; };
-		2C5B2AF81E561935006CC809 /* EmailInput.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2C5B2AF31E561935006CC809 /* EmailInput.xib */; };
 		2C5B2AF91E561935006CC809 /* TextFieldContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5B2AF41E561935006CC809 /* TextFieldContainer.swift */; };
 		2C8174491E6D3EFD001E2AF7 /* RingtonePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8174481E6D3EFD001E2AF7 /* RingtonePlayer.swift */; };
+		2CB546342107F04B0035C2DD /* Alerts.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2CB546322107F04A0035C2DD /* Alerts.storyboard */; };
+		2CB546352107F04B0035C2DD /* Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CB546332107F04B0035C2DD /* Alerts.swift */; };
 		2CE75BA61E55D40800EEE103 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE75BA51E55D40800EEE103 /* AppDelegate.swift */; };
 		2CE75BAD1E55D40800EEE103 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2CE75BAB1E55D40800EEE103 /* Main.storyboard */; };
 		2CE75BAF1E55D40800EEE103 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2CE75BAE1E55D40800EEE103 /* Assets.xcassets */; };
@@ -208,14 +206,12 @@
 		2C5B2AD51E561190006CC809 /* Model.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		2C5B2AD71E5615EF006CC809 /* v-Channel.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = "v-Channel.entitlements"; path = "v-Channel/v-Channel.entitlements"; sourceTree = "<group>"; };
 		2C5B2ADC1E5618F7006CC809 /* v-Channel-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "v-Channel-Bridging-Header.h"; sourceTree = "<group>"; };
-		2C5B2AF01E561935006CC809 /* ActionSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ActionSheet.swift; path = CustomViews/ActionSheet.swift; sourceTree = "<group>"; };
-		2C5B2AF11E561935006CC809 /* ActionSheet.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ActionSheet.xib; path = CustomViews/ActionSheet.xib; sourceTree = "<group>"; };
-		2C5B2AF21E561935006CC809 /* EmailInput.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EmailInput.swift; path = CustomViews/EmailInput.swift; sourceTree = "<group>"; };
-		2C5B2AF31E561935006CC809 /* EmailInput.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = EmailInput.xib; path = CustomViews/EmailInput.xib; sourceTree = "<group>"; };
 		2C5B2AF41E561935006CC809 /* TextFieldContainer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TextFieldContainer.swift; path = CustomViews/TextFieldContainer.swift; sourceTree = "<group>"; };
 		2C7E3F221E712B980019CB7F /* vChannel 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "vChannel 2.xcdatamodel"; sourceTree = "<group>"; };
 		2C8174481E6D3EFD001E2AF7 /* RingtonePlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RingtonePlayer.swift; sourceTree = "<group>"; };
 		2C8985271FC0104A0023683D /* vChannel 6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "vChannel 6.xcdatamodel"; sourceTree = "<group>"; };
+		2CB546322107F04A0035C2DD /* Alerts.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Alerts.storyboard; path = CustomViews/Alerts.storyboard; sourceTree = "<group>"; };
+		2CB546332107F04B0035C2DD /* Alerts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Alerts.swift; path = CustomViews/Alerts.swift; sourceTree = "<group>"; };
 		2CE75BA21E55D40800EEE103 /* v-Channel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "v-Channel.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CE75BA51E55D40800EEE103 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2CE75BAC1E55D40800EEE103 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -467,10 +463,8 @@
 		2C5B2AD91E5618B8006CC809 /* CustomViews */ = {
 			isa = PBXGroup;
 			children = (
-				2C5B2AF01E561935006CC809 /* ActionSheet.swift */,
-				2C5B2AF11E561935006CC809 /* ActionSheet.xib */,
-				2C5B2AF21E561935006CC809 /* EmailInput.swift */,
-				2C5B2AF31E561935006CC809 /* EmailInput.xib */,
+				2CB546322107F04A0035C2DD /* Alerts.storyboard */,
+				2CB546332107F04B0035C2DD /* Alerts.swift */,
 				2C5B2AF41E561935006CC809 /* TextFieldContainer.swift */,
 			);
 			name = CustomViews;
@@ -733,13 +727,11 @@
 				2C5897DE1E5D7C64004F8B46 /* ring_frame_19.gif in Resources */,
 				2CE96EE11EFD24E800416404 /* LGAlertView.xib in Resources */,
 				2C5897AA1E5D7C55004F8B46 /* frame_15.gif in Resources */,
-				2C5B2AF61E561935006CC809 /* ActionSheet.xib in Resources */,
 				2C5897A91E5D7C55004F8B46 /* frame_14.gif in Resources */,
 				2C5897DA1E5D7C64004F8B46 /* ring_frame_15.gif in Resources */,
 				2C5897CC1E5D7C64004F8B46 /* ring_frame_1.gif in Resources */,
 				2C5897A51E5D7C55004F8B46 /* frame_10.gif in Resources */,
 				2C5897A41E5D7C55004F8B46 /* frame_9.gif in Resources */,
-				2C5B2AF81E561935006CC809 /* EmailInput.xib in Resources */,
 				2C58979C1E5D7C55004F8B46 /* frame_1.gif in Resources */,
 				2CE96F171EFD614B00416404 /* Camera.storyboard in Resources */,
 				2C5897D61E5D7C64004F8B46 /* ring_frame_11.gif in Resources */,
@@ -752,6 +744,7 @@
 				2C5897D31E5D7C64004F8B46 /* ring_frame_8.gif in Resources */,
 				2C5897D21E5D7C64004F8B46 /* ring_frame_7.gif in Resources */,
 				2C5897A71E5D7C55004F8B46 /* frame_12.gif in Resources */,
+				2CB546342107F04B0035C2DD /* Alerts.storyboard in Resources */,
 				2C5897E11E5D7C64004F8B46 /* ring_frame_22.gif in Resources */,
 				2C5897D11E5D7C64004F8B46 /* ring_frame_6.gif in Resources */,
 				2C5897D81E5D7C64004F8B46 /* ring_frame_13.gif in Resources */,
@@ -896,7 +889,6 @@
 				2CE96EE71EFD24E800416404 /* NSPointerArray+AbstractionHelpers.m in Sources */,
 				2CE96F491EFDA08C00416404 /* ARDAppEngineClient.m in Sources */,
 				2CE96F061EFD26A400416404 /* UIViewExtension.swift in Sources */,
-				2C5B2AF51E561935006CC809 /* ActionSheet.swift in Sources */,
 				2C5B2AF91E561935006CC809 /* TextFieldContainer.swift in Sources */,
 				2CE96EFD1EFD26A400416404 /* DataExtension.swift in Sources */,
 				2C5B2AD61E561190006CC809 /* Model.swift in Sources */,
@@ -908,7 +900,6 @@
 				2C5B2ACC1E560FE8006CC809 /* vChannel.xcdatamodeld in Sources */,
 				2CE96F141EFD613E00416404 /* VideoLayerView.m in Sources */,
 				2CE96F571EFDA08C00416404 /* RTCIceServer+JSON.m in Sources */,
-				2C5B2AF71E561935006CC809 /* EmailInput.swift in Sources */,
 				2CE96F4B1EFDA08C00416404 /* ARDCaptureController.m in Sources */,
 				2CE96F1C1EFDA07300416404 /* SRWebSocket.m in Sources */,
 				2CE96F011EFD26A400416404 /* StringExtension.swift in Sources */,
@@ -933,6 +924,7 @@
 				2C4D32E21E8967D90059CAA2 /* CallController.swift in Sources */,
 				2CE96F051EFD26A400416404 /* UIViewControllerExtension.swift in Sources */,
 				2CE96EE01EFD24E800416404 /* LGAlertView.m in Sources */,
+				2CB546352107F04B0035C2DD /* Alerts.swift in Sources */,
 				2CE96F021EFD26A400416404 /* UIColorExtension.swift in Sources */,
 				2CE96F591EFDA08C00416404 /* RTCSessionDescription+JSON.m in Sources */,
 				2CE96F501EFDA08C00416404 /* ARDSettingsStore.m in Sources */,

@@ -160,10 +160,8 @@ class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigati
     
     @IBAction func setImage(_ sender: Any) {
         UIApplication.shared.sendAction(#selector(UIApplication.resignFirstResponder), to: nil, from: nil, for: nil)
-        let actionView = ActionSheet.create(
-            title: "Choose Photo",
-            actions: ["From Camera Roll", "Use Camera"],
-            handler1: {
+        let selections:[AlertSelection] = [
+            AlertSelection(name: "From Camera Roll", handler: {
                 let imagePicker = UIImagePickerController()
                 imagePicker.allowsEditing = false
                 imagePicker.sourceType = .photoLibrary
@@ -174,15 +172,18 @@ class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigati
                 }
                 imagePicker.navigationBar.tintColor = MainColor
                 self.present(imagePicker, animated: true, completion: nil)
-        }, handler2: {
-            let camera = UIStoryboard(name: "Camera", bundle: nil)
-            let cameraController = camera.instantiateViewController(withIdentifier: "Camera") as! CameraController
-            cameraController.modalTransitionStyle = .flipHorizontal
-            cameraController.delegate = self
-            cameraController.isFront = true
-            self.present(cameraController, animated: true, completion: nil)
-        })
-        actionView?.show()
+            }),
+            AlertSelection(name: "Use Camera", handler: {
+                let camera = UIStoryboard(name: "Camera", bundle: nil)
+                let cameraController = camera.instantiateViewController(withIdentifier: "Camera") as! CameraController
+                cameraController.modalTransitionStyle = .flipHorizontal
+                cameraController.delegate = self
+                cameraController.isFront = true
+                self.present(cameraController, animated: true, completion: nil)
+            })]
+
+        Alert.select(title: "Choose Photo".uppercased(), handlers: selections)
+
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {

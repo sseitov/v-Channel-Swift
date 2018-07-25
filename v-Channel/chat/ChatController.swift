@@ -33,7 +33,12 @@ class ChatController: MessagesViewController, UINavigationControllerDelegate, UI
         setupTitle(opponent!.name!)
         setupBackButton()
         
-        messageList = Model.shared.chatMessages(with: opponent!.uid!)
+        let messsages = Model.shared.chatMessages(with: opponent!.uid!)
+        for item in messsages {
+            item.isNew = false
+            messageList.append(ChatMessage(item))
+        }
+        Model.shared.saveContext()
         
         messagesCollectionView.messagesDataSource = self
         messagesCollectionView.messagesLayoutDelegate = self
@@ -104,9 +109,13 @@ class ChatController: MessagesViewController, UINavigationControllerDelegate, UI
             if let index = messageList.index(where: { msg in
                 return msg.messageId == chatMessage.messageId
             }) {
-                messageList.remove(at: index)
-                let set = IndexSet(integer: index)
-                messagesCollectionView.deleteSections(set)
+                messagesCollectionView.performBatchUpdates({
+                    messageList.remove(at: index)
+                    let indexSet = IndexSet(integer: index)
+                    messagesCollectionView.deleteSections(indexSet)
+                }, completion: { _ in
+                    self.reloadInputViews()
+                })
             }
         }
     }
@@ -117,19 +126,21 @@ class ChatController: MessagesViewController, UINavigationControllerDelegate, UI
             message.isNew = false
             Model.shared.saveContext()
             let chatMessage = ChatMessage(message)
-            messageList.append(chatMessage)
-            messagesCollectionView.insertSections([messageList.count - 1])
-            messagesCollectionView.scrollToBottom()
+            messagesCollectionView.performBatchUpdates({
+                messageList.append(chatMessage)
+                messagesCollectionView.insertSections([messageList.count - 1])
+            }, completion: { _ in
+                self.reloadInputViews()
+                self.messagesCollectionView.scrollToBottom()
+            })
         }
     }
 
     private func pressAccessoryButton() {
         UIApplication.shared.sendAction(#selector(UIApplication.resignFirstResponder), to: nil, from: nil, for: nil)
         
-        let actionView = ActionSheet.create(
-            title: "Choose Data",
-            actions: ["Photo from Camera Roll", "Create photo use Camera", "My current location"],
-            handler1: {
+        var selections:[AlertSelection] = [
+            AlertSelection(name: "Photo from Camera Roll", handler: {
                 let imagePicker = UIImagePickerController()
                 imagePicker.allowsEditing = false
                 imagePicker.sourceType = .photoLibrary
@@ -138,28 +149,29 @@ class ChatController: MessagesViewController, UINavigationControllerDelegate, UI
                 imagePicker.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor : MainColor, NSAttributedStringKey.font : UIFont.condensedFont(15)]
                 imagePicker.navigationBar.tintColor = MainColor
                 self.present(imagePicker, animated: true, completion: nil)
-        }, handler2: {
-            let imagePicker = UIImagePickerController()
-            imagePicker.allowsEditing = false
-            imagePicker.sourceType = .camera
-            imagePicker.delegate = self
-            imagePicker.modalPresentationStyle = .formSheet
-            imagePicker.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor : MainColor, NSAttributedStringKey.font : UIFont.condensedFont(15)]
-            imagePicker.navigationBar.tintColor = MainColor
-            self.present(imagePicker, animated: true, completion: nil)
-        }, handler3: {
-            SVProgressHUD.show(withStatus: "Get Location...")
-            LocationManager.shared.updateLocation({ location in
-                SVProgressHUD.dismiss()
-                if location != nil {
-                    Model.shared.sendLocationMessage(location!.coordinate, to: self.opponent!.uid!)
-                } else {
-                    self.showMessage("Can not get your location.")
-                }
-            })
-        })
-        
-        actionView?.show()
+            }),
+            AlertSelection(name: "Create photo use Camera", handler: {
+                let imagePicker = UIImagePickerController()
+                imagePicker.allowsEditing = false
+                imagePicker.sourceType = .camera
+                imagePicker.delegate = self
+                imagePicker.modalPresentationStyle = .formSheet
+                imagePicker.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor : MainColor, NSAttributedStringKey.font : UIFont.condensedFont(15)]
+                imagePicker.navigationBar.tintColor = MainColor
+                self.present(imagePicker, animated: true, completion: nil)
+            }),
+            AlertSelection(name: "My current location", handler: {
+                SVProgressHUD.show(withStatus: "Get Location...")
+                LocationManager.shared.updateLocation({ location in
+                    SVProgressHUD.dismiss()
+                    if location != nil {
+                        Model.shared.sendLocationMessage(location!.coordinate, to: self.opponent!.uid!)
+                    } else {
+                        self.showMessage("Can not get your location.")
+                    }
+                })
+            })]
+        Alert.select(title: "Choose Data".uppercased(), handlers: selections)
     }
     
     // MARK: - UIImagePickerController delegate
@@ -374,28 +386,37 @@ extension ChatController: MessageCellDelegate {
     private func tapOnMessage(_ message:ChatMessage) {
         if message.sender.id == currentUser()!.uid! {
             TextFieldContainer.deactivateAll()
-            let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            if messageIsPhoto(message) {
-                alert.addAction(UIAlertAction(title: "show photo", style: .default, handler: { _ in
-                    self.performSegue(withIdentifier: "showPhoto", sender: message)
-                }))
-            }
-            if messageIsLocation(message) {
-                alert.addAction(UIAlertAction(title: "show map", style: .default, handler: { _ in
-                    self.performSegue(withIdentifier: "showMap", sender: message)
-                }))
-            }
-            
-            alert.addAction(UIAlertAction(title: "delete message", style: .destructive, handler: { _ in
-                if let msg = Model.shared.getMessage(from: currentUser()!, date: message.sentDate) {
-                    SVProgressHUD.show(withStatus: "Delete...")
-                    Model.shared.deleteMessage(msg, completion: {
-                        SVProgressHUD.dismiss()
-                    })
+            if messageIsPhoto(message) || messageIsLocation(message) {
+                var selections:[AlertSelection] = []
+                if messageIsPhoto(message) {
+                    selections.append(AlertSelection(name: "Show photo", handler: {
+                        self.performSegue(withIdentifier: "showPhoto", sender: message)
+                    }))
                 }
-            }))
-            alert.addAction(UIAlertAction(title: "cancel", style: .cancel, handler: nil))
-            present(alert, animated: true, completion: nil)
+                if messageIsLocation(message) {
+                    selections.append(AlertSelection(name: "Show map", handler: {
+                        self.performSegue(withIdentifier: "showMap", sender: message)
+                    }))
+                }
+                selections.append(AlertSelection(name: "Delete message", handler: {
+                    if let msg = Model.shared.getMessage(from: currentUser()!, date: message.sentDate) {
+                        SVProgressHUD.show(withStatus: "Delete...")
+                        Model.shared.deleteMessage(msg, completion: {
+                            SVProgressHUD.dismiss()
+                        })
+                    }
+                }))
+                Alert.select(title: "Choose action".uppercased(), handlers: selections)
+            } else {
+                Alert.question(title: "Attention!", message: "Do you want to delete this message?", okHandler: {
+                    if let msg = Model.shared.getMessage(from: currentUser()!, date: message.sentDate) {
+                        SVProgressHUD.show(withStatus: "Delete...")
+                        Model.shared.deleteMessage(msg, completion: {
+                            SVProgressHUD.dismiss()
+                        })
+                    }
+                })
+            }
         } else {
             if messageIsPhoto(message) {
                 TextFieldContainer.deactivateAll()

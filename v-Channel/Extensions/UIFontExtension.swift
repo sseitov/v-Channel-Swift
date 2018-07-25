@@ -33,4 +33,13 @@ extension UIFont {
     class func commentsFont() -> UIFont {
         return mainFont(15)
     }
+    
+    func sizeOfString (string: String, constrainedToWidth width: Double) -> CGSize {
+        return NSString(string: string).boundingRect(
+            with: CGSize(width: width, height: .greatestFiniteMagnitude),
+            options: .usesLineFragmentOrigin,
+            attributes: [.font: self],
+            context: nil).size
+    }
+
 }

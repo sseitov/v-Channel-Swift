@@ -31,6 +31,11 @@ class TextFieldContainer: UIView, UITextFieldDelegate {
             textField.isSecureTextEntry = secure
         }
     }
+    var autoCapitalization:UITextAutocapitalizationType = .none {
+        didSet {
+            textField.autocapitalizationType = autoCapitalization
+        }
+    }
     var returnType:UIReturnKeyType = .default {
         didSet {
             textField.returnKeyType = returnType
@@ -73,9 +78,17 @@ class TextFieldContainer: UIView, UITextFieldDelegate {
         textField.font = textFont
         textField.textColor = MainColor
         
+        configure()
+
         self.addSubview(textField)
     }
     
+    func configure() {
+        backgroundColor = nonActiveColor
+        setupBorder(UIColor.white, radius: 5)
+        textField.textColor = UIColor.white
+    }
+
     override func layoutSubviews() {
         super.layoutSubviews()
         textField.frame = self.bounds.insetBy(dx: 10, dy: 3)
@@ -124,4 +137,18 @@ class TextFieldContainer: UIView, UITextFieldDelegate {
         }
     }
 
+}
+
+class DefaultTextInputContainer : TextFieldContainer {
+    
+    override func configure() {
+        backgroundColor = UIColor.clear
+        textField.font = UIFont.mainFont(15)
+        textField.textColor = UIColor.white
+        textField.textAlignment = .left
+        placeholderColor = UIColor.lightGray
+        textField.borderStyle = .none
+        nonActiveColor = UIColor.clear
+        activeColor = UIColor.clear
+    }
 }

@@ -162,6 +162,7 @@ extension AppDelegate : MessagingDelegate {
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
         Messaging.messaging().shouldEstablishDirectChannel = true
         if let currUser = currentUser() {
+            print("====== fcmToken \(fcmToken)")
             currUser.token = fcmToken
             Model.shared.publishToken(currUser, token: fcmToken)
         } else {
