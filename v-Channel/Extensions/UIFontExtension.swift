@@ -19,27 +19,22 @@ func printFontNames() {
 extension UIFont {
     
     class func mainFont(_ size:CGFloat = 17) -> UIFont {
-        return UIFont(name: "HelveticaNeue", size: size)!
+        return UIFont(name: "SFUIDisplay-Regular", size: size) ?? UIFont.systemFont(ofSize: 17)
+    }
+    
+    class func mediumFont(_ size:CGFloat = 17) -> UIFont {
+        return UIFont(name: "SFUIDisplay-Medium", size: size) ?? UIFont.systemFont(ofSize: 17)
+    }
+    
+    class func lightFont(_ size:CGFloat = 17) -> UIFont {
+        return UIFont(name: "SFUIDisplay-Light", size: size) ?? UIFont.systemFont(ofSize: 17)
     }
     
     class func thinFont(_ size:CGFloat = 17) -> UIFont {
-        return UIFont(name: "HelveticaNeue-Thin", size: size)!
+        return UIFont(name: "SFUIDisplay-Thin", size: size) ?? UIFont.systemFont(ofSize: 17)
     }
     
     class func condensedFont(_ size:CGFloat = 17) -> UIFont {
-        return UIFont(name: "HelveticaNeue-CondensedBold", size: size)!
+        return UIFont(name: "SFUIDisplay-Semibold", size: size) ?? UIFont.systemFont(ofSize: 17)
     }
-    
-    class func commentsFont() -> UIFont {
-        return mainFont(15)
-    }
-    
-    func sizeOfString (string: String, constrainedToWidth width: Double) -> CGSize {
-        return NSString(string: string).boundingRect(
-            with: CGSize(width: width, height: .greatestFiniteMagnitude),
-            options: .usesLineFragmentOrigin,
-            attributes: [.font: self],
-            context: nil).size
-    }
-
 }

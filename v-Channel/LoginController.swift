@@ -50,6 +50,13 @@ class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate,
         UIApplication.shared.sendAction(#selector(UIApplication.resignFirstResponder), to: nil, from: nil, for: nil)
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        TextAlert.getEmail({ _ in
+            
+        })
+    }
+    
     func textDone(_ sender:TextFieldContainer, text:String?) {
         if sender == userField {
             if userField.text().isEmail() {

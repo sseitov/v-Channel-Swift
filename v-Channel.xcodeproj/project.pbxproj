@@ -76,6 +76,15 @@
 		2C8174491E6D3EFD001E2AF7 /* RingtonePlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C8174481E6D3EFD001E2AF7 /* RingtonePlayer.swift */; };
 		2CB546342107F04B0035C2DD /* Alerts.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2CB546322107F04A0035C2DD /* Alerts.storyboard */; };
 		2CB546352107F04B0035C2DD /* Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CB546332107F04B0035C2DD /* Alerts.swift */; };
+		2CE4AA85210996D80055C895 /* sf-ui-display-ultralight.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2CE4AA7C210996D80055C895 /* sf-ui-display-ultralight.otf */; };
+		2CE4AA86210996D80055C895 /* sf-ui-display-thin.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2CE4AA7D210996D80055C895 /* sf-ui-display-thin.otf */; };
+		2CE4AA87210996D80055C895 /* sf-ui-display-bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2CE4AA7E210996D80055C895 /* sf-ui-display-bold.otf */; };
+		2CE4AA88210996D80055C895 /* sf-ui-display-light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2CE4AA7F210996D80055C895 /* sf-ui-display-light.otf */; };
+		2CE4AA89210996D80055C895 /* sf-ui-display-regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2CE4AA80210996D80055C895 /* sf-ui-display-regular.otf */; };
+		2CE4AA8A210996D80055C895 /* sf-ui-display-black.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2CE4AA81210996D80055C895 /* sf-ui-display-black.otf */; };
+		2CE4AA8B210996D80055C895 /* sf-ui-display-heavy.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2CE4AA82210996D80055C895 /* sf-ui-display-heavy.otf */; };
+		2CE4AA8C210996D80055C895 /* sf-ui-display-medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2CE4AA83210996D80055C895 /* sf-ui-display-medium.otf */; };
+		2CE4AA8D210996D80055C895 /* sf-ui-display-semibold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2CE4AA84210996D80055C895 /* sf-ui-display-semibold.otf */; };
 		2CE75BA61E55D40800EEE103 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE75BA51E55D40800EEE103 /* AppDelegate.swift */; };
 		2CE75BAD1E55D40800EEE103 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2CE75BAB1E55D40800EEE103 /* Main.storyboard */; };
 		2CE75BAF1E55D40800EEE103 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2CE75BAE1E55D40800EEE103 /* Assets.xcassets */; };
@@ -212,6 +221,15 @@
 		2C8985271FC0104A0023683D /* vChannel 6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "vChannel 6.xcdatamodel"; sourceTree = "<group>"; };
 		2CB546322107F04A0035C2DD /* Alerts.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Alerts.storyboard; path = CustomViews/Alerts.storyboard; sourceTree = "<group>"; };
 		2CB546332107F04B0035C2DD /* Alerts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Alerts.swift; path = CustomViews/Alerts.swift; sourceTree = "<group>"; };
+		2CE4AA7C210996D80055C895 /* sf-ui-display-ultralight.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "sf-ui-display-ultralight.otf"; path = "fonts/sf-ui-display-ultralight.otf"; sourceTree = "<group>"; };
+		2CE4AA7D210996D80055C895 /* sf-ui-display-thin.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "sf-ui-display-thin.otf"; path = "fonts/sf-ui-display-thin.otf"; sourceTree = "<group>"; };
+		2CE4AA7E210996D80055C895 /* sf-ui-display-bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "sf-ui-display-bold.otf"; path = "fonts/sf-ui-display-bold.otf"; sourceTree = "<group>"; };
+		2CE4AA7F210996D80055C895 /* sf-ui-display-light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "sf-ui-display-light.otf"; path = "fonts/sf-ui-display-light.otf"; sourceTree = "<group>"; };
+		2CE4AA80210996D80055C895 /* sf-ui-display-regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "sf-ui-display-regular.otf"; path = "fonts/sf-ui-display-regular.otf"; sourceTree = "<group>"; };
+		2CE4AA81210996D80055C895 /* sf-ui-display-black.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "sf-ui-display-black.otf"; path = "fonts/sf-ui-display-black.otf"; sourceTree = "<group>"; };
+		2CE4AA82210996D80055C895 /* sf-ui-display-heavy.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "sf-ui-display-heavy.otf"; path = "fonts/sf-ui-display-heavy.otf"; sourceTree = "<group>"; };
+		2CE4AA83210996D80055C895 /* sf-ui-display-medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "sf-ui-display-medium.otf"; path = "fonts/sf-ui-display-medium.otf"; sourceTree = "<group>"; };
+		2CE4AA84210996D80055C895 /* sf-ui-display-semibold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "sf-ui-display-semibold.otf"; path = "fonts/sf-ui-display-semibold.otf"; sourceTree = "<group>"; };
 		2CE75BA21E55D40800EEE103 /* v-Channel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "v-Channel.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CE75BA51E55D40800EEE103 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2CE75BAC1E55D40800EEE103 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -489,6 +507,22 @@
 			name = Profile;
 			sourceTree = "<group>";
 		};
+		2CE4AA7B210996B80055C895 /* fonts */ = {
+			isa = PBXGroup;
+			children = (
+				2CE4AA81210996D80055C895 /* sf-ui-display-black.otf */,
+				2CE4AA7E210996D80055C895 /* sf-ui-display-bold.otf */,
+				2CE4AA82210996D80055C895 /* sf-ui-display-heavy.otf */,
+				2CE4AA7F210996D80055C895 /* sf-ui-display-light.otf */,
+				2CE4AA83210996D80055C895 /* sf-ui-display-medium.otf */,
+				2CE4AA80210996D80055C895 /* sf-ui-display-regular.otf */,
+				2CE4AA84210996D80055C895 /* sf-ui-display-semibold.otf */,
+				2CE4AA7D210996D80055C895 /* sf-ui-display-thin.otf */,
+				2CE4AA7C210996D80055C895 /* sf-ui-display-ultralight.otf */,
+			);
+			name = fonts;
+			sourceTree = "<group>";
+		};
 		2CE75B991E55D40600EEE103 = {
 			isa = PBXGroup;
 			children = (
@@ -533,6 +567,7 @@
 		2CE75BBE1E55F8EF00EEE103 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				2CE4AA7B210996B80055C895 /* fonts */,
 				2C5897801E5D7C23004F8B46 /* animation */,
 				2C5897771E5D7868004F8B46 /* sounds */,
 				2C5B2AD71E5615EF006CC809 /* v-Channel.entitlements */,
@@ -722,9 +757,13 @@
 				2C5897B01E5D7C55004F8B46 /* frame_21.gif in Resources */,
 				2C5897CD1E5D7C64004F8B46 /* ring_frame_2.gif in Resources */,
 				2C5897B21E5D7C55004F8B46 /* frame_23.gif in Resources */,
+				2CE4AA88210996D80055C895 /* sf-ui-display-light.otf in Resources */,
 				2C5897AB1E5D7C55004F8B46 /* frame_16.gif in Resources */,
 				2C5897DC1E5D7C64004F8B46 /* ring_frame_17.gif in Resources */,
+				2CE4AA86210996D80055C895 /* sf-ui-display-thin.otf in Resources */,
 				2C5897DE1E5D7C64004F8B46 /* ring_frame_19.gif in Resources */,
+				2CE4AA8B210996D80055C895 /* sf-ui-display-heavy.otf in Resources */,
+				2CE4AA85210996D80055C895 /* sf-ui-display-ultralight.otf in Resources */,
 				2CE96EE11EFD24E800416404 /* LGAlertView.xib in Resources */,
 				2C5897AA1E5D7C55004F8B46 /* frame_15.gif in Resources */,
 				2C5897A91E5D7C55004F8B46 /* frame_14.gif in Resources */,
@@ -748,6 +787,7 @@
 				2C5897E11E5D7C64004F8B46 /* ring_frame_22.gif in Resources */,
 				2C5897D11E5D7C64004F8B46 /* ring_frame_6.gif in Resources */,
 				2C5897D81E5D7C64004F8B46 /* ring_frame_13.gif in Resources */,
+				2CE4AA87210996D80055C895 /* sf-ui-display-bold.otf in Resources */,
 				2C5897CE1E5D7C64004F8B46 /* ring_frame_3.gif in Resources */,
 				2C58977C1E5D7879004F8B46 /* calling.wav in Resources */,
 				2C5897CB1E5D7C64004F8B46 /* ring_frame_0.gif in Resources */,
@@ -756,6 +796,7 @@
 				2C5897A61E5D7C55004F8B46 /* frame_11.gif in Resources */,
 				2C5897E01E5D7C64004F8B46 /* ring_frame_21.gif in Resources */,
 				2C5897D41E5D7C64004F8B46 /* ring_frame_9.gif in Resources */,
+				2CE4AA8A210996D80055C895 /* sf-ui-display-black.otf in Resources */,
 				2C5897A21E5D7C55004F8B46 /* frame_7.gif in Resources */,
 				2C58979D1E5D7C55004F8B46 /* frame_2.gif in Resources */,
 				2C58977D1E5D7879004F8B46 /* ringtone.wav in Resources */,
@@ -768,6 +809,8 @@
 				2C58979F1E5D7C55004F8B46 /* frame_4.gif in Resources */,
 				2C5897D01E5D7C64004F8B46 /* ring_frame_5.gif in Resources */,
 				2C58977B1E5D7879004F8B46 /* busy.wav in Resources */,
+				2CE4AA8C210996D80055C895 /* sf-ui-display-medium.otf in Resources */,
+				2CE4AA89210996D80055C895 /* sf-ui-display-regular.otf in Resources */,
 				2CE96EE61EFD24E800416404 /* LGVAlertView.xib in Resources */,
 				2CE75BB21E55D40800EEE103 /* LaunchScreen.storyboard in Resources */,
 				2C5897B11E5D7C55004F8B46 /* frame_22.gif in Resources */,
@@ -778,6 +821,7 @@
 				2C5897A01E5D7C55004F8B46 /* frame_5.gif in Resources */,
 				2CE75BAF1E55D40800EEE103 /* Assets.xcassets in Resources */,
 				2C5897D71E5D7C64004F8B46 /* ring_frame_12.gif in Resources */,
+				2CE4AA8D210996D80055C895 /* sf-ui-display-semibold.otf in Resources */,
 				2C5897DB1E5D7C64004F8B46 /* ring_frame_16.gif in Resources */,
 				2CE75BAD1E55D40800EEE103 /* Main.storyboard in Resources */,
 				2C5897A11E5D7C55004F8B46 /* frame_6.gif in Resources */,

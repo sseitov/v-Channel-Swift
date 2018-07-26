@@ -148,6 +148,7 @@ class DefaultTextInputContainer : TextFieldContainer {
         textField.textAlignment = .left
         placeholderColor = UIColor.lightGray
         textField.borderStyle = .none
+        textField.tintColor = UIColor.white
         nonActiveColor = UIColor.clear
         activeColor = UIColor.clear
     }

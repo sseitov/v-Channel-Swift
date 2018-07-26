@@ -29,7 +29,8 @@ class Alert: UIViewController {
     @IBOutlet weak var containerHeight: NSLayoutConstraint!
     @IBOutlet weak var messageHeight: NSLayoutConstraint!
     @IBOutlet weak var thitdButtonHeight: NSLayoutConstraint!
-    
+    @IBOutlet weak var underlineWidth: NSLayoutConstraint!
+
     enum AlertType {
         case oneChoice
         case twoChoices
@@ -45,6 +46,9 @@ class Alert: UIViewController {
     private var thirdHandler:CompletionBlock?
     private var cancelHandler:CompletionBlock?
 
+    private var confirmTitle = "Confirm"
+    private var discardTitle = "Discard"
+
     private var presenter:UIViewController?
     
     override func viewDidLoad() {
@@ -57,14 +61,16 @@ class Alert: UIViewController {
         
         if alertType == .oneChoice {
             messageView.text = self.message
-            firstButton.setTitle("OK", for: .normal)
+            firstButton.setTitle("Ok", for: .normal)
             firstButton.setupBorder(UIColor.white, radius: 20)
         } else if alertType == .twoChoices {
             messageView.text = self.message
             firstButton.setTitle("Confirm", for: .normal)
             firstButton.setupBorder(UIColor.white, radius: 20)
+            firstButton.setTitle(confirmTitle, for: .normal)
             secondButton.setTitle("Discard", for: .normal)
             secondButton.setupBorder(UIColor.white, radius: 20)
+            secondButton.setTitle(discardTitle, for: .normal)
         } else {
             firstButton.setTitle(actions[0], for: .normal)
             firstButton.setupBorder(UIColor.white, radius: 20)
@@ -82,10 +88,10 @@ class Alert: UIViewController {
             containerHeight.constant = thirdHandler != nil ? 270 : 210
             thitdButtonHeight.constant = thirdButton != nil ? 40 : 0
         } else {
-            let textSize = messageView.font!.sizeOfString(string: message, constrainedToWidth: Double(messageView.frame.width))
-            messageHeight.constant = textSize.height + 30
-            let buttonsHeight:CGFloat = alertType == .oneChoice ? 80 : 140
-            containerHeight.constant = 40 + messageHeight.constant + buttonsHeight
+            let textSize = message.height(withConstrainedWidth: messageView.frame.width, font: messageView.font!)
+            messageHeight.constant = textSize + 30
+            let buttonsHeight:CGFloat = alertType == .oneChoice ? 60 : 120
+            containerHeight.constant = 30 + messageHeight.constant + buttonsHeight
         }
     }
     
@@ -150,7 +156,7 @@ class Alert: UIViewController {
         }
     }
     
-    class func question(title:String, message:String, okHandler:CompletionBlock? = nil, cancelHandler:CompletionBlock? = nil) {
+    class func question(title:String, message:String, okHandler:CompletionBlock? = nil, cancelHandler:CompletionBlock? = nil, okTitle:String = "Confirm", cancelTitle:String = "Discard") {
         let board = UIStoryboard(name: "Alerts", bundle: nil)
         if let controller = board.instantiateViewController(withIdentifier: "Alert") as? Alert {
             controller.alertType = .twoChoices
@@ -158,6 +164,8 @@ class Alert: UIViewController {
             controller.message = message
             controller.firstHandler = okHandler
             controller.secondHandler = cancelHandler
+            controller.confirmTitle = okTitle
+            controller.discardTitle = cancelTitle
             controller.show()
         }
     }
@@ -188,6 +196,8 @@ class TextAlert: UIViewController, TextFieldContainerDelegate {
     @IBOutlet weak var messageView: UIView!
     @IBOutlet weak var messageText: UILabel!
     @IBOutlet weak var titleView: UILabel!
+    @IBOutlet weak var confirmButton: UIButton!
+    @IBOutlet weak var discardButton: UIButton!
 
     enum AlertType {
         case text
@@ -207,7 +217,6 @@ class TextAlert: UIViewController, TextFieldContainerDelegate {
         
         if alertType == .email {
             inputField.textType = .emailAddress
-            inputField.placeholder = "E-mail"
             inputField.returnType = .done
             inputField.delegate = self
         } else {
@@ -217,9 +226,12 @@ class TextAlert: UIViewController, TextFieldContainerDelegate {
             inputField.delegate = self
         }
         
-        containerView.setupBorder(UIColor.clear, radius: 5)
+        containerView.setupBorder(UIColor.clear, radius: 10)
         messageView.setupBorder(ErrorColor, radius: 20)
         messageView.alpha = 0
+        
+        confirmButton.setupBorder(UIColor.white, radius: confirmButton.frame.size.height / 2.0)
+        discardButton.setupBorder(UIColor.white, radius: discardButton.frame.size.height / 2.0)
     }
     
     override func viewDidAppear(_ animated: Bool) {

@@ -139,7 +139,7 @@ class ChatController: MessagesViewController, UINavigationControllerDelegate, UI
     private func pressAccessoryButton() {
         UIApplication.shared.sendAction(#selector(UIApplication.resignFirstResponder), to: nil, from: nil, for: nil)
         
-        var selections:[AlertSelection] = [
+        let selections:[AlertSelection] = [
             AlertSelection(name: "Photo from Camera Roll", handler: {
                 self.becomeFirstResponder()
                 let imagePicker = UIImagePickerController()
