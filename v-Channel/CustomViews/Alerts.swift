@@ -58,7 +58,8 @@ class Alert: UIViewController {
 
         titleView.text = self.title
         containerView.setupBorder(UIColor.clear, radius: 10)
-        
+        underlineWidth.constant = self.title!.width(withConstrainedHeight: titleView.frame.height, font: titleView.font)
+
         if alertType == .oneChoice {
             messageView.text = self.message
             firstButton.setTitle("Ok", for: .normal)
@@ -72,6 +73,7 @@ class Alert: UIViewController {
             secondButton.setupBorder(UIColor.white, radius: 20)
             secondButton.setTitle(discardTitle, for: .normal)
         } else {
+            underlineWidth.constant = 0
             firstButton.setTitle(actions[0], for: .normal)
             firstButton.setupBorder(UIColor.white, radius: 20)
             secondButton.setTitle(actions[1], for: .normal)

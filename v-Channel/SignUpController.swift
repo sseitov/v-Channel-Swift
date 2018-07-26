@@ -13,9 +13,9 @@ import SVProgressHUD
 class SignUpController: UIViewController, TextFieldContainerDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate, CameraDelegate {
     
     @IBOutlet weak var imageButton: UIButton!
-    @IBOutlet weak var nickField: TextFieldContainer!
-    @IBOutlet weak var emailField: TextFieldContainer!
-    @IBOutlet weak var passwordField: TextFieldContainer!
+    @IBOutlet weak var nickField: AuthTextInputContainer!
+    @IBOutlet weak var emailField: AuthTextInputContainer!
+    @IBOutlet weak var passwordField: AuthTextInputContainer!
     @IBOutlet weak var signUpButton: UIButton!
    
     var userName:String?
