@@ -285,6 +285,7 @@ class Model: NSObject {
         cashedUser.type = Int16(SocialType.email.rawValue)
         cashedUser.avatar = UIImagePNGRepresentation(image) as NSData?
         if let token = Messaging.messaging().fcmToken {
+            cashedUser.token = token
             Model.shared.publishToken(cashedUser, token: token)
         }
 
@@ -309,6 +310,7 @@ class Model: NSObject {
         cashedUser.email = profile["email"] as? String
         cashedUser.name = profile["name"] as? String
         if let token = Messaging.messaging().fcmToken {
+            cashedUser.token = token
             Model.shared.publishToken(cashedUser, token: token)
         }
 
@@ -338,6 +340,7 @@ class Model: NSObject {
         cashedUser.email = googleProfile.email
         cashedUser.name = googleProfile.name
         if let token = Messaging.messaging().fcmToken {
+            cashedUser.token = token
             Model.shared.publishToken(cashedUser, token: token)
         }
 

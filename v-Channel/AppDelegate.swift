@@ -165,8 +165,6 @@ extension AppDelegate : MessagingDelegate {
             print("====== fcmToken \(fcmToken)")
             currUser.token = fcmToken
             Model.shared.publishToken(currUser, token: fcmToken)
-        } else {
-            UserDefaults.standard.set(fcmToken, forKey: "fcmToken")
         }
     }
     
