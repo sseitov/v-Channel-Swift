@@ -128,17 +128,19 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
                         self.tableView.insertRows(at: [indexPath], with: .bottom)
                         self.tableView.endUpdates()
                     case .alreadyInList:
-                        self.showMessage("This user is in list already.")
+                        Alert.message(title: "error", message: "This user is in list already")
                     case .notFound:
                         if self.inviteEnabled {
-                            self.yesNoQuestion("User not found. Do you want to invite him into v-Channel?", acceptLabel: "Yes", cancelLabel: "No", acceptHandler: {
+                            Alert.question(title: "invitation", message: "User not found. Do you want to invite him into v-Channel?", okHandler: {
                                 self.sendInvite()
-                            })
+                            }, cancelHandler: {
+                                
+                            }, okTitle: "Invite", cancelTitle: "Cancel")
                         } else {
-                            self.showMessage("User not found.")
+                            Alert.message(title: "error", message: "User not found")
                         }
                     case .errorLoadProfile:
-                        self.showMessage("Can not load user profile.")
+                        Alert.message(title: "error", message: "Can not load user profile")
                     }
                 })
             }
@@ -228,10 +230,8 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
         switch contact.getContactStatus() {
         case .requested:
             if contact.initiator != currentUser()!.uid, let user = Model.shared.getUser(contact.initiator!) {
-                yesNoQuestion("\(user.name!) ask you to add him into contact list. Are you agree?",
-                    acceptLabel: "Yes", cancelLabel: "No",
-                    acceptHandler: {
-                        Model.shared.approveContact(contact)
+                Alert.question(title: "invitation", message: "\(user.name!) ask you to add him into contact list. Are you agree?", okHandler: {
+                    Model.shared.approveContact(contact)
                 }, cancelHandler: {
                     Model.shared.rejectContact(contact)
                     self.refresh()
@@ -251,7 +251,7 @@ class ContactListController: UITableViewController, LoginControllerDelegate, GID
             if let contact = sender as? Contact {
                 if let user = Model.shared.getUser(contact.uid!) {
                     if user.token == nil {
-                        self.showMessage("\(user.name!) does not available for chat now.")
+                        Alert.message(title: "error", message: "\(user.name!) does not available for chat now")
                         return false
                     }
                 }
@@ -284,12 +284,10 @@ extension ContactListController : InviteDelegate {
     func inviteFinished(withInvitations invitationIds: [String], error: Error?) {
         if let error = error {
             if error.localizedDescription != "Canceled by User" {
-                let message = "Can not send invite. Error: \(error.localizedDescription)"
-                showMessage(message)
+                Alert.message(title: "error", message: "Can not send invite. \(error.localizedDescription)")
             }
         } else {
-            let message = "\(invitationIds.count) invites was sent."
-            showMessage(message)
+            Alert.message(title: "success", message: "\(invitationIds.count) invites was sent")
         }
     }
 }

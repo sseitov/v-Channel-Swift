@@ -90,14 +90,6 @@
 		2CE75BAF1E55D40800EEE103 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2CE75BAE1E55D40800EEE103 /* Assets.xcassets */; };
 		2CE75BB21E55D40800EEE103 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2CE75BB01E55D40800EEE103 /* LaunchScreen.storyboard */; };
 		2CE75BC01E55FA9F00EEE103 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 2CE75BBF1E55FA9F00EEE103 /* logo.png */; };
-		2CE96EE01EFD24E800416404 /* LGAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2CE96ED61EFD24E800416404 /* LGAlertView.m */; };
-		2CE96EE11EFD24E800416404 /* LGAlertView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2CE96ED71EFD24E800416404 /* LGAlertView.xib */; };
-		2CE96EE21EFD24E800416404 /* LGDecoratedAlertView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2CE96ED81EFD24E800416404 /* LGDecoratedAlertView.xib */; };
-		2CE96EE31EFD24E800416404 /* LGProgressAlertView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2CE96ED91EFD24E800416404 /* LGProgressAlertView.xib */; };
-		2CE96EE41EFD24E800416404 /* LGProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2CE96EDB1EFD24E800416404 /* LGProgressView.m */; };
-		2CE96EE51EFD24E800416404 /* LGTextFieldAlertView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2CE96EDC1EFD24E800416404 /* LGTextFieldAlertView.xib */; };
-		2CE96EE61EFD24E800416404 /* LGVAlertView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2CE96EDD1EFD24E800416404 /* LGVAlertView.xib */; };
-		2CE96EE71EFD24E800416404 /* NSPointerArray+AbstractionHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 2CE96EDF1EFD24E800416404 /* NSPointerArray+AbstractionHelpers.m */; };
 		2CE96EFA1EFD26A400416404 /* CLLocationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE96EEB1EFD26A400416404 /* CLLocationExtension.swift */; };
 		2CE96EFB1EFD26A400416404 /* ColorUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = 2CE96EED1EFD26A400416404 /* ColorUtility.m */; };
 		2CE96EFC1EFD26A400416404 /* Crypto.m in Sources */ = {isa = PBXBuildFile; fileRef = 2CE96EEF1EFD26A400416404 /* Crypto.m */; };
@@ -237,17 +229,6 @@
 		2CE75BB11E55D40800EEE103 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2CE75BB31E55D40800EEE103 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = "v-Channel/Info.plist"; sourceTree = "<group>"; };
 		2CE75BBF1E55FA9F00EEE103 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
-		2CE96ED51EFD24E800416404 /* LGAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LGAlertView.h; path = "v-Channel/Vendor/LGAlertView/LGAlertView.h"; sourceTree = "<group>"; };
-		2CE96ED61EFD24E800416404 /* LGAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LGAlertView.m; path = "v-Channel/Vendor/LGAlertView/LGAlertView.m"; sourceTree = "<group>"; };
-		2CE96ED71EFD24E800416404 /* LGAlertView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LGAlertView.xib; path = "v-Channel/Vendor/LGAlertView/LGAlertView.xib"; sourceTree = "<group>"; };
-		2CE96ED81EFD24E800416404 /* LGDecoratedAlertView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LGDecoratedAlertView.xib; path = "v-Channel/Vendor/LGAlertView/LGDecoratedAlertView.xib"; sourceTree = "<group>"; };
-		2CE96ED91EFD24E800416404 /* LGProgressAlertView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LGProgressAlertView.xib; path = "v-Channel/Vendor/LGAlertView/LGProgressAlertView.xib"; sourceTree = "<group>"; };
-		2CE96EDA1EFD24E800416404 /* LGProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LGProgressView.h; path = "v-Channel/Vendor/LGAlertView/LGProgressView.h"; sourceTree = "<group>"; };
-		2CE96EDB1EFD24E800416404 /* LGProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LGProgressView.m; path = "v-Channel/Vendor/LGAlertView/LGProgressView.m"; sourceTree = "<group>"; };
-		2CE96EDC1EFD24E800416404 /* LGTextFieldAlertView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LGTextFieldAlertView.xib; path = "v-Channel/Vendor/LGAlertView/LGTextFieldAlertView.xib"; sourceTree = "<group>"; };
-		2CE96EDD1EFD24E800416404 /* LGVAlertView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LGVAlertView.xib; path = "v-Channel/Vendor/LGAlertView/LGVAlertView.xib"; sourceTree = "<group>"; };
-		2CE96EDE1EFD24E800416404 /* NSPointerArray+AbstractionHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSPointerArray+AbstractionHelpers.h"; path = "v-Channel/Vendor/LGAlertView/NSPointerArray+AbstractionHelpers.h"; sourceTree = "<group>"; };
-		2CE96EDF1EFD24E800416404 /* NSPointerArray+AbstractionHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSPointerArray+AbstractionHelpers.m"; path = "v-Channel/Vendor/LGAlertView/NSPointerArray+AbstractionHelpers.m"; sourceTree = "<group>"; };
 		2CE96EEB1EFD26A400416404 /* CLLocationExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CLLocationExtension.swift; path = Extensions/CLLocationExtension.swift; sourceTree = "<group>"; };
 		2CE96EEC1EFD26A400416404 /* ColorUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ColorUtility.h; path = Extensions/ColorUtility.h; sourceTree = "<group>"; };
 		2CE96EED1EFD26A400416404 /* ColorUtility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ColorUtility.m; path = Extensions/ColorUtility.m; sourceTree = "<group>"; };
@@ -493,7 +474,6 @@
 			children = (
 				2CE96F191EFDA05B00416404 /* SocketRocket */,
 				2CE96F181EFDA04000416404 /* WebRTC */,
-				2CE96ED41EFD24C900416404 /* LGAlertView */,
 			);
 			name = Vendor;
 			sourceTree = "<group>";
@@ -579,24 +559,6 @@
 				2CE75BB31E55D40800EEE103 /* Info.plist */,
 			);
 			name = Resources;
-			sourceTree = "<group>";
-		};
-		2CE96ED41EFD24C900416404 /* LGAlertView */ = {
-			isa = PBXGroup;
-			children = (
-				2CE96ED51EFD24E800416404 /* LGAlertView.h */,
-				2CE96ED61EFD24E800416404 /* LGAlertView.m */,
-				2CE96ED71EFD24E800416404 /* LGAlertView.xib */,
-				2CE96ED81EFD24E800416404 /* LGDecoratedAlertView.xib */,
-				2CE96ED91EFD24E800416404 /* LGProgressAlertView.xib */,
-				2CE96EDA1EFD24E800416404 /* LGProgressView.h */,
-				2CE96EDB1EFD24E800416404 /* LGProgressView.m */,
-				2CE96EDC1EFD24E800416404 /* LGTextFieldAlertView.xib */,
-				2CE96EDD1EFD24E800416404 /* LGVAlertView.xib */,
-				2CE96EDE1EFD24E800416404 /* NSPointerArray+AbstractionHelpers.h */,
-				2CE96EDF1EFD24E800416404 /* NSPointerArray+AbstractionHelpers.m */,
-			);
-			name = LGAlertView;
 			sourceTree = "<group>";
 		};
 		2CE96F0C1EFD611F00416404 /* Camera */ = {
@@ -764,7 +726,6 @@
 				2C5897DE1E5D7C64004F8B46 /* ring_frame_19.gif in Resources */,
 				2CE4AA8B210996D80055C895 /* sf-ui-display-heavy.otf in Resources */,
 				2CE4AA85210996D80055C895 /* sf-ui-display-ultralight.otf in Resources */,
-				2CE96EE11EFD24E800416404 /* LGAlertView.xib in Resources */,
 				2C5897AA1E5D7C55004F8B46 /* frame_15.gif in Resources */,
 				2C5897A91E5D7C55004F8B46 /* frame_14.gif in Resources */,
 				2C5897DA1E5D7C64004F8B46 /* ring_frame_15.gif in Resources */,
@@ -792,7 +753,6 @@
 				2C58977C1E5D7879004F8B46 /* calling.wav in Resources */,
 				2C5897CB1E5D7C64004F8B46 /* ring_frame_0.gif in Resources */,
 				2C5897A31E5D7C55004F8B46 /* frame_8.gif in Resources */,
-				2CE96EE51EFD24E800416404 /* LGTextFieldAlertView.xib in Resources */,
 				2C5897A61E5D7C55004F8B46 /* frame_11.gif in Resources */,
 				2C5897E01E5D7C64004F8B46 /* ring_frame_21.gif in Resources */,
 				2C5897D41E5D7C64004F8B46 /* ring_frame_9.gif in Resources */,
@@ -805,16 +765,13 @@
 				2C5897AE1E5D7C55004F8B46 /* frame_19.gif in Resources */,
 				2C58979E1E5D7C55004F8B46 /* frame_3.gif in Resources */,
 				2C58979B1E5D7C55004F8B46 /* frame_0.gif in Resources */,
-				2CE96EE31EFD24E800416404 /* LGProgressAlertView.xib in Resources */,
 				2C58979F1E5D7C55004F8B46 /* frame_4.gif in Resources */,
 				2C5897D01E5D7C64004F8B46 /* ring_frame_5.gif in Resources */,
 				2C58977B1E5D7879004F8B46 /* busy.wav in Resources */,
 				2CE4AA8C210996D80055C895 /* sf-ui-display-medium.otf in Resources */,
 				2CE4AA89210996D80055C895 /* sf-ui-display-regular.otf in Resources */,
-				2CE96EE61EFD24E800416404 /* LGVAlertView.xib in Resources */,
 				2CE75BB21E55D40800EEE103 /* LaunchScreen.storyboard in Resources */,
 				2C5897B11E5D7C55004F8B46 /* frame_22.gif in Resources */,
-				2CE96EE21EFD24E800416404 /* LGDecoratedAlertView.xib in Resources */,
 				2CF8FBDB1E560AE4003FC98E /* GoogleService-Info.plist in Resources */,
 				2C5897D51E5D7C64004F8B46 /* ring_frame_10.gif in Resources */,
 				2C5897DD1E5D7C64004F8B46 /* ring_frame_18.gif in Resources */,
@@ -930,14 +887,12 @@
 			files = (
 				2CE96F481EFDA08C00416404 /* ARDAppClient.m in Sources */,
 				2CE96EFB1EFD26A400416404 /* ColorUtility.m in Sources */,
-				2CE96EE71EFD24E800416404 /* NSPointerArray+AbstractionHelpers.m in Sources */,
 				2CE96F491EFDA08C00416404 /* ARDAppEngineClient.m in Sources */,
 				2CE96F061EFD26A400416404 /* UIViewExtension.swift in Sources */,
 				2C5B2AF91E561935006CC809 /* TextFieldContainer.swift in Sources */,
 				2CE96EFD1EFD26A400416404 /* DataExtension.swift in Sources */,
 				2C5B2AD61E561190006CC809 /* Model.swift in Sources */,
 				2CE96F4E1EFDA08C00416404 /* ARDSDPUtils.m in Sources */,
-				2CE96EE41EFD24E800416404 /* LGProgressView.m in Sources */,
 				2C5B2AD21E56110A006CC809 /* Contact+CoreDataProperties.swift in Sources */,
 				2CE96F131EFD613E00416404 /* CameraController.swift in Sources */,
 				2C58977F1E5D7A97004F8B46 /* ContactCell.swift in Sources */,
@@ -967,7 +922,6 @@
 				2CE96F121EFD613E00416404 /* Camera.m in Sources */,
 				2C4D32E21E8967D90059CAA2 /* CallController.swift in Sources */,
 				2CE96F051EFD26A400416404 /* UIViewControllerExtension.swift in Sources */,
-				2CE96EE01EFD24E800416404 /* LGAlertView.m in Sources */,
 				2CB546352107F04B0035C2DD /* Alerts.swift in Sources */,
 				2CE96F021EFD26A400416404 /* UIColorExtension.swift in Sources */,
 				2CE96F591EFDA08C00416404 /* RTCSessionDescription+JSON.m in Sources */,

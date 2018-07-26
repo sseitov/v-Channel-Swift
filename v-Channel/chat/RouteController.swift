@@ -85,9 +85,9 @@ class RouteController: UIViewController {
                 self.createDirection(from: myLocation!.coordinate, to: self.userMarker!.position, completion: { result in
                     SVProgressHUD.dismiss()
                     if result == -1 {
-                        self.showMessage("Can not create route to \(self.user!.name!)")
+                        Alert.message(title: "Error", message: "Can not create route to \(self.user!.name!)")
                     } else if result == 0 {
-                        self.showMessage("You are in the same place.")
+                        Alert.message(title: "Information", message: "You are in the same place")
                     }
                 })
             })

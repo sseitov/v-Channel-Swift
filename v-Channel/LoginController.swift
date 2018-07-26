@@ -17,10 +17,25 @@ protocol LoginControllerDelegate {
     func didLogout()
 }
 
+class AuthTextInputContainer : TextFieldContainer {
+    
+    override func configure() {
+        backgroundColor = UIColor.clear
+        textField.font = UIFont.mainFont(15)
+        textField.textColor = UIColor.black
+        textField.textAlignment = .center
+        placeholderColor = UIColor.lightGray
+        textField.borderStyle = .none
+        textField.tintColor = UIColor.black
+        nonActiveColor = UIColor.clear
+        activeColor = UIColor.clear
+    }
+}
+
 class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate, TextFieldContainerDelegate {
 
-    @IBOutlet weak var userField: TextFieldContainer!
-    @IBOutlet weak var passwordField: TextFieldContainer!
+    @IBOutlet weak var userField: AuthTextInputContainer!
+    @IBOutlet weak var passwordField: AuthTextInputContainer!
     
     var delegate:LoginControllerDelegate?
     
@@ -50,25 +65,18 @@ class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate,
         UIApplication.shared.sendAction(#selector(UIApplication.resignFirstResponder), to: nil, from: nil, for: nil)
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        TextAlert.getEmail({ _ in
-            
-        })
-    }
-    
     func textDone(_ sender:TextFieldContainer, text:String?) {
         if sender == userField {
             if userField.text().isEmail() {
                 passwordField.activate(true)
             } else {
-                showMessage("Email should have xxxx@domain.prefix format.", messageHandler: {
+                Alert.message(title: "error", message: "Email should have xxxx@domain.prefix format", okHandler: {
                     self.userField.activate(true)
                 })
             }
         } else {
             if passwordField.text().isEmpty {
-                showMessage("Password field required.", messageHandler: {
+                Alert.message(title: "error", message: "Password field required", okHandler: {
                     self.passwordField.activate(true)
                 })
             } else if userField.text().isEmpty {
@@ -88,7 +96,7 @@ class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate,
     @IBAction func facebookSignIn(_ sender: Any) { // read_custom_friendlists
         FBSDKLoginManager().logIn(withReadPermissions: ["public_profile","email","user_friends","user_photos"], from: self, handler: { result, error in
             if error != nil {
-                self.showMessage("Facebook authorization error.")
+                Alert.message(title: "error", message: "Facebook authorization error")
                 return
             }
             
@@ -98,13 +106,13 @@ class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate,
             request!.start(completionHandler: { _, result, fbError in
                 if fbError != nil {
                     SVProgressHUD.dismiss()
-                    self.showMessage(fbError!.localizedDescription)
+                    Alert.message(title: "error", message: fbError!.localizedDescription)
                 } else {
                     let credential = FacebookAuthProvider.credential(withAccessToken: FBSDKAccessToken.current().tokenString)
                     Auth.auth().signInAndRetrieveData(with: credential, completion: { firUser, error in
                         if error != nil {
                             SVProgressHUD.dismiss()
-                            self.showMessage((error as NSError?)!.localizedDescription)
+                            Alert.message(title: "error", message: (error as NSError?)!.localizedDescription)
                         } else {
                             if let profile = result as? [String:Any] {
                                 Model.shared.createFacebookUser(firUser!.user, profile: profile, completion: {
@@ -112,7 +120,7 @@ class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate,
                                     self.delegate?.didLogin()
                                 })
                             } else {
-                                self.showMessage("Can not read user profile.")
+                                Alert.message(title: "error", message: "Can not read user profile")
                                 try? Auth.auth().signOut()
                             }
                         }
@@ -130,7 +138,7 @@ class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate,
     
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
         if error != nil {
-            showMessage(error.localizedDescription)
+            Alert.message(title: "error", message: error.localizedDescription)
             return
         }
         let authentication = user.authentication
@@ -140,7 +148,7 @@ class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate,
         Auth.auth().signInAndRetrieveData(with: credential, completion: { firUser, error in
             if error != nil {
                 SVProgressHUD.dismiss()
-                self.showMessage((error as NSError?)!.localizedDescription)
+                Alert.message(title: "error", message: (error as NSError?)!.localizedDescription)
             } else {
                 Model.shared.createGoogleUser(firUser!.user, googleProfile: user.profile, completion: {
                     SVProgressHUD.dismiss()
@@ -166,10 +174,10 @@ class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate,
                     if reason == "ERROR_USER_NOT_FOUND" {
                         self.performSegue(withIdentifier: "signUp", sender: nil)
                     } else {
-                        self.showMessage(error!.localizedDescription)
+                        Alert.message(title: "error", message: error!.localizedDescription)
                     }
                 } else {
-                    self.showMessage(error!.localizedDescription)
+                    Alert.message(title: "error", message: error!.localizedDescription)
                 }
             } else {
                 if firUser!.user.isEmailVerified || testUser(user) {
@@ -178,12 +186,12 @@ class LoginController: UIViewController, GIDSignInDelegate, GIDSignInUIDelegate,
                         if user != nil {
                             self.delegate?.didLogin()
                         } else {
-                            self.showMessage("Can not download profile data.")
+                            Alert.message(title: "error", message: "Can not download profile data")
                         }
                     })
                 } else {
                     SVProgressHUD.dismiss()
-                    self.showMessage("You must confirm your registeration. Check your mailbox and try again.")
+                    Alert.message(title: "Confirmation error", message: "You must confirm your registeration. Check your mailbox and try again")
                 }
             }
         })

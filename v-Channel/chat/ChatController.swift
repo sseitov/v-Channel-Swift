@@ -91,12 +91,12 @@ class ChatController: MessagesViewController, UINavigationControllerDelegate, UI
         if UIApplication.shared.applicationState == .active {
             if let call = UserDefaults.standard.object(forKey: "incommingCall") as? [String:Any] {
                 if let callId = call["uid"] as? String, let from = call["from"] as? String, let user = Model.shared.getUser(from) {
-                    yesNoQuestion("\(user.name!) call you.", acceptLabel: "Accept", cancelLabel: "Reject", acceptHandler: {
+                    Alert.question(title: "Incomming Call", message: "\(user.name!) call you.", okHandler: {
                         Model.shared.acceptCall(callId)
                         self.performSegue(withIdentifier: "call", sender: callId)
                     }, cancelHandler: {
                         Model.shared.hangUpCall(callId)
-                    })
+                    }, okTitle: "Accept", cancelTitle: "Reject")
                 }
             }
         }
@@ -170,7 +170,7 @@ class ChatController: MessagesViewController, UINavigationControllerDelegate, UI
                     if location != nil {
                         Model.shared.sendLocationMessage(location!.coordinate, to: self.opponent!.uid!)
                     } else {
-                        self.showMessage("Can not get your location.")
+                        Alert.message(title: "Error", message: "Can not get your location")
                     }
                 })
             })]
@@ -188,7 +188,7 @@ class ChatController: MessagesViewController, UINavigationControllerDelegate, UI
                 Model.shared.sendImageMessage(pickedImage, to: self.opponent!.uid!, result: { error in
                     SVProgressHUD.dismiss()
                     if error != nil {
-                        self.showMessage(error!.localizedDescription)
+                        Alert.message(title: "Error", message: error!.localizedDescription)
                     }
                 })
             }

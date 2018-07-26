@@ -36,7 +36,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>2</string>
 	<key>FacebookAppID</key>
 	<string>958081360882958</string>
 	<key>FacebookDisplayName</key>
@@ -66,6 +66,18 @@
 	<string>v-Channel needs use your microphone for VOIP audio call.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>v-Channel needs your photo library for setup your avatar.</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>sf-ui-display-heavy.otf</string>
+		<string>sf-ui-display-semibold.otf</string>
+		<string>sf-ui-display-black.otf</string>
+		<string>sf-ui-display-light.otf</string>
+		<string>sf-ui-display-thin.otf</string>
+		<string>sf-ui-display-bold.otf</string>
+		<string>sf-ui-display-medium.otf</string>
+		<string>sf-ui-display-ultralight.otf</string>
+		<string>sf-ui-display-regular.otf</string>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
@@ -105,17 +117,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-    <key>UIAppFonts</key>
-    <array>
-        <string>sf-ui-display-heavy.otf</string>
-        <string>sf-ui-display-semibold.otf</string>
-        <string>sf-ui-display-black.otf</string>
-        <string>sf-ui-display-light.otf</string>
-        <string>sf-ui-display-thin.otf</string>
-        <string>sf-ui-display-bold.otf</string>
-        <string>sf-ui-display-medium.otf</string>
-        <string>sf-ui-display-ultralight.otf</string>
-        <string>sf-ui-display-regular.otf</string>
-    </array>
 </dict>
 </plist>

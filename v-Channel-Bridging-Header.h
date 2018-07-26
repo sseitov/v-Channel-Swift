@@ -8,7 +8,6 @@
 #import "ARDCaptureController.h"
 #import <WebRTC/WebRTC.h>
 
-#import "LGAlertView.h"
 #import "ColorUtility.h"
 #import "Camera.h"
 #import "VideoLayerView.h"

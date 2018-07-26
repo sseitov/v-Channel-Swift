@@ -49,7 +49,7 @@ extension UIViewController {
     @objc func goBack() {
         _ = self.navigationController!.popViewController(animated: true)
     }
-    
+/*
     // MARK: - alerts
     
     func showMessage(_ message:String, messageHandler: (() -> ())? = nil) {
@@ -118,4 +118,5 @@ extension UIViewController {
         alert?.otherButton.backgroundColor = MainColor
         alert?.show()
     }
+ */
 }

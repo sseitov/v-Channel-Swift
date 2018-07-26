@@ -123,13 +123,15 @@ class CallController: UIViewController {
     
     override func goBack() {
         if incommingCall != nil {
-            yesNoQuestion("Want you hang up?", acceptLabel: "Yes", cancelLabel: "Cancel", acceptHandler: {
+            Alert.question(title: "confirmation", message: "Want you hang up?", okHandler: {
                 Model.shared.hangUpCall(self.incommingCall!)
                 if self.rtcClient != nil {
                     self.disconnect()
                     super.goBack()
                 }
-            })
+            }, cancelHandler: {
+                
+            }, okTitle: "Yes", cancelTitle: "Cancel")
         } else {
             if self.busyPlayer != nil {
                 self.busyPlayer?.stop()
@@ -213,7 +215,7 @@ extension CallController : ARDAppClientDelegate {
     
     func appClient(_ client: ARDAppClient!, didError error: Error!) {
         DispatchQueue.main.async {
-            self.showMessage("Error: \(error.localizedDescription)", messageHandler: {
+            Alert.message(title: "error", message: error.localizedDescription, okHandler: {
                 self.goBack()
             })
         }

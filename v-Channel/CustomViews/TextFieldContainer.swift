@@ -73,11 +73,6 @@ class TextFieldContainer: UIView, UITextFieldDelegate {
         textField.autocapitalizationType = .none
         textField.delegate = self
         
-        backgroundColor = nonActiveColor
-        setupBorder(MainColor, radius: 5)
-        textField.font = textFont
-        textField.textColor = MainColor
-        
         configure()
 
         self.addSubview(textField)
